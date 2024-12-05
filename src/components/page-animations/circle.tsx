@@ -19,7 +19,7 @@ const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, cl
       const speed = 20;
 
       const draw = () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        // context.clearRect(0, 0, canvas.width, canvas.height);
         context.beginPath();
         context.arc(canvas.width / 2, canvas.height / 2, currentRadius, 0, 2 * Math.PI);
         context.fillStyle = backgroundColor;
@@ -29,7 +29,7 @@ const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, cl
           currentRadius += speed;
           requestId = requestAnimationFrame(draw);
         } else {
-          // canvas.style.display = 'none';
+          cancelAnimationFrame(requestId); // Stop the animation
         }
       };
 

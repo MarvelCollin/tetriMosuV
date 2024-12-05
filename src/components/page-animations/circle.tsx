@@ -1,12 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ICircle from '../../interfaces/ICircle';
 
 interface CircleTransitionProps extends ICircle {
   className?: string;
+  children: React.ReactNode;
 }
 
-const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, className })  => {
+const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor })  => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [transitionDone, setTransitionDone] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -19,7 +21,7 @@ const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, cl
       const speed = 20;
 
       const draw = () => {
-        // context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
         context.beginPath();
         context.arc(canvas.width / 2, canvas.height / 2, currentRadius, 0, 2 * Math.PI);
         context.fillStyle = backgroundColor;
@@ -29,6 +31,7 @@ const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, cl
           currentRadius += speed;
           requestId = requestAnimationFrame(draw);
         } else {
+          setTransitionDone(true);
           cancelAnimationFrame(requestId); // Stop the animation
         }
       };
@@ -41,7 +44,11 @@ const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor, cl
     }
   }, [backgroundColor]);
 
-  return <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className={className} />;
+  return (
+    <div className="fixed top-0 left-0 w-full h-full">
+      <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="absolute top-0 left-0 z-0" />
+    </div>
+  );
 };
 
 export default CircleTransition;

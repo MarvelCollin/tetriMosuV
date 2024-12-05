@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import ILayered from '../../interfaces/ILayered';
 import clsx from 'clsx';
 
-const LayeredTransition: React.FC<ILayered> = ({ colors, speed = 60 }) => {
+const LayeredTransition: React.FC<ILayered> = ({ colors, speed = 60, children, onTransitionEnd }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [transitionDone, setTransitionDone] = useState(false);
 
@@ -10,13 +10,13 @@ const LayeredTransition: React.FC<ILayered> = ({ colors, speed = 60 }) => {
         const canvas = canvasRef.current;
         const context = canvas?.getContext('2d');
         if (canvas && context) {
-            const width = canvas.width;
-            const height = canvas.height;
+            const width = canvas.width * 3;
+            const height = canvas.height * 2;
             const layerWidth = Math.sqrt(width * width + height * height) / colors.length;
-            let currentOffset = width + height;
+            let currentOffset = width - layerWidth;
 
             const draw = () => {
-                context.clearRect(0, 0, width, height);
+                // context.clearRect(0, 0, width, height);
 
                 colors.forEach((color, index) => {
                     context.fillStyle = color;
@@ -34,16 +34,20 @@ const LayeredTransition: React.FC<ILayered> = ({ colors, speed = 60 }) => {
                     requestAnimationFrame(draw);
                 } else {
                     setTransitionDone(true);
+                    if (onTransitionEnd) {
+                        onTransitionEnd();
+                    }
                 }
             };
 
             draw();
         }
-    }, [colors, speed]);
+    }, [colors, speed, onTransitionEnd]);
 
     return (
-        <div className="fixed top-0 left-0 w-full h-full">
+        <div className="fixed top-0 left-0 w-full h-full transition-opacity duration-1000">
             <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="absolute top-0 left-0 z-0" />
+            {transitionDone && <div className="absolute top-0 left-0 w-full h-full">{children}</div>}
         </div>
     );
 };

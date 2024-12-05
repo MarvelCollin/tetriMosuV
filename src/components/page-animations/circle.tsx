@@ -1,12 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ICircle from '../../interfaces/ICircle';
 
-interface CircleTransitionProps extends ICircle {
-  className?: string;
-  children: React.ReactNode;
-}
-
-const CircleTransition: React.FC<CircleTransitionProps> = ({ backgroundColor })  => {
+const CircleTransition: React.FC<ICircle> = ({ backgroundColor })  => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [transitionDone, setTransitionDone] = useState(false);
 

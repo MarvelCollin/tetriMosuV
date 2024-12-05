@@ -6,7 +6,7 @@ function Game() {
 
   return (
     <div className='bg-purple-800 w-full h-screen flex items-center justify-center'>
-      <LayeredTransition colors={colors} />
+      {/* <LayeredTransition colors={colors} /> */}
       <div className="relative z-10 opacity-100 transition-opacity duration-1000 flex items-center justify-center w-full h-full">
         <Link to="/home">
           <button className="bg-green-500 text-white p-2 rounded">Go to Home</button>

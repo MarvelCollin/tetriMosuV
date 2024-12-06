@@ -7,6 +7,24 @@
     src: url('/assets/fonts/joystix monospace.otf') format('opentype');
 }
 
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: fadeIn 2s ease-in-out infinite;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.animate-fade-out {
+    animation: fadeOut 2s ease-in-out infinite;
+}
+
 * {
     font-family: 'Joystix Monospace', sans-serif;
 }

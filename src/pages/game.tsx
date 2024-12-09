@@ -91,13 +91,13 @@ const createGrid = (width, height) => {
 };
 
 const checkCollision = (tetromino, scene) => {
-  const box = new THREE.Box3().setFromObject(tetromino);
+  const box = new THREE.Box3().setFromObject(tetromino).expandByScalar(-0.1); // Adjusted bounding box
   if (box.min.y <= -10) return true; 
 
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
     if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child);
+      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(-0.1); // Adjusted bounding box
       if (box.intersectsBox(childBox)) return true;
     }
   }

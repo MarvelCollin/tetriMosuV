@@ -1,149 +1,124 @@
-import { Link } from 'react-router-dom';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+function createTetrisShape(type) {
+  const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+  let shape;
+
+  switch (type) {
+    case 'I':
+      shape = new THREE.Group();
+      for (let i = 0; i < 4; i++) {
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+        cube.position.set(i, 0, 0);
+        shape.add(cube);
+      }
+      break;
+    case 'O':
+      shape = new THREE.Group();
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+          cube.position.set(i, j, 0);
+          shape.add(cube);
+        }
+      }
+      break;
+    case 'T':
+      shape = new THREE.Group();
+      for (let i = 0; i < 3; i++) {
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+        cube.position.set(i, 0, 0);
+        shape.add(cube);
+      }
+      const topCube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+      topCube.position.set(1, 1, 0);
+      shape.add(topCube);
+      break;
+    case 'L':
+      shape = new THREE.Group();
+      for (let i = 0; i < 3; i++) {
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+        cube.position.set(0, i, 0);
+        shape.add(cube);
+      }
+      const bottomCube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+      bottomCube.position.set(1, 0, 0);
+      shape.add(bottomCube);
+      break;
+    case 'J':
+      shape = new THREE.Group();
+      for (let i = 0; i < 3; i++) {
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+        cube.position.set(0, i, 0);
+        shape.add(cube);
+      }
+      const bottomCubeJ = new THREE.Mesh(new THREE.BoxGeometry(), material);
+      bottomCubeJ.position.set(-1, 0, 0);
+      shape.add(bottomCubeJ);
+      break;
+    case 'S':
+      shape = new THREE.Group();
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+          cube.position.set(i + (j % 2), j, 0);
+          shape.add(cube);
+        }
+      }
+      break;
+    case 'Z':
+      shape = new THREE.Group();
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
+          cube.position.set(i - (j % 2), j, 0);
+          shape.add(cube);
+        }
+      }
+      break;
+    default:
+      shape = new THREE.Mesh(new THREE.BoxGeometry(), material);
+  }
+
+  return shape;
+}
+
 function Game() {
-  const colors = ['yellow', 'green', 'purple'];
   const mountRef = useRef(null);
+  const [scene, setScene] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [renderer, setRenderer] = useState(null);
+  const [currentShape, setCurrentShape] = useState(null);
 
   useEffect(() => {
-    const currentMount = mountRef.current;
-
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
-    currentMount.appendChild(renderer.domElement);
-
-    renderer.setClearColor(0x000000);
-
-    camera.position.z = 5;
+    mountRef.current.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.mouseButtons = {
-      LEFT: THREE.MOUSE.ROTATE,
-      MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: null
-    };
+    camera.position.z = 20;
 
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-
-    scene.add(cube);
-
-    const shapes = [
-      // I shape
-      [
-        [1, 1, 1, 1]
-      ],
-      // O shape
-      [
-        [1, 1],
-        [1, 1]
-      ],
-      // T shape
-      [
-        [0, 1, 0],
-        [1, 1, 1]
-      ],
-      // S shape
-      [
-        [0, 1, 1],
-        [1, 1, 0]
-      ],
-      // Z shape
-      [
-        [1, 1, 0],
-        [0, 1, 1]
-      ],
-      // J shape
-      [
-        [1, 0, 0],
-        [1, 1, 1]
-      ],
-      // L shape
-      [
-        [0, 0, 1],
-        [1, 1, 1]
-      ]
-    ];
-
-    const grid = new Array(20).fill(null).map(() => new Array(10).fill(0));
-
-    const createShape = (shape) => {
-      const group = new THREE.Group();
-      shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.set(x - shape[0].length / 2, -y + shape.length / 2, 0);
-            group.add(cube);
-          }
-        });
-      });
-      return group;
-    };
-
-    const shape = createShape(shapes[0]);
+    const shapes = ['I', 'O', 'T', 'L', 'J', 'S', 'Z'];
+    const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+    const shape = createTetrisShape(shapeType);
     scene.add(shape);
+    setCurrentShape(shape);
 
-    const boxGeometry = new THREE.BoxGeometry(10, 20, 1);
-    const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
-    const box = new THREE.Mesh(boxGeometry, boxMaterial);
+    setScene(scene);
+    setCamera(camera);
+    setRenderer(renderer);
 
-    box.position.set(0, 0, 0);
-
-    scene.add(box);
-
-    const createGrid = (width, height) => {
-      const gridGroup = new THREE.Group();
-      const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-      for (let i = -width / 2; i <= width / 2; i++) {
-        const geometry = new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(i, -height / 2, 0),
-          new THREE.Vector3(i, height / 2, 0)
-        ]);
-        const line = new THREE.Line(geometry, material);
-        gridGroup.add(line);
-      }
-
-      for (let j = -height / 2; j <= height / 2; j++) {
-        const geometry = new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(-width / 2, j, 0),
-          new THREE.Vector3(width / 2, j, 0)
-        ]);
-        const line = new THREE.Line(geometry, material);
-        gridGroup.add(line);
-      }
-
-      return gridGroup;
-    };
-
-    const tetrisGrid = createGrid(10, 20);
-    scene.add(tetrisGrid);
-
-    const handleResize = () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', handleResize);
-
-    const animate = () => {
+    const animate = function () {
       requestAnimationFrame(animate);
+
+      if (currentShape) {
+        currentShape.position.y -= 0.1; 
+      }
+
       controls.update();
       renderer.render(scene, camera);
     };
@@ -151,11 +126,7 @@ function Game() {
     animate();
 
     return () => {
-      currentMount.removeChild(renderer.domElement);
-      scene.remove(shape);
-      scene.remove(box);
-      window.removeEventListener('resize', handleResize);
-      controls.dispose();
+      mountRef.current.removeChild(renderer.domElement);
     };
   }, []);
 

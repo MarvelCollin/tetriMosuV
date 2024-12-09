@@ -92,7 +92,7 @@ const createGrid = (width, height) => {
 
 const checkCollision = (tetromino, scene) => {
   const box = new THREE.Box3().setFromObject(tetromino).expandByScalar(-0.1); // Adjusted bounding box
-  if (box.min.y <= -10) return true; 
+  if (box.min.y <= -10 || box.max.x > 5 || box.min.x < -5) return true; // Check grid boundaries
 
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
@@ -137,40 +137,34 @@ const Game = () => {
     let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
     scene.add(tetromino);
 
-    let lastTime = 0;
-    const dropSpeed = 0.5;
-    const dropInterval = 10; 
+    const dropSpeed = 0.1; 
+    const dropInterval = 50; 
 
-    const animate = (time) => {
-      const deltaTime = time - lastTime;
-      if (deltaTime > dropInterval) {
-        tetromino.position.y -= dropSpeed;
-        if (checkCollision(tetromino, scene)) {
-          tetromino.position.y += dropSpeed;
-          mergeTetromino(tetromino, scene);
-          const newIndex = Math.floor(Math.random() * TETROMINOES.length);
-          tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-          tetromino.position.y = 10; 
-          scene.add(tetromino);
-        }
-        lastTime = time;
+    const animate = () => {
+      tetromino.position.y -= dropSpeed;
+      if (checkCollision(tetromino, scene)) {
+        tetromino.position.y += dropSpeed;
+        mergeTetromino(tetromino, scene);
+        const newIndex = Math.floor(Math.random() * TETROMINOES.length);
+        tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
+        tetromino.position.y = 10; 
+        scene.add(tetromino);
       }
       controls.update();
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     };
 
-    requestAnimationFrame(animate);
+    const intervalId = setInterval(animate, dropInterval);
 
     const handleKeyDown = (event) => {
       switch (event.key) {
         case 'a':
-          tetromino.position.x -= 0.1;
-          if (checkCollision(tetromino, scene)) tetromino.position.x += 0.1;
+          tetromino.position.x -= 1; // Move left by 1 grid unit
+          if (checkCollision(tetromino, scene)) tetromino.position.x += 1;
           break;
         case 'd':
-          tetromino.position.x += 0.1;
-          if (checkCollision(tetromino, scene)) tetromino.position.x -= 0.1;
+          tetromino.position.x += 1; // Move right by 1 grid unit
+          if (checkCollision(tetromino, scene)) tetromino.position.x -= 1;
           break;
         case ' ':
           while (!checkCollision(tetromino, scene)) {
@@ -192,6 +186,7 @@ const Game = () => {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      clearInterval(intervalId);
       window.removeEventListener('keydown', handleKeyDown);
       mountRef.current.removeChild(renderer.domElement);
     };

@@ -39,13 +39,23 @@ const TETROMINOES = [
   ]
 ];
 
-const createTetromino = (shape) => {
+const COLORS = [
+  0x00ffff, // I shape - Cyan
+  0xffff00, // O shape - Yellow
+  0x800080, // T shape - Purple
+  0x00ff00, // S shape - Green
+  0xff0000, // Z shape - Red
+  0x0000ff, // J shape - Blue
+  0xffa500  // L shape - Orange
+];
+
+const createTetromino = (shape, color) => {
   const group = new THREE.Group();
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
         const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
         group.add(cube);
@@ -123,11 +133,12 @@ const Game = () => {
 
     camera.position.set(0, 0, 15); 
 
-    let tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+    const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
+    let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
     scene.add(tetromino);
 
     let lastTime = 0;
-    const dropSpeed = 0.05;
+    const dropSpeed = 0.5;
     const dropInterval = 10; 
 
     const animate = (time) => {
@@ -137,7 +148,8 @@ const Game = () => {
         if (checkCollision(tetromino, scene)) {
           tetromino.position.y += dropSpeed;
           mergeTetromino(tetromino, scene);
-          tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+          const newIndex = Math.floor(Math.random() * TETROMINOES.length);
+          tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
           tetromino.position.y = 10; 
           scene.add(tetromino);
         }
@@ -166,7 +178,8 @@ const Game = () => {
           }
           tetromino.position.y += dropSpeed;
           mergeTetromino(tetromino, scene);
-          tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+          const newIndex = Math.floor(Math.random() * TETROMINOES.length);
+          tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
           tetromino.position.y = 10;
           scene.add(tetromino);
           break;

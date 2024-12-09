@@ -1,96 +1,110 @@
-import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { useEffect, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-function createTetrisShape(type) {
-  const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
-  let shape;
+const TETROMINOES = [
+  // I shape
+  [
+    [1, 1, 1, 1]
+  ],
+  // O shape
+  [
+    [1, 1],
+    [1, 1]
+  ],
+  // T shape
+  [
+    [0, 1, 0],
+    [1, 1, 1]
+  ],
+  // S shape
+  [
+    [0, 1, 1],
+    [1, 1, 0]
+  ],
+  // Z shape
+  [
+    [1, 1, 0],
+    [0, 1, 1]
+  ],
+  // J shape
+  [
+    [1, 0, 0],
+    [1, 1, 1]
+  ],
+  // L shape
+  [
+    [0, 0, 1],
+    [1, 1, 1]
+  ]
+];
 
-  switch (type) {
-    case 'I':
-      shape = new THREE.Group();
-      for (let i = 0; i < 4; i++) {
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-        cube.position.set(i, 0, 0);
-        shape.add(cube);
+const createTetromino = (shape) => {
+  const group = new THREE.Group();
+  shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value) {
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.set(x, -y, 0);
+        group.add(cube);
       }
-      break;
-    case 'O':
-      shape = new THREE.Group();
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-          cube.position.set(i, j, 0);
-          shape.add(cube);
-        }
-      }
-      break;
-    case 'T':
-      shape = new THREE.Group();
-      for (let i = 0; i < 3; i++) {
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-        cube.position.set(i, 0, 0);
-        shape.add(cube);
-      }
-      const topCube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-      topCube.position.set(1, 1, 0);
-      shape.add(topCube);
-      break;
-    case 'L':
-      shape = new THREE.Group();
-      for (let i = 0; i < 3; i++) {
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-        cube.position.set(0, i, 0);
-        shape.add(cube);
-      }
-      const bottomCube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-      bottomCube.position.set(1, 0, 0);
-      shape.add(bottomCube);
-      break;
-    case 'J':
-      shape = new THREE.Group();
-      for (let i = 0; i < 3; i++) {
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-        cube.position.set(0, i, 0);
-        shape.add(cube);
-      }
-      const bottomCubeJ = new THREE.Mesh(new THREE.BoxGeometry(), material);
-      bottomCubeJ.position.set(-1, 0, 0);
-      shape.add(bottomCubeJ);
-      break;
-    case 'S':
-      shape = new THREE.Group();
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-          cube.position.set(i + (j % 2), j, 0);
-          shape.add(cube);
-        }
-      }
-      break;
-    case 'Z':
-      shape = new THREE.Group();
-      for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-          const cube = new THREE.Mesh(new THREE.BoxGeometry(), material);
-          cube.position.set(i - (j % 2), j, 0);
-          shape.add(cube);
-        }
-      }
-      break;
-    default:
-      shape = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    });
+  });
+  return group;
+};
+
+const createGrid = (width, height) => {
+  const grid = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); 
+
+  for (let i = -width / 2; i <= width / 2; i++) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(i, -height / 2, 0),
+      new THREE.Vector3(i, height / 2, 0)
+    ]);
+    const line = new THREE.Line(geometry, material);
+    grid.add(line);
   }
 
-  return shape;
-}
+  for (let i = -height / 2; i <= height / 2; i++) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-width / 2, i, 0),
+      new THREE.Vector3(width / 2, i, 0)
+    ]);
+    const line = new THREE.Line(geometry, material);
+    grid.add(line);
+  }
 
-function Game() {
+  return grid;
+};
+
+const checkCollision = (tetromino, scene) => {
+  const box = new THREE.Box3().setFromObject(tetromino);
+  if (box.min.y <= -10) return true; 
+
+  for (let i = 0; i < scene.children.length; i++) {
+    const child = scene.children[i];
+    if (child !== tetromino && child.type === 'Mesh') {
+      const childBox = new THREE.Box3().setFromObject(child);
+      if (box.intersectsBox(childBox)) return true;
+    }
+  }
+  return false;
+};
+
+const mergeTetromino = (tetromino, scene) => {
+  tetromino.children.forEach(cube => {
+    const newCube = cube.clone();
+    newCube.position.add(tetromino.position);
+    scene.add(newCube);
+  });
+  scene.remove(tetromino);
+};
+
+const Game = () => {
   const mountRef = useRef(null);
-  const [scene, setScene] = useState(null);
-  const [camera, setCamera] = useState(null);
-  const [renderer, setRenderer] = useState(null);
-  const [currentShape, setCurrentShape] = useState(null);
 
   useEffect(() => {
     const scene = new THREE.Scene();
@@ -100,40 +114,77 @@ function Game() {
     mountRef.current.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.z = 20;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.enableZoom = true;
 
-    const shapes = ['I', 'O', 'T', 'L', 'J', 'S', 'Z'];
-    const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
-    const shape = createTetrisShape(shapeType);
-    scene.add(shape);
-    setCurrentShape(shape);
+    const grid = createGrid(10, 20);
+    scene.add(grid);
 
-    setScene(scene);
-    setCamera(camera);
-    setRenderer(renderer);
+    camera.position.set(0, 0, 15); 
 
-    const animate = function () {
-      requestAnimationFrame(animate);
+    let tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+    scene.add(tetromino);
 
-      if (currentShape) {
-        currentShape.position.y -= 0.1; 
+    let lastTime = 0;
+    const dropSpeed = 0.05;
+    const dropInterval = 10; 
+
+    const animate = (time) => {
+      const deltaTime = time - lastTime;
+      if (deltaTime > dropInterval) {
+        tetromino.position.y -= dropSpeed;
+        if (checkCollision(tetromino, scene)) {
+          tetromino.position.y += dropSpeed;
+          mergeTetromino(tetromino, scene);
+          tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+          tetromino.position.y = 10; 
+          scene.add(tetromino);
+        }
+        lastTime = time;
       }
-
       controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case 'a':
+          tetromino.position.x -= 0.1;
+          if (checkCollision(tetromino, scene)) tetromino.position.x += 0.1;
+          break;
+        case 'd':
+          tetromino.position.x += 0.1;
+          if (checkCollision(tetromino, scene)) tetromino.position.x -= 0.1;
+          break;
+        case ' ':
+          while (!checkCollision(tetromino, scene)) {
+            tetromino.position.y -= dropSpeed;
+          }
+          tetromino.position.y += dropSpeed;
+          mergeTetromino(tetromino, scene);
+          tetromino = createTetromino(TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)]);
+          tetromino.position.y = 10;
+          scene.add(tetromino);
+          break;
+        default:
+          break;
+      }
       renderer.render(scene, camera);
     };
 
-    animate();
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       mountRef.current.removeChild(renderer.domElement);
     };
   }, []);
 
-  return (
-    <div ref={mountRef} className='w-full h-screen'>
-    </div>
-  );
-}
+  return <div ref={mountRef}></div>;
+};
 
 export default Game;

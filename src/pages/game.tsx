@@ -54,7 +54,7 @@ const createTetromino = (shape, color) => {
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); // Make the cubes slightly smaller
+        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
         const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
@@ -62,7 +62,7 @@ const createTetromino = (shape, color) => {
       }
     });
   });
-  group.position.set(-Math.floor(shape[0].length / 2), Math.floor(shape.length / 2), 0); // Center the tetromino
+  group.position.set(-Math.floor(shape[0].length / 2), Math.floor(shape.length / 2), 0);
   return group;
 };
 
@@ -84,7 +84,7 @@ const updateShadowPosition = (shadow, tetromino, scene) => {
 
 const createGrid = (width, height) => {
   const grid = new THREE.Group();
-  grid.name = 'grid'; // Add a name to the grid for easier reference
+  grid.name = 'grid';
   const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
 
   for (let i = -width / 2; i <= width / 2; i++) {
@@ -105,7 +105,7 @@ const createGrid = (width, height) => {
     grid.add(line);
   }
 
-  grid.position.x = width / 4; // Move the grid to the right by half of its width in terms of cells
+  grid.position.x = width / 4;
 
   return grid;
 };
@@ -138,6 +138,19 @@ const mergeTetromino = (tetromino, scene) => {
     scene.add(newCube);
   });
   scene.remove(tetromino);
+};
+
+const rotateTetromino = (tetromino, shadowTetromino) => {
+  const center = new THREE.Vector3();
+  const box = new THREE.Box3().setFromObject(tetromino);
+  box.getCenter(center);
+  tetromino.position.sub(center); // Translate to origin
+  tetromino.rotation.z += Math.PI / 2; // Rotate
+  tetromino.position.add(center); // Translate back
+
+  shadowTetromino.position.sub(center); // Translate shadow to origin
+  shadowTetromino.rotation.z += Math.PI / 2; // Rotate shadow
+  shadowTetromino.position.add(center); // Translate shadow back
 };
 
 const Game = () => {
@@ -212,6 +225,15 @@ const Game = () => {
           tetromino.position.set(0, 10, 0);
           scene.add(tetromino);
           scene.add(shadowTetromino);
+          break;
+        case 'w':
+          rotateTetromino(tetromino, shadowTetromino);
+          if (checkCollision(tetromino, scene)) {
+            rotateTetromino(tetromino, shadowTetromino); // Rotate back if collision occurs
+            rotateTetromino(tetromino, shadowTetromino);
+            rotateTetromino(tetromino, shadowTetromino);
+          }
+          updateShadowPosition(shadowTetromino, tetromino, scene); // Update shadow position after rotation
           break;
         default:
           break;

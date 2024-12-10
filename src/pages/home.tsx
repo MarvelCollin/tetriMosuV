@@ -3,7 +3,7 @@ import { useState } from 'react';
 import LayeredTransition from '../components/page-animations/layered';
 import TetrisBackground from '../components/background-animations/tetris-background';
 import '../index.css';
-
+``
 function Home() {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showTransition, setShowTransition] = useState(false);

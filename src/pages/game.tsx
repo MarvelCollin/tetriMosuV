@@ -66,9 +66,26 @@ const createTetromino = (shape, color) => {
   return group;
 };
 
+const createShadowTetromino = (tetromino) => {
+  const shadow = tetromino.clone();
+  shadow.children.forEach(cube => {
+    cube.material = new THREE.MeshBasicMaterial({ color: 0x888888, opacity: 0.5, transparent: true });
+  });
+  return shadow;
+};
+
+const updateShadowPosition = (shadow, tetromino, scene) => {
+  shadow.position.copy(tetromino.position);
+  while (!checkCollision(shadow, scene)) {
+    shadow.position.y -= 0.1; 
+  }
+  shadow.position.y += 0.1; 
+};
+
 const createGrid = (width, height) => {
   const grid = new THREE.Group();
-  const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); 
+  grid.name = 'grid'; // Add a name to the grid for easier reference
+  const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
 
   for (let i = -width / 2; i <= width / 2; i++) {
     const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -88,18 +105,26 @@ const createGrid = (width, height) => {
     grid.add(line);
   }
 
+  grid.position.x = width / 4; // Move the grid to the right by half of its width in terms of cells
+
   return grid;
 };
 
 const checkCollision = (tetromino, scene) => {
-  const box = new THREE.Box3().setFromObject(tetromino); // Remove expandByScalar for more precise collision
-  if (box.min.y <= -10 || box.max.x > 5 || box.min.x < -5) return true; 
+  const tetrominoBox = new THREE.Box3().setFromObject(tetromino);
+  const gridBox = new THREE.Box3().setFromObject(scene.getObjectByName('grid'));
+
+  if (tetrominoBox.min.y <= gridBox.min.y || tetrominoBox.max.x > gridBox.max.x || tetrominoBox.min.x < gridBox.min.x) {
+    return true;
+  }
 
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
     if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child); // Remove expandByScalar for more precise collision
-      if (box.intersectsBox(childBox)) return true;
+      const childBox = new THREE.Box3().setFromObject(child);
+      if (tetrominoBox.intersectsBox(childBox)) {
+        return true;
+      }
     }
   }
   return false;
@@ -137,20 +162,26 @@ const Game = () => {
 
     const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
     let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
+    let shadowTetromino = createShadowTetromino(tetromino);
     scene.add(tetromino);
+    scene.add(shadowTetromino);
 
     const dropSpeed = 0.1; 
     const dropInterval = 50; 
 
     const animate = () => {
       tetromino.position.y -= dropSpeed;
+      updateShadowPosition(shadowTetromino, tetromino, scene);
       if (checkCollision(tetromino, scene)) {
         tetromino.position.y += dropSpeed;
         mergeTetromino(tetromino, scene);
+        scene.remove(shadowTetromino); // Remove shadow tetromino
         const newIndex = Math.floor(Math.random() * TETROMINOES.length);
         tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
+        shadowTetromino = createShadowTetromino(tetromino);
         tetromino.position.set(0, 10, 0);
         scene.add(tetromino);
+        scene.add(shadowTetromino);
       }
       controls.update();
       renderer.render(scene, camera);
@@ -172,16 +203,19 @@ const Game = () => {
           while (!checkCollision(tetromino, scene)) {
             tetromino.position.y -= dropSpeed;
           }
-          tetromino.position.y += dropSpeed;
           mergeTetromino(tetromino, scene);
+          scene.remove(shadowTetromino); 
           const newIndex = Math.floor(Math.random() * TETROMINOES.length);
           tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
+          shadowTetromino = createShadowTetromino(tetromino);
           tetromino.position.set(0, 10, 0);
           scene.add(tetromino);
+          scene.add(shadowTetromino);
           break;
         default:
           break;
       }
+      updateShadowPosition(shadowTetromino, tetromino, scene);
       renderer.render(scene, camera);
     };
 

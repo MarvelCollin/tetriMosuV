@@ -3,28 +3,52 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: 'Joystix Monospace';
-    src: url('/assets/fonts/joystix monospace.otf') format('opentype');
+  font-family: "Joystix Monospace";
+  src: url("/assets/fonts/joystix monospace.otf") format("opentype");
 }
 
 @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
-    animation: fadeIn 2s ease-in-out infinite;
+  animation: fadeIn 2s ease-in-out infinite;
 }
 
 @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes rotate-text {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+#rotate-text {
+  animation-name: rotate-text;
+  animation-duration: 120s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }
 
 .animate-fade-out {
-    animation: fadeOut 2s ease-in-out infinite;
+  animation: fadeOut 2s ease-in-out infinite;
 }
 
 * {
-    font-family: 'Joystix Monospace', sans-serif;
+  font-family: "Joystix Monospace", sans-serif;
 }

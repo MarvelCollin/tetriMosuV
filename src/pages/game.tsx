@@ -54,7 +54,7 @@ const createTetromino = (shape, color) => {
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        const geometry = new THREE.BoxGeometry();
+        const geometry = new THREE.BoxGeometry(1, 1, 1); 
         const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
@@ -62,6 +62,7 @@ const createTetromino = (shape, color) => {
       }
     });
   });
+  group.position.set(-Math.floor(shape[0].length / 2), Math.floor(shape.length / 2), 0); // Center the tetromino
   return group;
 };
 
@@ -91,13 +92,13 @@ const createGrid = (width, height) => {
 };
 
 const checkCollision = (tetromino, scene) => {
-  const box = new THREE.Box3().setFromObject(tetromino).expandByScalar(-0.1); // Adjusted bounding box
-  if (box.min.y <= -10 || box.max.x > 5 || box.min.x < -5) return true; // Check grid boundaries
+  const box = new THREE.Box3().setFromObject(tetromino).expandByScalar(-0.05); 
+  if (box.min.y <= -10 || box.max.x > 5 || box.min.x < -5) return true; 
 
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
     if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(-0.1); // Adjusted bounding box
+      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(-0.05); 
       if (box.intersectsBox(childBox)) return true;
     }
   }
@@ -108,6 +109,7 @@ const mergeTetromino = (tetromino, scene) => {
   tetromino.children.forEach(cube => {
     const newCube = cube.clone();
     newCube.position.add(tetromino.position);
+    newCube.rotation.copy(tetromino.rotation); 
     scene.add(newCube);
   });
   scene.remove(tetromino);
@@ -159,11 +161,11 @@ const Game = () => {
     const handleKeyDown = (event) => {
       switch (event.key) {
         case 'a':
-          tetromino.position.x -= 1; // Move left by 1 grid unit
+          tetromino.position.x -= 1; 
           if (checkCollision(tetromino, scene)) tetromino.position.x += 1;
           break;
         case 'd':
-          tetromino.position.x += 1; // Move right by 1 grid unit
+          tetromino.position.x += 1; 
           if (checkCollision(tetromino, scene)) tetromino.position.x -= 1;
           break;
         case ' ':
@@ -174,7 +176,7 @@ const Game = () => {
           mergeTetromino(tetromino, scene);
           const newIndex = Math.floor(Math.random() * TETROMINOES.length);
           tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-          tetromino.position.y = 10;
+          tetromino.position.set(0, 10, 0);
           scene.add(tetromino);
           break;
         default:

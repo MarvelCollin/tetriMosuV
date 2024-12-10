@@ -54,7 +54,7 @@ const createTetromino = (shape, color) => {
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        const geometry = new THREE.BoxGeometry(1, 1, 1); 
+        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9); // Make the cubes slightly smaller
         const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
@@ -114,7 +114,7 @@ const checkCollision = (tetromino, scene) => {
   const tetrominoBox = new THREE.Box3().setFromObject(tetromino);
   const gridBox = new THREE.Box3().setFromObject(scene.getObjectByName('grid'));
 
-  if (tetrominoBox.min.y <= gridBox.min.y || tetrominoBox.max.x > gridBox.max.x || tetrominoBox.min.x < gridBox.min.x) {
+  if (tetrominoBox.min.y < gridBox.min.y || tetrominoBox.max.x > gridBox.max.x || tetrominoBox.min.x < gridBox.min.x) {
     return true;
   }
 
@@ -203,6 +203,7 @@ const Game = () => {
           while (!checkCollision(tetromino, scene)) {
             tetromino.position.y -= dropSpeed;
           }
+          tetromino.position.y += dropSpeed; // Adjust position after collision
           mergeTetromino(tetromino, scene);
           scene.remove(shadowTetromino); 
           const newIndex = Math.floor(Math.random() * TETROMINOES.length);

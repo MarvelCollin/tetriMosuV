@@ -92,13 +92,13 @@ const createGrid = (width, height) => {
 };
 
 const checkCollision = (tetromino, scene) => {
-  const box = new THREE.Box3().setFromObject(tetromino).expandByScalar(-0.05); 
+  const box = new THREE.Box3().setFromObject(tetromino); // Remove expandByScalar for more precise collision
   if (box.min.y <= -10 || box.max.x > 5 || box.min.x < -5) return true; 
 
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
     if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(-0.05); 
+      const childBox = new THREE.Box3().setFromObject(child); // Remove expandByScalar for more precise collision
       if (box.intersectsBox(childBox)) return true;
     }
   }
@@ -149,7 +149,7 @@ const Game = () => {
         mergeTetromino(tetromino, scene);
         const newIndex = Math.floor(Math.random() * TETROMINOES.length);
         tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-        tetromino.position.y = 10; 
+        tetromino.position.set(0, 10, 0);
         scene.add(tetromino);
       }
       controls.update();

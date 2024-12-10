@@ -17,16 +17,16 @@ const TETROMINOES = [
     [0, 1, 0],
     [1, 1, 1]
   ],
-  // S shape
-  [
-    [0, 1, 1],
-    [1, 1, 0]
-  ],
-  // Z shape
-  [
-    [1, 1, 0],
-    [0, 1, 1]
-  ],
+  // // S shape
+  // [
+  //   [0, 1, 1],
+  //   [1, 1, 0]
+  // ],
+  // // Z shape
+  // [
+  //   [1, 1, 0],
+  //   [0, 1, 1]
+  // ],
   // J shape
   [
     [1, 0, 0],
@@ -54,7 +54,7 @@ const createTetromino = (shape, color) => {
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+        const geometry = new THREE.BoxGeometry(1,1,1);
         const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
@@ -111,6 +111,7 @@ const createGrid = (width, height) => {
 };
 
 const checkCollision = (tetromino, scene) => {
+  const gap = -0.1;
   const tetrominoBox = new THREE.Box3().setFromObject(tetromino);
   const gridBox = new THREE.Box3().setFromObject(scene.getObjectByName('grid'));
 
@@ -121,7 +122,7 @@ const checkCollision = (tetromino, scene) => {
   for (let i = 0; i < scene.children.length; i++) {
     const child = scene.children[i];
     if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child);
+      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(gap);
       if (tetrominoBox.intersectsBox(childBox)) {
         return true;
       }
@@ -144,13 +145,13 @@ const rotateTetromino = (tetromino, shadowTetromino) => {
   const center = new THREE.Vector3();
   const box = new THREE.Box3().setFromObject(tetromino);
   box.getCenter(center);
-  tetromino.position.sub(center); // Translate to origin
-  tetromino.rotation.z += Math.PI / 2; // Rotate
-  tetromino.position.add(center); // Translate back
+  tetromino.position.sub(center); 
+  tetromino.rotation.z += Math.PI / 2; 
+  tetromino.position.add(center); 
 
-  shadowTetromino.position.sub(center); // Translate shadow to origin
-  shadowTetromino.rotation.z += Math.PI / 2; // Rotate shadow
-  shadowTetromino.position.add(center); // Translate shadow back
+  shadowTetromino.position.sub(center);
+  shadowTetromino.rotation.z += Math.PI / 2; 
+  shadowTetromino.position.add(center); 
 };
 
 const Game = () => {
@@ -188,7 +189,7 @@ const Game = () => {
       if (checkCollision(tetromino, scene)) {
         tetromino.position.y += dropSpeed;
         mergeTetromino(tetromino, scene);
-        scene.remove(shadowTetromino); // Remove shadow tetromino
+        scene.remove(shadowTetromino); 
         const newIndex = Math.floor(Math.random() * TETROMINOES.length);
         tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
         shadowTetromino = createShadowTetromino(tetromino);
@@ -216,7 +217,7 @@ const Game = () => {
           while (!checkCollision(tetromino, scene)) {
             tetromino.position.y -= dropSpeed;
           }
-          tetromino.position.y += dropSpeed; // Adjust position after collision
+          tetromino.position.y += dropSpeed; 
           mergeTetromino(tetromino, scene);
           scene.remove(shadowTetromino); 
           const newIndex = Math.floor(Math.random() * TETROMINOES.length);
@@ -229,11 +230,11 @@ const Game = () => {
         case 'w':
           rotateTetromino(tetromino, shadowTetromino);
           if (checkCollision(tetromino, scene)) {
-            rotateTetromino(tetromino, shadowTetromino); // Rotate back if collision occurs
+            rotateTetromino(tetromino, shadowTetromino); 
             rotateTetromino(tetromino, shadowTetromino);
             rotateTetromino(tetromino, shadowTetromino);
           }
-          updateShadowPosition(shadowTetromino, tetromino, scene); // Update shadow position after rotation
+          updateShadowPosition(shadowTetromino, tetromino, scene); 
           break;
         default:
           break;

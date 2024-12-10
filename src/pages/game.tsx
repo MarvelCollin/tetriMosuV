@@ -54,7 +54,7 @@ const createTetromino = (shape, color) => {
   shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        const geometry = new THREE.BoxGeometry(1,1,1);
+        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
         const material = new THREE.MeshBasicMaterial({ color });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(x, -y, 0);
@@ -62,7 +62,7 @@ const createTetromino = (shape, color) => {
       }
     });
   });
-  group.position.set(-Math.floor(shape[0].length / 2), Math.floor(shape.length / 2), 0);
+  group.position.set(-Math.floor(shape[0].length / 2) + 5, Math.floor(shape.length / 2) + 10, 0); // Adjust position to start within the grid
   return group;
 };
 
@@ -76,42 +76,30 @@ const createShadowTetromino = (tetromino) => {
 
 const updateShadowPosition = (shadow, tetromino, scene) => {
   shadow.position.copy(tetromino.position);
+  shadow.position.y -= 0.1;
   while (!checkCollision(shadow, scene)) {
-    shadow.position.y -= 0.1; 
+    shadow.position.y -= 0.1;
   }
-  shadow.position.y += 0.1; 
+  shadow.position.y += 0.1;
 };
 
 const createGrid = (width, height) => {
-  const grid = new THREE.Group();
-  grid.name = 'grid';
-  const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-
-  for (let i = -width / 2; i <= width / 2; i++) {
-    const geometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(i, -height / 2, 0),
-      new THREE.Vector3(i, height / 2, 0)
-    ]);
-    const line = new THREE.Line(geometry, material);
-    grid.add(line);
+  const group = new THREE.Group();
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, opacity: 0.5, transparent: true });
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(x, -y, 0);
+      group.add(cube);
+    }
   }
-
-  for (let i = -height / 2; i <= height / 2; i++) {
-    const geometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(-width / 2, i, 0),
-      new THREE.Vector3(width / 2, i, 0)
-    ]);
-    const line = new THREE.Line(geometry, material);
-    grid.add(line);
-  }
-
-  grid.position.x = width / 4;
-
-  return grid;
+  group.name = 'grid';
+  return group;
 };
 
 const checkCollision = (tetromino, scene) => {
-  const gap = -0.1;
+  const gap = 0;
   const tetrominoBox = new THREE.Box3().setFromObject(tetromino);
   const gridBox = new THREE.Box3().setFromObject(scene.getObjectByName('grid'));
 
@@ -172,7 +160,7 @@ const Game = () => {
     const grid = createGrid(10, 20);
     scene.add(grid);
 
-    camera.position.set(0, 0, 15); 
+    camera.position.set(5, -10, 15); // Adjust camera position to center the grid
 
     const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
     let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
@@ -192,8 +180,8 @@ const Game = () => {
         scene.remove(shadowTetromino); 
         const newIndex = Math.floor(Math.random() * TETROMINOES.length);
         tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-        shadowTetromino = createShadowTetromino(tetromino);
         tetromino.position.set(0, 10, 0);
+        shadowTetromino = createShadowTetromino(tetromino);
         scene.add(tetromino);
         scene.add(shadowTetromino);
       }
@@ -223,7 +211,7 @@ const Game = () => {
           const newIndex = Math.floor(Math.random() * TETROMINOES.length);
           tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
           shadowTetromino = createShadowTetromino(tetromino);
-          tetromino.position.set(0, 10, 0);
+          tetromino.position.set(5, 10, 0); // Adjust position to start within the grid
           scene.add(tetromino);
           scene.add(shadowTetromino);
           break;

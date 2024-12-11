@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const TETROMINOES = [
   // I shape
@@ -17,16 +17,16 @@ const TETROMINOES = [
     [0, 1, 0],
     [1, 1, 1]
   ],
-  // // S shape
-  // [
-  //   [0, 1, 1],
-  //   [1, 1, 0]
-  // ],
-  // // Z shape
-  // [
-  //   [1, 1, 0],
-  //   [0, 1, 1]
-  // ],
+  // S shape
+  [
+    [0, 1, 1],
+    [1, 1, 0]
+  ],
+  // Z shape
+  [
+    [1, 1, 0],
+    [0, 1, 1]
+  ],
   // J shape
   [
     [1, 0, 0],
@@ -49,70 +49,38 @@ const COLORS = [
   0xffa500  // L shape - Orange
 ];
 
-const createTetromino = (shape, color) => {
-  const group = new THREE.Group();
-  shape.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value) {
-        const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-        const material = new THREE.MeshBasicMaterial({ color });
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(x, -y, 0);
-        group.add(cube);
-      }
-    });
-  });
-  group.position.set(-Math.floor(shape[0].length / 2) + 5, Math.floor(shape.length / 2) + 10, 0); // Adjust position to start within the grid
-  return group;
-};
-
-const createShadowTetromino = (tetromino) => {
-  const shadow = tetromino.clone();
-  shadow.children.forEach(cube => {
-    cube.material = new THREE.MeshBasicMaterial({ color: 0x888888, opacity: 0.5, transparent: true });
-  });
-  return shadow;
-};
-
-const updateShadowPosition = (shadow, tetromino, scene) => {
-  shadow.position.copy(tetromino.position);
-  shadow.position.y -= 0.1;
-  while (!checkCollision(shadow, scene)) {
-    shadow.position.y -= 0.1;
-  }
-  shadow.position.y += 0.1;
-};
+let grid: Array<Array<{ color: number | null, filled: boolean }>>;
 
 const createGrid = (width, height) => {
-  const group = new THREE.Group();
+  const grid: Array<Array<{ color: number | null, filled: boolean }>> = [];
   for (let y = 0; y < height; y++) {
+    const row: Array<{ color: number | null, filled: boolean }> = [];
     for (let x = 0; x < width; x++) {
-      const geometry = new THREE.BoxGeometry(1, 1, 1);
-      const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, opacity: 0.5, transparent: true });
-      const cube = new THREE.Mesh(geometry, material);
-      cube.position.set(x, -y, 0);
-      group.add(cube);
+      row.push({ color: null, filled: false });
     }
+    grid.push(row);
   }
-  group.name = 'grid';
-  return group;
+  return grid;
 };
 
-const checkCollision = (tetromino, scene) => {
-  const gap = 0;
-  const tetrominoBox = new THREE.Box3().setFromObject(tetromino);
-  const gridBox = new THREE.Box3().setFromObject(scene.getObjectByName('grid'));
-
-  if (tetrominoBox.min.y < gridBox.min.y || tetrominoBox.max.x > gridBox.max.x || tetrominoBox.min.x < gridBox.min.x) {
-    return true;
+const setGridCell = (x, y, value) => {
+  if (grid[y] && grid[y][x]) {
+    grid[y][x].filled = value === 1;
+    grid[y][x].color = value === 1 ? 0x000000 : null;
   }
+};
 
-  for (let i = 0; i < scene.children.length; i++) {
-    const child = scene.children[i];
-    if (child !== tetromino && child.type === 'Mesh') {
-      const childBox = new THREE.Box3().setFromObject(child).expandByScalar(gap);
-      if (tetrominoBox.intersectsBox(childBox)) {
-        return true;
+const checkCollision = (tetromino, grid, startX, startY) => {
+  const shape = TETROMINOES[tetromino];
+  for (let y = 0; y < shape.length; y++) {
+    for (let x = 0; x < shape[y].length; x++) {
+      if (shape[y][x] === 1) {
+        const gridX = startX + x;
+        const gridY = startY + y + 1; // Check the next row
+
+        if (gridY >= grid.length || (grid[gridY] && grid[gridY][gridX] && grid[gridY][gridX].filled)) {
+          return true;
+        }
       }
     }
   }
@@ -120,12 +88,31 @@ const checkCollision = (tetromino, scene) => {
 };
 
 const mergeTetromino = (tetromino, scene) => {
+  const shape = tetromino.userData.shape;
+  const position = tetromino.position;
+
+  shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value === 1) {
+        const worldX = position.x + x;
+        const worldY = position.y - y;
+        const gridX = Math.floor(worldX);
+        const gridY = Math.floor(worldY);
+
+        if (grid[gridY] && grid[gridY][gridX]) {
+          grid[gridY][gridX] = { color: (tetromino.children[0] as THREE.Mesh).material.color.getHex(), filled: true };
+        }
+      }
+    });
+  });
+
   tetromino.children.forEach(cube => {
-    const newCube = cube.clone();
-    newCube.position.add(tetromino.position);
-    newCube.rotation.copy(tetromino.rotation); 
+    const newCube = (cube as THREE.Mesh).clone();
+    newCube.position.copy(cube.position).applyMatrix4(tetromino.matrixWorld);
+    newCube.rotation.copy(tetromino.rotation);
     scene.add(newCube);
   });
+
   scene.remove(tetromino);
 };
 
@@ -142,6 +129,108 @@ const rotateTetromino = (tetromino, shadowTetromino) => {
   shadowTetromino.position.add(center); 
 };
 
+const renderGrid = (grid: Array<Array<{ color: number | null, filled: boolean }>>) => {
+  const group = new THREE.Group();
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (grid[y][x].filled) { 
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const color = grid[y][x].color || 0xffffff;
+        const material = new THREE.MeshBasicMaterial({ color, wireframe: !grid[y][x].filled, opacity: 0.5, transparent: true });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.set(x + 0.5, -y - 0.5, 0); // Adjusted position
+        group.add(cube);
+      }
+    }
+  }
+  group.name = 'grid';
+  return group;
+};
+
+const renderGridBorders = (width, height) => {
+  const group = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+  for (let y = 0; y <= height; y++) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -y, 0),
+      new THREE.Vector3(width, -y, 0)
+    ]);
+    const line = new THREE.Line(geometry, material);
+    group.add(line);
+  }
+
+  for (let x = 0; x <= width; x++) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x, 0, 0),
+      new THREE.Vector3(x, -height, 0)
+    ]);
+    const line = new THREE.Line(geometry, material);
+    group.add(line);
+  }
+
+  return group;
+};
+
+const placeTetrominoOnGrid = (tetromino, grid, startX, startY) => {
+  const shape = TETROMINOES[tetromino];
+  shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value === 1) {
+        const gridX = startX + x;
+        const gridY = startY + y;
+        if (grid[gridY] && grid[gridX]) {
+          grid[gridY][gridX] = { color: COLORS[tetromino], filled: true };
+        }
+      }
+    });
+  });
+};
+
+const dropInterval = 1000; // Drop interval in milliseconds
+
+const clearTetrominoFromGrid = (tetromino, grid, startX, startY) => {
+  const shape = TETROMINOES[tetromino];
+  shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value === 1) {
+        const gridX = startX + x;
+        const gridY = startY + y;
+        if (grid[gridY] && grid[gridX]) {
+          grid[gridY][gridX] = { color: null, filled: false };
+        }
+      }
+    });
+  });
+};
+
+const autoDropTetromino = (tetromino, grid, scene) => {
+  let startX = 3;
+  let startY = 0;
+
+  const drop = () => {
+    if (checkCollision(tetromino, grid, startX, startY)) {
+      mergeTetromino(tetromino, scene);
+      clearInterval(dropIntervalId);
+      // Create a new tetromino
+      const newTetromino = Math.floor(Math.random() * TETROMINOES.length);
+      startX = 3;
+      startY = 0;
+      placeTetrominoOnGrid(newTetromino, grid, startX, startY);
+      autoDropTetromino(newTetromino, grid, scene);
+    } else {
+      clearTetrominoFromGrid(tetromino, grid, startX, startY);
+      startY += 1;
+      placeTetrominoOnGrid(tetromino, grid, startX, startY);
+      scene.remove(scene.getObjectByName('grid'));
+      const gridGroup = renderGrid(grid);
+      scene.add(gridGroup);
+    }
+  };
+
+  const dropIntervalId = setInterval(drop, dropInterval);
+};
+
 const Game = () => {
   const mountRef = useRef(null);
 
@@ -152,91 +241,32 @@ const Game = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.enableDamping = true;
-    // controls.dampingFactor = 0.25;
-    // controls.enableZoom = true;
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.enableZoom = true;
+    
+    grid = createGrid(10, 20);
+    const tetromino = 0; // Example: I shape
+    placeTetrominoOnGrid(tetromino, grid, 3, 0); // Initial placement
+    const gridGroup = renderGrid(grid);
+    const gridBorders = renderGridBorders(10, 20);
+    scene.add(gridGroup);
+    scene.add(gridBorders);
 
-    const grid = createGrid(10, 20);
-    scene.add(grid);
+    autoDropTetromino(tetromino, grid, scene);
 
     camera.position.set(5, -10, 20);
-    camera.lookAt(5, -10, 0); 
-
-    const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
-    let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
-    let shadowTetromino = createShadowTetromino(tetromino);
-    scene.add(tetromino);
-    scene.add(shadowTetromino);
-
-    const dropSpeed = 0.1; 
-    const dropInterval = 50; 
+    camera.lookAt(5, -10, 0);
 
     const animate = () => {
-      tetromino.position.y -= dropSpeed;
-      updateShadowPosition(shadowTetromino, tetromino, scene);
-      if (checkCollision(tetromino, scene)) {
-        tetromino.position.y += dropSpeed;
-        mergeTetromino(tetromino, scene);
-        scene.remove(shadowTetromino); 
-        const newIndex = Math.floor(Math.random() * TETROMINOES.length);
-        tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-        tetromino.position.set(0, 10, 0);
-        shadowTetromino = createShadowTetromino(tetromino);
-        scene.add(tetromino);
-        scene.add(shadowTetromino);
-      }
-      // controls.update();
+      requestAnimationFrame(animate);
+      controls.update();
       renderer.render(scene, camera);
     };
-
-    const intervalId = setInterval(animate, dropInterval);
-
-    const handleKeyDown = (event) => {
-      switch (event.key) {
-        case 'a':
-          tetromino.position.x -= 1; 
-          if (checkCollision(tetromino, scene)) tetromino.position.x += 1;
-          break;
-        case 'd':
-          tetromino.position.x += 1; 
-          if (checkCollision(tetromino, scene)) tetromino.position.x -= 1;
-          break;
-        case ' ':
-          while (!checkCollision(tetromino, scene)) {
-            tetromino.position.y -= dropSpeed;
-          }
-          tetromino.position.y += dropSpeed; 
-          mergeTetromino(tetromino, scene);
-          scene.remove(shadowTetromino); 
-          const newIndex = Math.floor(Math.random() * TETROMINOES.length);
-          tetromino = createTetromino(TETROMINOES[newIndex], COLORS[newIndex]);
-          shadowTetromino = createShadowTetromino(tetromino);
-          tetromino.position.set(5, 10, 0); // Adjust position to start within the grid
-          scene.add(tetromino);
-          scene.add(shadowTetromino);
-          break;
-        case 'w':
-          rotateTetromino(tetromino, shadowTetromino);
-          if (checkCollision(tetromino, scene)) {
-            rotateTetromino(tetromino, shadowTetromino); 
-            rotateTetromino(tetromino, shadowTetromino);
-            rotateTetromino(tetromino, shadowTetromino);
-          }
-          updateShadowPosition(shadowTetromino, tetromino, scene); 
-          break;
-        default:
-          break;
-      }
-      updateShadowPosition(shadowTetromino, tetromino, scene);
-      renderer.render(scene, camera);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
+    animate();
 
     return () => {
-      clearInterval(intervalId);
-      window.removeEventListener('keydown', handleKeyDown);
       mountRef.current.removeChild(renderer.domElement);
     };
   }, []);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const TETROMINOES = [
   // I shape
@@ -152,15 +152,16 @@ const Game = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.25;
-    controls.enableZoom = true;
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // controls.enableDamping = true;
+    // controls.dampingFactor = 0.25;
+    // controls.enableZoom = true;
 
     const grid = createGrid(10, 20);
     scene.add(grid);
 
-    camera.position.set(5, -10, 15); // Adjust camera position to center the grid
+    camera.position.set(5, -10, 20);
+    camera.lookAt(5, -10, 0); 
 
     const randomIndex = Math.floor(Math.random() * TETROMINOES.length);
     let tetromino = createTetromino(TETROMINOES[randomIndex], COLORS[randomIndex]);
@@ -185,7 +186,7 @@ const Game = () => {
         scene.add(tetromino);
         scene.add(shadowTetromino);
       }
-      controls.update();
+      // controls.update();
       renderer.render(scene, camera);
     };
 

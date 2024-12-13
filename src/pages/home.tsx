@@ -3,6 +3,8 @@ import { useState } from "react";
 import LayeredTransition from "../components/page-animations/layered";
 import TetrisBackground from "../components/background-animations/tetris-background";
 import "../index.css";
+import HeroComponent from "../components/main-page/HeroComponent";
+import SlidingText from "../components/main-page/SlidingText";
 
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -14,7 +16,7 @@ function Home() {
 
   return (
     <div
-      className="bg-black w-full h-screen flex items-center justify-center font-game"
+      className="bg-black w-full h-screen flex flex-col items-center justify-center font-game"
       onClick={handleClick}
     >
       <TetrisBackground />
@@ -33,38 +35,36 @@ function Home() {
         />
       )}
       {showWelcome && (
-        <div className="relative bg-[#666666] z-10 opacity-100 transition-opacity duration-1000 flex items-center justify-center w-full h-full">
-          <div className="w-full flex flex-row items-center justify-center text-center transition-transform duration-1000 transform font-game">
-            <div className="relative flex flex-1 items-center justify-center">
-              <img
-                className="max-w-3xl"
-                src="./assets/images/logo.png"
-                alt="logo"
-              />
-            </div>
-            <div className="flex-1 flex flex-col items-center justify-center">
-              <p className="text-white mt-4 text-7xl">
-                New Assistant Recruitment
-              </p>
-              <p className="text-white mt-4 text-7xl">25-1</p>
+        <div className="w-full h-full">
+          {/* Hero */}
+          <div
+            className="relative bg-navy 
+                     bg-[linear-gradient(to_right,#80808020_1px,transparent_1px),linear-gradient(to_bottom,#80808020_1px,transparent_1px)] bg-[size:64px_64px]
+                     z-10 opacity-100 transition-opacity duration-1000 flex items-center justify-center w-full h-full"
+          >
+            <div className="w-full flex flex-row items-center justify-center text-center transition-transform duration-1000 transform font-game">
+              <div className="relative flex flex-1 items-center justify-center">
+                <img
+                  id="hero-logo"
+                  className="max-w-3xl hover:scale-105 transition-transform duration-500"
+                  src="./assets/images/logo.png"
+                  alt="logo"
+                />
+              </div>
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <p className="mt-4 text-7xl" id="hero-text">
+                  New Assistant Recruitment
+                  <br />
+                  25-2
+                </p>
+              </div>
             </div>
           </div>
+          {/* Benefits */}
+          <SlidingText text="NAR25-2" />
         </div>
       )}
-      {!showTransition && !showWelcome && (
-        <div className="relative z-10 opacity-100 transition-opacity duration-1000 flex items-center justify-center w-full h-full">
-          <div className="text-center transition-transform duration-1000 transform hover:scale-105 font-game flex flex-col items-center justify-center h-full">
-            <h1 className="text-white animate-bounce text-7xl">NAR</h1>
-            <h2
-              className="text-white animate-pulse mt-2"
-              style={{ fontSize: "10rem" }}
-            >
-              25-2
-            </h2>
-            <p className="text-white mt-4">Click anywhere to continue</p>
-          </div>
-        </div>
-      )}
+      {!showTransition && !showWelcome && <HeroComponent />}
     </div>
   );
 }

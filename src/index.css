@@ -7,6 +7,11 @@
   src: url("/assets/fonts/joystix monospace.otf") format("opentype");
 }
 
+@font-face {
+  font-family: "SportsWorld";
+  src: url("/assets/fonts/SportWorl.otf") format("truetype");
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -35,6 +40,66 @@
   }
   to {
     transform: rotate(-360deg);
+  }
+}
+
+#hero-text {
+  background: linear-gradient(
+    75deg,
+    hsl(196, 85%, 70%) 0%,
+    hsl(198, 88%, 68%) 12.5%,
+    hsl(202, 92%, 66%) 25%,
+    hsl(205, 100%, 65%) 37.5%,
+    hsl(0, 0%, 85%) 50%,
+    hsl(205, 100%, 65%) 62.5%,
+    hsl(202, 92%, 66%) 75%,
+    hsl(198, 88%, 68%) 87.5%,
+    hsl(196, 85%, 70%) 100%
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 10s infinite linear;
+}
+
+#hero-logo {
+  animation: heartbeat 1.5s infinite;
+}
+
+#marquee-text-hollow {
+  /* font-family: "SportsWorld"; */
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 4px #a0d8f4;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0;
+  }
+  25% {
+    background-position: 250px;
+  }
+  50% {
+    background-position: 500px;
+  }
+  75% {
+    background-position: 750px;
+  }
+  100% {
+    background-position: 925px;
   }
 }
 

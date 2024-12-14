@@ -329,6 +329,7 @@ class TetrisGame {
       this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
       if (this.currentY >= 0) {
         this.activePiece = null;
+        this.checkAndClearLines(); // Add this line
         this.spawnNewTetromino();
       }
     }
@@ -368,10 +369,33 @@ class TetrisGame {
     this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
     
     if (this.currentY >= 0) {
+      this.checkAndClearLines(); // Add this line
       this.spawnNewTetromino();
     }
     
     requestAnimationFrame(() => this.updateScene());
+  }
+
+  private checkAndClearLines() {
+    let linesCleared = 0;
+    
+    for (let y = this.grid.length - 1; y >= 0; y--) {
+      const isLineFilled = this.grid[y].every(cell => cell.filled);
+      
+      if (isLineFilled) {
+        // Remove the filled line
+        this.grid.splice(y, 1);
+        // Add new empty line at the top
+        const newRow = Array(this.grid[0].length).fill({ color: null, filled: false });
+        this.grid.unshift(newRow);
+        y++; // Check the same y position again since lines have shifted
+        linesCleared++;
+      }
+    }
+    
+    if (linesCleared > 0) {
+      this.updateScene();
+    }
   }
 
   spawnNewTetromino() {

@@ -292,6 +292,58 @@ class TetrisGame {
     requestAnimationFrame(() => this.updateScene());
   }
 
+  rotateTetromino() {
+    this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    
+    const shape = TETROMINOES[this.currentTetromino];
+    const newRotation: number[][] = [];
+    
+    // Create rotated shape
+    for (let i = 0; i < shape[0].length; i++) {
+      const row: number[] = [];
+      for (let j = shape.length - 1; j >= 0; j--) {
+        row.push(shape[j][i]);
+      }
+      newRotation.push(row);
+    }
+    
+    // Store original shape
+    const originalShape = TETROMINOES[this.currentTetromino];
+    
+    // Temporarily set the rotated shape
+    TETROMINOES[this.currentTetromino] = newRotation;
+    
+    // Check if rotation is possible
+    if (!this.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
+      // If rotation is valid, keep the new shape
+      this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    } else {
+      // If rotation is not valid, restore original shape
+      TETROMINOES[this.currentTetromino] = originalShape;
+      this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    }
+    
+    requestAnimationFrame(() => this.updateScene());
+  }
+
+  hardDrop() {
+    this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    
+    // Keep moving down until collision
+    while (!this.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
+      this.currentY++;
+    }
+    
+    this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    
+    // If the piece has landed, spawn a new one
+    if (this.currentY >= 0) {
+      this.spawnNewTetromino();
+    }
+    
+    requestAnimationFrame(() => this.updateScene());
+  }
+
   spawnNewTetromino() {
     this.currentTetromino = Math.floor(Math.random() * TETROMINOES.length);
     this.currentX = Math.floor((this.grid[0].length - TETROMINOES[this.currentTetromino][0].length) / 2);
@@ -329,6 +381,12 @@ class TetrisGame {
         break;
       case 's':
         this.moveDown();
+        break;
+      case 'w':
+        this.rotateTetromino();
+        break;
+      case ' ': // Handle spacebar
+        this.hardDrop();
         break;
     }
   }

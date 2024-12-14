@@ -49,7 +49,15 @@ const COLORS = [
   0xffa500  // L shape - Orange
 ];
 
-const dropInterval = 200; 
+// Add constants for optimization
+const BLOCK_GEOMETRY = new THREE.BoxGeometry(1, 1, 1);
+const MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({ 
+  color, 
+  opacity: 0.8,
+  transparent: true,
+  shininess: 30
+}));
+const dropInterval = 300; // Increased interval to reduce updates
 
 class TetrisGame {
   grid: Array<Array<{ color: number | null, filled: boolean }>>;
@@ -60,17 +68,30 @@ class TetrisGame {
   setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void;
   currentTetromino: number;
   gameOver: boolean;
+  private lastRenderTime: number;
+  private blockInstances: THREE.InstancedMesh[];
 
   constructor(scene: THREE.Scene, setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void) {
     this.grid = this.createGrid(10, 20);
     this.currentX = 3;
-    this.currentY = 2;
+    this.currentY = -2; 
     this.dropIntervalId = null;
     this.scene = scene;
     this.setTetrominoState = setTetrominoState;
     this.currentTetromino = 0;
     this.gameOver = false;
+    this.lastRenderTime = 0;
+    this.blockInstances = this.initializeBlockInstances();
+    this.scene.add(...this.blockInstances);
     this.startAutoDrop();
+    this.setupLighting();
+  }
+
+  private setupLighting() {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(10, 10, 10);
+    this.scene.add(ambientLight, directionalLight);
   }
 
   createGrid(width: number, height: number) {
@@ -83,79 +104,6 @@ class TetrisGame {
       grid.push(row);
     }
     return grid;
-  }
-
-  mergeTetromino(tetromino: number, startX: number, startY: number) {
-    const shape = TETROMINOES[tetromino];
-    shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value === 1) {
-          const gridX = startX + x;
-          const gridY = startY + y;
-          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
-            this.grid[gridY][gridX] = { color: COLORS[tetromino], filled: true };
-          }
-        }
-      });
-    });
-  }
-
-  clearTetrominoFromGrid(tetromino: number, startX: number, startY: number) {
-    const shape = TETROMINOES[tetromino];
-    for (let y = 0; y < shape.length; y++) {
-      for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x] === 1) {
-          const gridX = startX + x;
-          const gridY = startY + y;
-          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
-            this.grid[gridY][gridX] = { color: null, filled: false };
-          }
-        }
-      }
-    }
-  }
-
-  renderGrid() {
-    const group = new THREE.Group();
-    for (let y = 0; y < this.grid.length; y++) {
-      for (let x = 0; x < this.grid[y].length ; x++) {
-        if (this.grid[y][x].filled) {
-          const geometry = new THREE.BoxGeometry(1, 1, 1);
-          const color = this.grid[y][x].color || 0xffffff;
-          const material = new THREE.MeshBasicMaterial({ color, wireframe: !this.grid[y][x].filled, opacity: 0.5, transparent: true });
-          const cube = new THREE.Mesh(geometry, material);
-          cube.position.set(x + 0.5, -y + 0.5, 0); 
-          group.add(cube);
-        }
-      }
-    }
-    group.name = 'grid';
-    return group;
-  }
-
-  renderGridBorders(width: number, height: number) {
-    const group = new THREE.Group();
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-    for (let y = 0; y <= height; y++) {
-      const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, -y, 0),
-        new THREE.Vector3(width, -y, 0)
-      ]);
-      const line = new THREE.Line(geometry, material);
-      group.add(line);
-    }
-
-    for (let x = 0; x <= width; x++) {
-      const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(x, 0, 0),
-        new THREE.Vector3(x, -height, 0)
-      ]);
-      const line = new THREE.Line(geometry, material);
-      group.add(line);
-    }
-
-    return group;
   }
 
   placeTetrominoOnGrid(tetromino: number, startX: number, startY: number) {
@@ -173,10 +121,102 @@ class TetrisGame {
     }
   }
 
+  clearTetrominoFromGrid(tetromino: number, startX: number, startY: number) {
+    const shape = TETROMINOES[tetromino];
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
+          const gridX = startX + x;
+          const gridY = startY + y;
+          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
+            this.grid[gridY][gridX] = { color: null, filled: false };
+          }
+        }
+      }
+    }
+  }
+
+  private initializeBlockInstances(): THREE.InstancedMesh[] {
+    return COLORS.map((_, index) => {
+      const instancedMesh = new THREE.InstancedMesh(
+        BLOCK_GEOMETRY,
+        MATERIALS[index],
+        200 // Max instances per color
+      );
+      instancedMesh.count = 0;
+      return instancedMesh;
+    });
+  }
+
+  renderGrid() {
+    const matrix = new THREE.Matrix4();
+    const instanceCounts = new Array(COLORS.length).fill(0);
+
+    // Reset instance counts
+    this.blockInstances.forEach(mesh => mesh.count = 0);
+
+    // Update instances
+    for (let y = 0; y < this.grid.length; y++) {
+      for (let x = 0; x < this.grid[y].length; x++) {
+        const cell = this.grid[y][x];
+        if (cell.filled && cell.color !== null) {
+          const colorIndex = COLORS.indexOf(cell.color);
+          if (colorIndex !== -1) {
+            matrix.setPosition(x + 0.5, -y + 0.5, 0);
+            this.blockInstances[colorIndex].setMatrixAt(
+              instanceCounts[colorIndex]++,
+              matrix
+            );
+            this.blockInstances[colorIndex].count = instanceCounts[colorIndex];
+          }
+        }
+      }
+    }
+
+    // Update instance matrices
+    this.blockInstances.forEach(mesh => {
+      if (mesh.count > 0) {
+        mesh.instanceMatrix.needsUpdate = true;
+      }
+    });
+  }
+
+  renderGridBorders(width: number, height: number) {
+    const group = new THREE.Group();
+    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+    // Draw horizontal lines
+    for (let y = 0; y <= height; y++) {
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, -y, 0),
+        new THREE.Vector3(width, -y, 0)
+      ]);
+      const line = new THREE.Line(geometry, material);
+      group.add(line);
+    }
+
+    // Draw vertical lines
+    for (let x = 0; x <= width; x++) {
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(x, 0, 0),
+        new THREE.Vector3(x, -height, 0)
+      ]);
+      const line = new THREE.Line(geometry, material);
+      group.add(line);
+    }
+
+    return group;
+  }
+
   updateScene() {
-    this.scene.remove(this.scene.getObjectByName('grid'));
-    const gridGroup = this.renderGrid();
-    this.scene.add(gridGroup);
+    // Throttle updates
+    const now = performance.now();
+    if (now - this.lastRenderTime < 16) { // Cap at ~60fps
+      return;
+    }
+    this.lastRenderTime = now;
+
+    this.renderGrid();
   }
 
   checkCollision(tetromino: number, testX: number, testY: number): boolean {
@@ -187,16 +227,20 @@ class TetrisGame {
           const newX = testX + x;
           const newY = testY + y;
           
-          // Check boundaries
-          if (newX < 0 || newX >= this.grid[0].length || newY >= this.grid.length) {
+          // Check horizontal boundaries
+          if (newX < 0 || newX >= this.grid[0].length) {
             return true;
           }
           
-          // Check collision with other pieces
+          // Check bottom boundary
+          if (newY >= this.grid.length) {
+            return true;
+          }
+          
+          // Check collision with other pieces only when within grid
           if (newY >= 0) {
-            // Skip checking positions above the grid
             if (this.grid[newY][newX].filled) {
-              // Need to check if the filled cell belongs to the current tetromino
+              // Check if the filled cell belongs to current piece
               const isSelfCollision = (
                 newY === this.currentY + y &&
                 newX === this.currentX + x
@@ -214,39 +258,44 @@ class TetrisGame {
 
   moveLeft() {
     this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    
     if (!this.checkCollision(this.currentTetromino, this.currentX - 1, this.currentY)) {
       this.currentX--;
     }
     this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
-    this.updateScene();
+    requestAnimationFrame(() => this.updateScene());
   }
 
   moveRight() {
     this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    
     if (!this.checkCollision(this.currentTetromino, this.currentX + 1, this.currentY)) {
       this.currentX++;
     }
     this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
-    this.updateScene();
+    requestAnimationFrame(() => this.updateScene());
   }
 
   moveDown() {
     this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+
     if (!this.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
       this.currentY++;
       this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
     } else {
-      // If we can't move down, place the piece back and spawn a new one
       this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
-      this.spawnNewTetromino();
+      if (this.currentY >= 0) {
+        this.spawnNewTetromino();
+      }
     }
-    this.updateScene();
+    
+    requestAnimationFrame(() => this.updateScene());
   }
 
   spawnNewTetromino() {
     this.currentTetromino = Math.floor(Math.random() * TETROMINOES.length);
     this.currentX = Math.floor((this.grid[0].length - TETROMINOES[this.currentTetromino][0].length) / 2);
-    this.currentY = 0;
+    this.currentY = -2; // Start above the grid
     
     if (this.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
       this.gameOver = true;
@@ -286,49 +335,61 @@ class TetrisGame {
 }
 
 const Game = () => {
-  const mountRef = useRef(null);
+  const mountRef = useRef<HTMLDivElement>(null); 
   const [tetrominoState, setTetrominoState] = useState({ tetromino: 0, startX: 3, startY: 0 });
   const gameInstanceRef = useRef<TetrisGame | null>(null);
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111111); 
+
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true,
+      alpha: true
+    });
+    
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    if (mountRef.current) {
-      mountRef.current.appendChild(renderer.domElement);
-    }
+    renderer.setClearColor(0x000000, 0);
+
+    const mount = mountRef.current;
+    if (!mount) return;
+    
+    mount.innerHTML = ''; 
+    mount.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.25;
     controls.enableZoom = true;
 
-    // Create and store the game instance
     const tetrisGame = new TetrisGame(scene, setTetrominoState);
     gameInstanceRef.current = tetrisGame;
     tetrisGame.spawnNewTetromino();
 
-    const gridGroup = tetrisGame.renderGrid();
     const gridBorders = tetrisGame.renderGridBorders(10, 20);
-    scene.add(gridGroup);
     scene.add(gridBorders);
 
     camera.position.set(5, -10, 20);
     camera.lookAt(5, -10, 0);
 
-    const animate = () => {
+    let lastTime = 0;
+    const animate = (currentTime: number) => {
+      if (currentTime - lastTime >= 16) {
+        controls.update();
+        renderer.render(scene, camera);
+        lastTime = currentTime;
+      }
       requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
     };
-    animate();
+    requestAnimationFrame(animate);
 
     return () => {
-      if (mountRef.current) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (mount && mount.contains(renderer.domElement)) {
+        mount.removeChild(renderer.domElement);
       }
-      // Clear the game instance on cleanup
+      renderer.dispose();
       gameInstanceRef.current = null;
     };
   };
@@ -336,10 +397,7 @@ const Game = () => {
   useEffect(() => {
     const cleanup = initializeGame();
     
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (gameInstanceRef.current) {
-        gameInstanceRef.current.handleKeyPress(event);
-      }
+    const handleKeyPress = (event: KeyboardEvent) => {      if (gameInstanceRef.current) {        gameInstanceRef.current.handleKeyPress(event);      }
     };
     
     window.addEventListener('keydown', handleKeyPress);
@@ -353,7 +411,7 @@ const Game = () => {
     };
   }, []);
 
-  return <div ref={mountRef}></div>;
+  return <div ref={mountRef} style={{ width: '100%', height: '100vh' }}></div>;
 };
 
 export default Game;

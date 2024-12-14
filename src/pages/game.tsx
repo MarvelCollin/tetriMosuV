@@ -58,14 +58,19 @@ class TetrisGame {
   dropIntervalId: NodeJS.Timeout | null;
   scene: THREE.Scene;
   setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void;
+  currentTetromino: number;
+  gameOver: boolean;
 
   constructor(scene: THREE.Scene, setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void) {
     this.grid = this.createGrid(10, 20);
     this.currentX = 3;
-    this.currentY = 0;
+    this.currentY = 2;
     this.dropIntervalId = null;
     this.scene = scene;
     this.setTetrominoState = setTetrominoState;
+    this.currentTetromino = 0;
+    this.gameOver = false;
+    this.startAutoDrop();
   }
 
   createGrid(width: number, height: number) {
@@ -80,31 +85,6 @@ class TetrisGame {
     return grid;
   }
 
-  checkCollision(tetromino: number, startX: number, startY: number) {
-    const shape = TETROMINOES[tetromino];
-    for (let y = shape.length - 1; y >= 0; y--) {
-      for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x] === 1) {
-          const gridX = startX + x;
-          const gridY = startY + y + 1;
-
-          let isLastLayer = true;
-          for (let k = y + 1; k < shape.length; k++) {
-            if (shape[k][x] === 1) {
-              isLastLayer = false;
-              break;
-            }
-          }
-
-          if (isLastLayer && (gridY >= this.grid.length || (this.grid[gridY] && this.grid[gridY][gridX] && this.grid[gridY][gridX].filled))) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
   mergeTetromino(tetromino: number, startX: number, startY: number) {
     const shape = TETROMINOES[tetromino];
     shape.forEach((row, y) => {
@@ -112,7 +92,7 @@ class TetrisGame {
         if (value === 1) {
           const gridX = startX + x;
           const gridY = startY + y;
-          if (this.grid[gridY] && this.grid[gridX]) {
+          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
             this.grid[gridY][gridX] = { color: COLORS[tetromino], filled: true };
           }
         }
@@ -122,23 +102,23 @@ class TetrisGame {
 
   clearTetrominoFromGrid(tetromino: number, startX: number, startY: number) {
     const shape = TETROMINOES[tetromino];
-    shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value === 1) {
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
           const gridX = startX + x;
           const gridY = startY + y;
-          if (this.grid[gridY] && this.grid[gridX]) {
+          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
             this.grid[gridY][gridX] = { color: null, filled: false };
           }
         }
-      });
-    });
+      }
+    }
   }
 
   renderGrid() {
     const group = new THREE.Group();
     for (let y = 0; y < this.grid.length; y++) {
-      for (let x = 0; x < this.grid[y].length; x++) {
+      for (let x = 0; x < this.grid[y].length ; x++) {
         if (this.grid[y][x].filled) {
           const geometry = new THREE.BoxGeometry(1, 1, 1);
           const color = this.grid[y][x].color || 0xffffff;
@@ -180,68 +160,127 @@ class TetrisGame {
 
   placeTetrominoOnGrid(tetromino: number, startX: number, startY: number) {
     const shape = TETROMINOES[tetromino];
-    shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value === 1) {
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
           const gridX = startX + x;
           const gridY = startY + y;
-          if (this.grid[gridY] && this.grid[gridX]) {
+          if (gridY >= 0 && gridY < this.grid.length && gridX >= 0 && gridX < this.grid[0].length) {
             this.grid[gridY][gridX] = { color: COLORS[tetromino], filled: true };
           }
         }
-      });
-    });
-  }
-
-  autoDropTetromino(tetromino: number, startX: number, startY: number) {
-    this.currentX = startX;
-    this.currentY = startY;
-
-    const drop = () => {
-      if (this.checkCollision(tetromino, this.currentX, this.currentY)) {
-        this.mergeTetromino(tetromino, this.currentX, this.currentY);
-        clearInterval(this.dropIntervalId!);
-        const newTetromino = Math.floor(Math.random() * TETROMINOES.length);
-        const newStartX = 3;
-        const newStartY = 0;
-        this.setTetrominoState({ tetromino: newTetromino, startX: newStartX, startY: newStartY });
-        this.autoDropTetromino(newTetromino, newStartX, newStartY);
-      } else {
-        this.clearTetrominoFromGrid(tetromino, this.currentX, this.currentY);
-        this.currentY += 1;
-        this.placeTetrominoOnGrid(tetromino, this.currentX, this.currentY);
-        this.setTetrominoState({ tetromino, startX: this.currentX, startY: this.currentY });
-        this.scene.remove(this.scene.getObjectByName('grid'));
-        const gridGroup = this.renderGrid();
-        this.scene.add(gridGroup);
       }
-    };
-
-    clearInterval(this.dropIntervalId!);
-    this.dropIntervalId = setInterval(drop, dropInterval);
-  }
-
-  moveLeft(tetromino: number) {
-    if (this.currentX > 0 && !this.checkCollision(tetromino, this.currentX - 1, this.currentY)) {
-      this.clearTetrominoFromGrid(tetromino, this.currentX, this.currentY);
-      this.placeTetrominoOnGrid(tetromino, this.currentX - 1, this.currentY);
-      this.currentX -= 1;
     }
   }
 
-  moveRight(tetromino: number) {
-    if (this.currentX < this.grid[0].length - TETROMINOES[tetromino][0].length && !this.checkCollision(tetromino, this.currentX + 1, this.currentY)) {
-      this.clearTetrominoFromGrid(tetromino, this.currentX, this.currentY);
-      this.placeTetrominoOnGrid(tetromino, this.currentX + 1, this.currentY);
-      this.currentX += 1;
-    }
+  updateScene() {
+    this.scene.remove(this.scene.getObjectByName('grid'));
+    const gridGroup = this.renderGrid();
+    this.scene.add(gridGroup);
   }
 
-  moveDown(tetromino: number) {
-    if (!this.checkCollision(tetromino, this.currentX, this.currentY + 1)) {
-      this.clearTetrominoFromGrid(tetromino, this.currentX, this.currentY);
-      this.placeTetrominoOnGrid(tetromino, this.currentX, this.currentY + 1);
-      this.currentY += 1;
+  checkCollision(tetromino: number, testX: number, testY: number): boolean {
+    const shape = TETROMINOES[tetromino];
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
+          const newX = testX + x;
+          const newY = testY + y;
+          
+          // Check boundaries
+          if (newX < 0 || newX >= this.grid[0].length || newY >= this.grid.length) {
+            return true;
+          }
+          
+          // Check collision with other pieces
+          if (newY >= 0) {
+            // Skip checking positions above the grid
+            if (this.grid[newY][newX].filled) {
+              // Need to check if the filled cell belongs to the current tetromino
+              const isSelfCollision = (
+                newY === this.currentY + y &&
+                newX === this.currentX + x
+              );
+              if (!isSelfCollision) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  moveLeft() {
+    this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    if (!this.checkCollision(this.currentTetromino, this.currentX - 1, this.currentY)) {
+      this.currentX--;
+    }
+    this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    this.updateScene();
+  }
+
+  moveRight() {
+    this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    if (!this.checkCollision(this.currentTetromino, this.currentX + 1, this.currentY)) {
+      this.currentX++;
+    }
+    this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    this.updateScene();
+  }
+
+  moveDown() {
+    this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
+    if (!this.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
+      this.currentY++;
+      this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    } else {
+      // If we can't move down, place the piece back and spawn a new one
+      this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+      this.spawnNewTetromino();
+    }
+    this.updateScene();
+  }
+
+  spawnNewTetromino() {
+    this.currentTetromino = Math.floor(Math.random() * TETROMINOES.length);
+    this.currentX = Math.floor((this.grid[0].length - TETROMINOES[this.currentTetromino][0].length) / 2);
+    this.currentY = 0;
+    
+    if (this.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
+      this.gameOver = true;
+      if (this.dropIntervalId) {
+        clearInterval(this.dropIntervalId);
+      }
+      console.log('Game Over!');
+    } else {
+      this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
+    }
+    this.updateScene();
+  }
+
+  startAutoDrop() {
+    this.dropIntervalId = setInterval(() => {
+      if (!this.gameOver) {
+        this.moveDown();
+      }
+    }, dropInterval);
+  }
+
+  handleKeyPress(event: KeyboardEvent) {
+    if (this.gameOver) return;
+    
+    switch (event.key.toLowerCase()) {
+      case 'a':
+        this.moveLeft();
+        break;
+      case 'd':
+        this.moveRight();
+        break;
+      case 's':
+        this.moveDown();
+        break;
     }
   }
 }
@@ -249,6 +288,7 @@ class TetrisGame {
 const Game = () => {
   const mountRef = useRef(null);
   const [tetrominoState, setTetrominoState] = useState({ tetromino: 0, startX: 3, startY: 0 });
+  const gameInstanceRef = useRef<TetrisGame | null>(null);
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
@@ -264,34 +304,16 @@ const Game = () => {
     controls.dampingFactor = 0.25;
     controls.enableZoom = true;
 
+    // Create and store the game instance
     const tetrisGame = new TetrisGame(scene, setTetrominoState);
-    const tetromino = Math.floor(Math.random() * TETROMINOES.length);
-    const startX = 3;
-    const startY = 0;
-    setTetrominoState({ tetromino, startX, startY });
+    gameInstanceRef.current = tetrisGame;
+    tetrisGame.spawnNewTetromino();
 
     const gridGroup = tetrisGame.renderGrid();
     const gridBorders = tetrisGame.renderGridBorders(10, 20);
     scene.add(gridGroup);
     scene.add(gridBorders);
-    tetrisGame.autoDropTetromino(tetrominoState.tetromino, tetrominoState.startX, tetrominoState.startY);
 
-    const handleKeyDown = (event) => {
-      if (event.key === 'a' || event.key === 'A') {
-        tetrisGame.moveLeft(tetrominoState.tetromino);
-      } else if (event.key === 'd' || event.key === 'D') {
-        tetrisGame.moveRight(tetrominoState.tetromino);
-      } else if (event.key === 's' || event.key === 'S') {
-        tetrisGame.moveDown(tetrominoState.tetromino);
-      }
-
-      setTetrominoState({ tetromino: tetrominoState.tetromino, startX: tetrisGame.currentX, startY: tetrisGame.currentY });
-      scene.remove(scene.getObjectByName('grid'));
-      const gridGroup = tetrisGame.renderGrid();
-      scene.add(gridGroup);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
     camera.position.set(5, -10, 20);
     camera.lookAt(5, -10, 0);
 
@@ -303,16 +325,32 @@ const Game = () => {
     animate();
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
       if (mountRef.current) {
         mountRef.current.removeChild(renderer.domElement);
       }
-      clearInterval(tetrisGame.dropIntervalId!);
+      // Clear the game instance on cleanup
+      gameInstanceRef.current = null;
     };
   };
 
   useEffect(() => {
-    initializeGame();
+    const cleanup = initializeGame();
+    
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (gameInstanceRef.current) {
+        gameInstanceRef.current.handleKeyPress(event);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    
+    return () => {
+      cleanup();
+      window.removeEventListener('keydown', handleKeyPress);
+      if (gameInstanceRef.current?.dropIntervalId) {
+        clearInterval(gameInstanceRef.current.dropIntervalId);
+      }
+    };
   }, []);
 
   return <div ref={mountRef}></div>;

@@ -378,21 +378,14 @@ class TetrisGame {
 
   private checkAndClearLines() {
     let linesCleared = 0;
-    
     for (let y = this.grid.length - 1; y >= 0; y--) {
-      const isLineFilled = this.grid[y].every(cell => cell.filled);
-      
-      if (isLineFilled) {
-        // Remove the filled line
+      if (this.grid[y].every(cell => cell.filled)) {
         this.grid.splice(y, 1);
-        // Add new empty line at the top
-        const newRow = Array(this.grid[0].length).fill({ color: null, filled: false });
-        this.grid.unshift(newRow);
-        y++; // Check the same y position again since lines have shifted
+        this.grid.unshift(Array(this.grid[0].length).fill({ color: null, filled: false }));
         linesCleared++;
       }
     }
-    
+  
     if (linesCleared > 0) {
       this.updateScene();
     }

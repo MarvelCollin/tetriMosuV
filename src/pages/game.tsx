@@ -329,7 +329,7 @@ class TetrisGame {
       this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
       if (this.currentY >= 0) {
         this.activePiece = null;
-        this.checkAndClearLines(); // Add this line
+        this.checkAndClearLines(); // Check and clear lines after placing a tetromino
         this.spawnNewTetromino();
       }
     }
@@ -369,29 +369,14 @@ class TetrisGame {
     this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
     
     if (this.currentY >= 0) {
-      this.checkAndClearLines(); // Add this line
+      this.checkAndClearLines(); // Check and clear lines after hard drop
       this.spawnNewTetromino();
     }
     
     requestAnimationFrame(() => this.updateScene());
   }
 
-  private checkAndClearLines() {
-    let linesCleared = 0;
-    for (let y = this.grid.length - 1; y >= 0; y--) {
-      if (this.grid[y].every(cell => cell.filled)) {
-        this.grid.splice(y, 1);
-        this.grid.unshift(Array(this.grid[0].length).fill({ color: null, filled: false }));
-        linesCleared++;
-      }
-    }
-  
-    if (linesCleared > 0) {
-      this.updateScene();
-    }
-  }
-
-  spawnNewTetromino() {
+  spawnNewTetromino() { 
     this.currentTetromino = Math.floor(Math.random() * TETROMINOES.length);
     this.currentX = Math.floor((this.grid[0].length - TETROMINOES[this.currentTetromino][0].length) / 2);
     this.currentY = -2;
@@ -435,6 +420,23 @@ class TetrisGame {
         this.hardDrop();
         break;
     }
+  }
+
+  private checkAndClearLines() {
+    let linesCleared = 0;
+    const newGrid = this.grid.filter(row => !row.every(cell => cell.filled));
+    linesCleared = this.grid.length - newGrid.length;
+    while (newGrid.length < this.grid.length) {
+      newGrid.unshift(this.createEmptyRow());
+    }
+    this.grid = newGrid;
+    if (linesCleared > 0) {
+      console.log(`${linesCleared} line(s) cleared!`);
+    }
+  }
+
+  private createEmptyRow() {
+    return new Array(this.grid[0].length).fill({ color: null, filled: false });
   }
 }
 

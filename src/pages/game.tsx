@@ -48,14 +48,92 @@ const MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({
   shininess: 30
 }));
 
-// Modify shadow material to be a darker version of the tetromino color
 const SHADOW_MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({
   color: new THREE.Color(color).multiplyScalar(0.5),
   opacity: 0.5,
   transparent: true
 }));
 
-const dropInterval = 200; // Reduced drop interval for faster gameplay
+const dropInterval = 200; 
+
+class ParticleSystem {
+  private particles: {
+    mesh: THREE.Mesh,
+    velocity: THREE.Vector3,
+    life: number
+  }[] = [];
+  private scene: THREE.Scene;
+  private lastUpdate: number = 0;
+  private isAnimating: boolean = false;
+
+  constructor(scene: THREE.Scene) {
+    this.scene = scene;
+  }
+
+  addParticlesForLine(lineY: number, grid: Array<Array<{ color: number | null, filled: boolean }>>) {
+    const newParticles = [];
+    for (let x = 0; x < grid[0].length; x++) {
+      if (grid[lineY][x].filled && grid[lineY][x].color !== null) {
+        const colorIndex = COLORS.indexOf(grid[lineY][x].color!);
+        if (colorIndex !== -1) {
+          const geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+          const material = MATERIALS[colorIndex].clone();
+          material.transparent = true;
+          
+          const particle = new THREE.Mesh(geometry, material);
+          particle.position.set(x + 0.5, -lineY + 0.5, 0);
+          this.scene.add(particle);
+          
+          newParticles.push({
+            mesh: particle,
+            velocity: new THREE.Vector3(
+              (Math.random() - 0.5) * 2,
+              (Math.random() - 0.5) * 2,
+              (Math.random() - 0.5) * 2
+            ),
+            life: 3.0
+          });
+        }
+      }
+    }
+    
+    this.particles.push(...newParticles);
+    if (!this.isAnimating) {
+      this.startAnimation();
+    }
+  }
+
+  private startAnimation() {
+    this.isAnimating = true;
+    const animate = () => {
+      const currentTime = performance.now();
+      if (currentTime - this.lastUpdate >= 16) { 
+        this.lastUpdate = currentTime;
+        this.updateParticles();
+      }
+
+      if (this.particles.length > 0 && this.isAnimating) {
+        requestAnimationFrame(animate);
+      } else {
+        this.isAnimating = false;
+      }
+    };
+    requestAnimationFrame(animate);
+  }
+
+  private updateParticles() {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const particle = this.particles[i];
+      particle.mesh.position.add(particle.velocity);
+      particle.mesh.material.opacity = particle.life;
+      particle.life -= 0.02;
+      if (particle.life <= 0) {
+        this.scene.remove(particle.mesh);
+        this.particles.splice(i, 1);
+      }
+    }
+  }
+}
 
 class TetrisGame {
   grid: Array<Array<{ color: number | null, filled: boolean }>>;
@@ -71,7 +149,7 @@ class TetrisGame {
   private shadowBlockInstances: THREE.InstancedMesh[];
   private hardDropPressed: boolean;
   private dropAnimation: { scale: number, blocks: Set<string> } = { scale: 1, blocks: new Set() };
-  private lineClearEffect: { mesh: THREE.Mesh, velocity: THREE.Vector3, life: number }[] = [];
+  private particleSystem: ParticleSystem;
 
   constructor(scene: THREE.Scene, setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void) {
     this.grid = this.createGrid(10, 20);
@@ -90,6 +168,7 @@ class TetrisGame {
     this.startAutoDrop();
     this.setupLighting();
     this.hardDropPressed = false;
+    this.particleSystem = new ParticleSystem(scene);
   }
 
   private setupLighting() {
@@ -103,7 +182,7 @@ class TetrisGame {
 
   createGrid(width: number, height: number) {
     const grid: Array<Array<{ color: number | null, filled: boolean }>> = [];
-    for (let y = 0; y < height + 1; y++) { // Adjust height to remove the bottom row
+    for (let y = 0; y < height + 1; y++) { 
       const row: Array<{ color: number | null, filled: boolean }> = [];
       for (let x = 0; x < width; x++) {
         row.push({ color: null, filled: false });
@@ -260,11 +339,11 @@ class TetrisGame {
 
     if (this.hardDropPressed) {
       this.blockInstances.forEach(mesh => {
-        mesh.material.opacity = 1.0; // Increase opacity for pressed effect
+        mesh.material.opacity = 1.0;
       });
     } else {
       this.blockInstances.forEach(mesh => {
-        mesh.material.opacity = 0.8; // Reset opacity
+        mesh.material.opacity = 0.8;
       });
     }
 
@@ -304,7 +383,7 @@ class TetrisGame {
     }
     this.lastRenderTime = now;
     this.renderGrid();
-    this.updateLineClearEffect();
+    this.particleSystem.updateParticles();
   }
 
   checkCollision(tetromino: number, testX: number, testY: number): boolean {
@@ -441,9 +520,8 @@ class TetrisGame {
     if (this.currentY >= 0) {
       const shape = TETROMINOES[this.currentTetromino];
       this.dropAnimation.blocks.clear();
-      this.dropAnimation.scale = 1.1; // Reduced from 1.2 to 1.1 for subtler effect
+      this.dropAnimation.scale = 1.1; 
       
-      // Add affected blocks to animation set
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x] === 1) {
@@ -454,10 +532,9 @@ class TetrisGame {
         }
       }
 
-      // Faster, more subtle animation
       const animate = () => {
         if (this.dropAnimation.scale > 1) {
-          this.dropAnimation.scale -= 0.1; // Faster animation
+          this.dropAnimation.scale -= 0.1; 
           this.updateScene();
           requestAnimationFrame(animate);
         } else {
@@ -532,51 +609,15 @@ class TetrisGame {
     this.grid = newGrid;
     if (clearedLines > 0) {
       console.log(`${clearedLines} line(s) cleared!`);
-      this.clearShadow(); // Clear shadow when lines are cleared
+      this.clearShadow(); 
       for (let y = 0; y < clearedLines; y++) {
-        this.createLineClearEffect(this.grid.length - clearedLines + y);
+        this.particleSystem.addParticlesForLine(this.grid.length - clearedLines + y, this.grid);
       }
     }
   }
 
   private createEmptyRow() {
     return new Array(this.grid[0].length).fill({ color: null, filled: false });
-  }
-
-  private createLineClearEffect(lineY: number) {
-    const blocksToAnimate = [];
-    for (let x = 0; x < this.grid[0].length; x++) {
-      if (this.grid[lineY][x].filled) {
-        const colorIndex = COLORS.indexOf(this.grid[lineY][x].color);
-        if (colorIndex !== -1) {
-          const block = new THREE.Mesh(BLOCK_GEOMETRY, MATERIALS[colorIndex]);
-          block.position.set(x + 0.5, -lineY + 0.5, 0);
-          this.scene.add(block);
-          blocksToAnimate.push({
-            mesh: block,
-            velocity: new THREE.Vector3(
-              (Math.random() - 0.5) * 2, // Further increased velocity
-              (Math.random() - 0.5) * 2, // Further increased velocity
-              (Math.random() - 0.5) * 2  // Further increased velocity
-            ),
-            life: 3 // Increased life for longer effect
-          });
-        }
-      }
-    }
-    this.lineClearEffect.push(...blocksToAnimate);
-  }
-
-  private updateLineClearEffect() {
-    this.lineClearEffect.forEach((block, index) => {
-      block.mesh.position.add(block.velocity);
-      block.mesh.material.opacity = block.life;
-      block.life -= 0.07; // Faster fade out
-      if (block.life <= 0) {
-        this.scene.remove(block.mesh);
-        this.lineClearEffect.splice(index, 1);
-      }
-    });
   }
 }
 

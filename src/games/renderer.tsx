@@ -13,6 +13,9 @@ class Renderer {
     private shadowBlocks: THREE.Mesh[] = [];
     private previewBlocks: THREE.Mesh[] = [];
     private directionLabels: THREE.Mesh[] = [];
+    // Add new property
+    private scoreText: THREE.Mesh | null = null;
+    private keybindText: THREE.Mesh | null = null;
 
     constructor(scene: THREE.Scene, gridManager: GridManager) {
         this.scene = scene;
@@ -134,59 +137,9 @@ class Renderer {
             subtitleMesh.position.set(previewX - 0.6, -previewY + 2, 0);
             this.scene.add(subtitleMesh);
             this.directionLabels.push(subtitleMesh);
-
-            const directions = [
-                { text: 'N', x: 0, y: -3.5, lineStart: new THREE.Vector2(0, -2.5), lineEnd: new THREE.Vector2(0, -3.2) },
-                { text: 'E', x: 2, y: -5, lineStart: new THREE.Vector2(1, -5), lineEnd: new THREE.Vector2(1.7, -5) },
-                { text: 'S', x: 0, y: -6.5, lineStart: new THREE.Vector2(0, -6.2), lineEnd: new THREE.Vector2(0, -5.5) },
-                { text: 'W', x: -2, y: -5, lineStart: new THREE.Vector2(-1.7, -5), lineEnd: new THREE.Vector2(-1, -5) }
-            ];
-
-            const circleGeometry = new THREE.CircleGeometry(0.8, 32);
-            const circleMaterial = new THREE.LineBasicMaterial({ 
-                color: 0x00ffff,
-                opacity: 0.3,
-                transparent: true 
-            });
-            const circle = new THREE.LineLoop(circleGeometry, circleMaterial);
-            circle.position.set(previewX + shape[0].length/2, -previewY - shape.length - 5, 0);
-            this.scene.add(circle);
-            this.directionLabels.push(circle);
-
-            directions.forEach(dir => {
-                // Add connecting line
-                const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(dir.lineStart.x + previewX + shape[0].length/2, dir.lineStart.y - previewY - shape.length, 0),
-                    new THREE.Vector3(dir.lineEnd.x + previewX + shape[0].length/2, dir.lineEnd.y - previewY - shape.length, 0)
-                ]);
-                const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({
-                    color: 0x00ffff,
-                    opacity: 0.5,
-                    transparent: true
-                }));
-                this.scene.add(line);
-                this.directionLabels.push(line);
-
-                // Add direction text
-                const dirGeometry = new TextGeometry(dir.text, {
-                    font: font,
-                    size: 0.3,
-                    height: 0.1,
-                    curveSegments: 12,
-                    bevelEnabled: false
-                });
-                
-                const dirMesh = new THREE.Mesh(dirGeometry, titleMaterial.clone());
-                dirMesh.position.set(
-                    previewX + shape[0].length/2 + dir.x,
-                    -previewY - shape.length + dir.y,
-                    0
-                );
-                this.scene.add(dirMesh);
-                this.directionLabels.push(dirMesh);
-            });
         });
 
+        // Preview blocks
         shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value === 1) {
@@ -199,13 +152,7 @@ class Renderer {
             });
         });
 
-        const labelMaterial = new THREE.MeshBasicMaterial({
-            color: 0x00ffff,
-            transparent: true,
-            opacity: 0.8,
-            side: THREE.DoubleSide
-        });
-
+        // Preview border
         const borderGeometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(previewX - 0.5, -previewY + 1.5, 0),
             new THREE.Vector3(previewX + shape[0].length + 0.5, -previewY + 1.5, 0),
@@ -225,7 +172,59 @@ class Renderer {
         );
         this.scene.add(border);
         this.directionLabels.push(border);
+    }
 
+    updateScore(score: number) {
+        if (this.scoreText) {
+            this.scene.remove(this.scoreText);
+        }
+
+        const loader = new FontLoader();
+        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+            const textGeometry = new TextGeometry(`SCORE: ${score}`, {
+                font: font,
+                size: 0.5,
+                height: 0.1,
+                curveSegments: 12,
+                bevelEnabled: false
+            });
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x00ffff,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.4,
+                transparent: true,
+                opacity: 0.9
+            });
+            
+            this.scoreText = new THREE.Mesh(textGeometry, material);
+            this.scoreText.position.set(-5, 1, 0); // Position to the left of grid
+            this.scene.add(this.scoreText);
+
+            // Add keybinds if not already added
+            if (!this.keybindText) {
+                const keybindsGeometry = new TextGeometry(
+                    "CONTROLS:\n\n" +
+                    "W - Rotate\n" +
+                    "A - Move Left\n" +
+                    "S - Move Down\n" +
+                    "D - Move Right\n" +
+                    "R - Swap Piece\n" +
+                    "SPACE - Hard Drop", {
+                    font: font,
+                    size: 0.3,
+                    height: 0.05,
+                    curveSegments: 12,
+                    bevelEnabled: false
+                });
+
+                const keybindsMaterial = material.clone();
+                keybindsMaterial.opacity = 0.7;
+                this.keybindText = new THREE.Mesh(keybindsGeometry, keybindsMaterial);
+                this.keybindText.position.set(12, -8, 0); // Position to the right of grid
+                this.scene.add(this.keybindText);
+            }
+        });
     }
 }
 

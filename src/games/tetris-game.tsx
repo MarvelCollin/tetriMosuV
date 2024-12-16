@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { TETROMINOES } from './tetrominoes';
-import { COLORS, MATERIALS, SHADOW_MATERIALS, BLOCK_GEOMETRY } from './colors';
+import { COLORS, MATERIALS, SHADOW_MATERIALS, BLOCK_GEOMETRY, currentTheme } from './colors';
 import ParticleSystem from './particle-system';
 import GridManager from './grid-manager';
 import InputHandler from './input-handler';
@@ -28,6 +28,7 @@ class TetrisGame {
     private cameraShake: { enabled: boolean; intensity: number; decay: number; };
     private originalCameraPosition: THREE.Vector3;
     private nextTetromino: number;
+    private score: number = 0;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -57,6 +58,8 @@ class TetrisGame {
         };
 
         this.nextTetromino = Math.floor(Math.random() * TETROMINOES.length);
+        this.score = 0;
+        this.renderer.updateScore(this.score);
 
         this.setupLighting();
         this.startAutoDrop();
@@ -163,7 +166,11 @@ class TetrisGame {
             this.currentY++;
         } else {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
-            if (this.gridManager.checkAndClearLines(this.particleSystem) > 0) {
+            const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
+            if (linesCleared > 0) {
+                // Add score based on lines cleared
+                this.score += linesCleared * 100;
+                this.renderer.updateScore(this.score);
                 this.triggerCameraShake(0.5);
             }
             this.spawnNewTetromino();
@@ -316,7 +323,7 @@ class TetrisGame {
         
         // Main grid lines with glow effect
         const material = new THREE.LineBasicMaterial({ 
-            color: 0x0088ff,
+            color: currentTheme.grid,
             opacity: 0.2,
             transparent: true,
             blending: THREE.AdditiveBlending
@@ -352,7 +359,7 @@ class TetrisGame {
 
         // Add outer border with glow effect
         const borderMaterial = new THREE.LineBasicMaterial({ 
-            color: 0x00ffff,
+            color: currentTheme.border,
             opacity: 0.8,
             transparent: true,
             blending: THREE.AdditiveBlending

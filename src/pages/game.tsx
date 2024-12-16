@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import TetrisGame from '../games/tetris-game';
+import { currentTheme } from '../games/colors';
 
 const Game = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -9,7 +10,7 @@ const Game = () => {
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000811);  // Dark blue background
+    scene.background = new THREE.Color(currentTheme.background);  // Use theme background color
     
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(5, -10, 16);  // Adjusted camera position
@@ -25,6 +26,15 @@ const Game = () => {
     renderer.setClearColor(0x000000, 0);
     renderer.gammaFactor = 2.2;
     renderer.outputEncoding = THREE.sRGBEncoding;
+
+    // Add resize handler
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial size setup
 
     const mount = mountRef.current;
     if (!mount) return;
@@ -50,6 +60,7 @@ const Game = () => {
       if (mount && mount.contains(renderer.domElement)) {
         mount.removeChild(renderer.domElement);
       }
+      window.removeEventListener('resize', handleResize);
       renderer.dispose();
       gameInstanceRef.current = null;
     };

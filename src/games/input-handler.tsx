@@ -31,6 +31,9 @@ class InputHandler {
             case ' ':
                 this.game.hardDrop();
                 break;
+            case 'r':
+                this.game.replaceTetromino();
+                break;
         }
         this.game.renderer.renderScene();
     }

@@ -27,6 +27,7 @@ class TetrisGame {
     private camera: THREE.PerspectiveCamera;
     private cameraShake: { enabled: boolean; intensity: number; decay: number; };
     private originalCameraPosition: THREE.Vector3;
+    private nextTetromino: number;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -54,6 +55,8 @@ class TetrisGame {
             intensity: 0,
             decay: 0.9
         };
+
+        this.nextTetromino = Math.floor(Math.random() * TETROMINOES.length);
 
         this.setupLighting();
         this.startAutoDrop();
@@ -138,7 +141,8 @@ class TetrisGame {
     }
 
     spawnNewTetromino() {
-        this.currentTetromino = Math.floor(Math.random() * TETROMINOES.length);
+        this.currentTetromino = this.nextTetromino;
+        this.nextTetromino = Math.floor(Math.random() * TETROMINOES.length);
         this.currentX = Math.floor((this.gridManager.width - TETROMINOES[this.currentTetromino][0].length) / 2);
         this.currentY = -2;
 
@@ -150,6 +154,7 @@ class TetrisGame {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             this.renderer.updateActivePiece(this.currentTetromino, this.currentX, this.currentY);
         }
+        this.renderer.updateNextPiecePreview(this.nextTetromino);
     }
 
     moveDown() {
@@ -199,6 +204,29 @@ class TetrisGame {
             const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
             if (linesCleared > 0) {
                 this.triggerCameraShake(0.4);
+                // Add flash effect
+                const flashGeometry = new THREE.PlaneGeometry(15, 25);
+                const flashMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.3,
+                    side: THREE.DoubleSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+                flash.position.set(5, -10, 0.1);
+                this.scene.add(flash);
+                
+                // Fade out and remove flash
+                const fadeOut = () => {
+                    if (flash.material.opacity > 0) {
+                        flash.material.opacity -= 0.05;
+                        requestAnimationFrame(fadeOut);
+                    } else {
+                        this.scene.remove(flash);
+                    }
+                };
+                fadeOut();
             }
             this.spawnNewTetromino();
         }
@@ -224,6 +252,55 @@ class TetrisGame {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
         } else {
             TETROMINOES[this.currentTetromino] = originalShape;
+            this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+        }
+        
+        this.renderer.renderScene();
+    }
+
+    replaceTetromino() {
+        if (this.gameOver) return;
+        
+        this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
+        
+        // Swap current and next tetromino
+        const temp = this.currentTetromino;
+        this.currentTetromino = this.nextTetromino;
+        this.nextTetromino = temp;
+        
+        // Check if new position is valid
+        if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
+            this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+            this.renderer.updateNextPiecePreview(this.nextTetromino);
+            
+            // Add a small visual effect for the swap
+            const flashGeometry = new THREE.PlaneGeometry(2, 2);
+            const flashMaterial = new THREE.MeshBasicMaterial({
+                color: COLORS[this.currentTetromino],
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+            flash.position.set(this.currentX + 1, -this.currentY - 1, 0.1);
+            this.scene.add(flash);
+            
+            // Fade out and remove flash
+            const fadeOut = () => {
+                if (flash.material.opacity > 0) {
+                    flash.material.opacity -= 0.1;
+                    requestAnimationFrame(fadeOut);
+                } else {
+                    this.scene.remove(flash);
+                }
+            };
+            fadeOut();
+        } else {
+            // If collision, revert the swap
+            const temp = this.currentTetromino;
+            this.currentTetromino = this.nextTetromino;
+            this.nextTetromino = temp;
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
         }
         

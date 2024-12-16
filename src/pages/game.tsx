@@ -71,6 +71,7 @@ class TetrisGame {
   private shadowBlockInstances: THREE.InstancedMesh[];
   private hardDropPressed: boolean;
   private dropAnimation: { scale: number, blocks: Set<string> } = { scale: 1, blocks: new Set() };
+  private lineClearEffect: { mesh: THREE.Mesh, velocity: THREE.Vector3, life: number }[] = [];
 
   constructor(scene: THREE.Scene, setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void) {
     this.grid = this.createGrid(10, 20);
@@ -303,6 +304,7 @@ class TetrisGame {
     }
     this.lastRenderTime = now;
     this.renderGrid();
+    this.updateLineClearEffect();
   }
 
   checkCollision(tetromino: number, testX: number, testY: number): boolean {
@@ -523,19 +525,58 @@ class TetrisGame {
   private checkAndClearLines() {
     let linesCleared = 0;
     const newGrid = this.grid.filter(row => !row.every(cell => cell.filled));
-    linesCleared = this.grid.length - newGrid.length;
+    const clearedLines = this.grid.length - newGrid.length;
     while (newGrid.length < this.grid.length) {
       newGrid.unshift(this.createEmptyRow());
     }
     this.grid = newGrid;
-    if (linesCleared > 0) {
-      console.log(`${linesCleared} line(s) cleared!`);
+    if (clearedLines > 0) {
+      console.log(`${clearedLines} line(s) cleared!`);
       this.clearShadow(); // Clear shadow when lines are cleared
+      for (let y = 0; y < clearedLines; y++) {
+        this.createLineClearEffect(this.grid.length - clearedLines + y);
+      }
     }
   }
 
   private createEmptyRow() {
     return new Array(this.grid[0].length).fill({ color: null, filled: false });
+  }
+
+  private createLineClearEffect(lineY: number) {
+    const blocksToAnimate = [];
+    for (let x = 0; x < this.grid[0].length; x++) {
+      if (this.grid[lineY][x].filled) {
+        const colorIndex = COLORS.indexOf(this.grid[lineY][x].color);
+        if (colorIndex !== -1) {
+          const block = new THREE.Mesh(BLOCK_GEOMETRY, MATERIALS[colorIndex]);
+          block.position.set(x + 0.5, -lineY + 0.5, 0);
+          this.scene.add(block);
+          blocksToAnimate.push({
+            mesh: block,
+            velocity: new THREE.Vector3(
+              (Math.random() - 0.5) * 0.1,
+              (Math.random() - 0.5) * 0.1,
+              (Math.random() - 0.5) * 0.1
+            ),
+            life: 1.0
+          });
+        }
+      }
+    }
+    this.lineClearEffect.push(...blocksToAnimate);
+  }
+
+  private updateLineClearEffect() {
+    this.lineClearEffect.forEach((block, index) => {
+      block.mesh.position.add(block.velocity);
+      block.mesh.material.opacity = block.life;
+      block.life -= 0.02;
+      if (block.life <= 0) {
+        this.scene.remove(block.mesh);
+        this.lineClearEffect.splice(index, 1);
+      }
+    });
   }
 }
 

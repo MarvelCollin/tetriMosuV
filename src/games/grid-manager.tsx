@@ -8,7 +8,7 @@ class GridManager {
 
     constructor(width: number, height: number) {
         this.width = width;
-        this.height = height;
+        this.height = height + 1;
         this.grid = this.createGrid();
     }
 
@@ -58,10 +58,10 @@ class GridManager {
                 if (shape[y][x] === 1) {
                     const gridX = testX + x;
                     const gridY = testY + y;
-                    if (gridX < 0 || gridX >= this.width || gridY >= this.height) {
+                    if (gridX < 0 || gridX >= this.width || gridY >= this.height|| gridY < -2) {
                         return true;
                     }
-                    if (gridY >= 0 && this.grid[gridY][gridX].filled) {
+                    if (gridY >= 0 && gridY < this.height && this.grid[gridY][gridX].filled) {
                         return true;
                     }
                 }
@@ -72,7 +72,7 @@ class GridManager {
 
     checkAndClearLines(particleSystem: ParticleSystem): number {
         const newGrid = this.grid.filter((row) => !row.every((cell) => cell.filled));
-        const clearedLines = this.height - newGrid.length;
+        const clearedLines = (this.height) - newGrid.length; 
         
         while (newGrid.length < this.height) {
             newGrid.unshift(Array(this.width).fill({ color: null, filled: false }));

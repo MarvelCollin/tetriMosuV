@@ -149,7 +149,6 @@ class ParticleSystem {
             const particle = this.particles[i];
             
             if (particle.mesh.geometry.type === 'CylinderGeometry') {
-                // Light beam behavior
                 particle.mesh.scale.y *= 0.97;
                 particle.mesh.scale.x *= 0.99;
                 particle.mesh.scale.z *= 0.99;
@@ -157,7 +156,6 @@ class ParticleSystem {
                 particle.mesh.rotation.y += 0.02;
                 particle.mesh.material.opacity *= 0.97;
             } else {
-                // Normal particle behavior
                 particle.mesh.rotation.x += 0.1;
                 particle.mesh.rotation.y += 0.1;
                 particle.mesh.rotation.z += 0.1;

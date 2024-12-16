@@ -61,19 +61,48 @@ class TetrisGame {
     }
 
     private setupLighting() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        // Ambient light
+        const ambientLight = new THREE.AmbientLight(0x222222, 0.6);
         
+        // Main directional light
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
         directionalLight.position.set(5, 15, 10);
         directionalLight.castShadow = true;
         
-        const secondaryLight = new THREE.DirectionalLight(0x4444ff, 0.5);
-        secondaryLight.position.set(-5, 5, -10);
+        // Blue rim light
+        const rimLight = new THREE.DirectionalLight(0x2244ff, 0.8);
+        rimLight.position.set(-5, 5, -10);
         
-        const groundLight = new THREE.PointLight(0x0099ff, 0.5);
+        // Ground glow
+        const groundLight = new THREE.PointLight(0x00ffff, 1.2);
         groundLight.position.set(5, -22, 10);
+        groundLight.distance = 35;
+        groundLight.decay = 2;
         
-        this.scene.add(ambientLight, directionalLight, secondaryLight, groundLight);
+        // Top spotlight
+        const spotlight = new THREE.SpotLight(0x7744ff, 0.8);
+        spotlight.position.set(5, 25, 5);
+        spotlight.angle = Math.PI / 4;
+        spotlight.penumbra = 0.5;
+        spotlight.decay = 1.5;
+        spotlight.distance = 40;
+        
+        // Side accent lights
+        const leftAccent = new THREE.PointLight(0xff00ff, 0.4);
+        leftAccent.position.set(-15, -10, 15);
+        
+        const rightAccent = new THREE.PointLight(0x00ffff, 0.4);
+        rightAccent.position.set(15, -10, 15);
+        
+        this.scene.add(
+            ambientLight, 
+            directionalLight, 
+            rimLight, 
+            groundLight, 
+            spotlight,
+            leftAccent,
+            rightAccent
+        );
     }
 
     private initializeBlockInstances(): THREE.InstancedMesh[] {
@@ -153,16 +182,16 @@ class TetrisGame {
         if (this.currentY >= 0) {
             this.triggerCameraShake(0.2);
             const shape = TETROMINOES[this.currentTetromino];
+            const currentColor = COLORS[this.currentTetromino]; 
             
-            // Create light beams with slight delay for each block
             shape.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value === 1) {
                         const gridX = this.currentX + x;
                         const gridY = this.currentY + y;
                         setTimeout(() => {
-                            this.particleSystem.addLightBeam(gridX, gridY, COLORS[this.currentTetromino]);
-                        }, (x + y) * 50); // Stagger effect
+                            this.particleSystem.addLightBeam(gridX, gridY, currentColor);
+                        }, (x + y) * 50); 
                     }
                 });
             });
@@ -207,32 +236,80 @@ class TetrisGame {
 
     renderGridBorders(width: number, height: number) {
         const group = new THREE.Group();
+        
+        // Main grid lines with glow effect
         const material = new THREE.LineBasicMaterial({ 
-            color: 0xffffff,
-            opacity: 0.5,
-            transparent: true 
+            color: 0x0088ff,
+            opacity: 0.2,
+            transparent: true,
+            blending: THREE.AdditiveBlending
         });
 
-        // Add horizontal lines
+        // Create horizontal lines with varying opacity
         for (let y = 0; y <= height; y++) {
+            const opacity = y % 2 === 0 ? 0.3 : 0.15;
+            const lineMaterial = material.clone();
+            lineMaterial.opacity = opacity;
+            
             const geometry = new THREE.BufferGeometry().setFromPoints([
                 new THREE.Vector3(0, -y, 0),
                 new THREE.Vector3(width, -y, 0)
             ]);
-            const line = new THREE.Line(geometry, material);
+            const line = new THREE.Line(geometry, lineMaterial);
             group.add(line);
         }
 
-        // Add vertical lines
+        // Create vertical lines with varying opacity
         for (let x = 0; x <= width; x++) {
+            const opacity = x % 2 === 0 ? 0.3 : 0.15;
+            const lineMaterial = material.clone();
+            lineMaterial.opacity = opacity;
+            
             const geometry = new THREE.BufferGeometry().setFromPoints([
                 new THREE.Vector3(x, 0, 0),
                 new THREE.Vector3(x, -height, 0)
             ]);
-            const line = new THREE.Line(geometry, material);
+            const line = new THREE.Line(geometry, lineMaterial);
             group.add(line);
         }
 
+        // Add outer border with glow effect
+        const borderMaterial = new THREE.LineBasicMaterial({ 
+            color: 0x00ffff,
+            opacity: 0.8,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
+
+        const borderGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-0.1, 0.1, 0),
+            new THREE.Vector3(width + 0.1, 0.1, 0),
+            new THREE.Vector3(width + 0.1, -(height + 0.1), 0),
+            new THREE.Vector3(-0.1, -(height + 0.1), 0),
+            new THREE.Vector3(-0.1, 0.1, 0)
+        ]);
+        
+        const border = new THREE.Line(borderGeometry, borderMaterial);
+        
+        // Add second border for stronger glow effect
+        const outerBorderMaterial = new THREE.LineBasicMaterial({ 
+            color: 0x00ffff,
+            opacity: 0.4,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
+
+        const outerBorderGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-0.2, 0.2, 0),
+            new THREE.Vector3(width + 0.2, 0.2, 0),
+            new THREE.Vector3(width + 0.2, -(height + 0.2), 0),
+            new THREE.Vector3(-0.2, -(height + 0.2), 0),
+            new THREE.Vector3(-0.2, 0.2, 0)
+        ]);
+        
+        const outerBorder = new THREE.Line(outerBorderGeometry, outerBorderMaterial);
+        
+        group.add(border, outerBorder);
         return group;
     }
 

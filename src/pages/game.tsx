@@ -9,14 +9,22 @@ const Game = () => {
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222);
+    scene.background = new THREE.Color(0x000811);  // Dark blue background
+    
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(5, -10, 15);
+    camera.position.set(5, -10, 16);  // Adjusted camera position
     camera.lookAt(5, -10, 0);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: "high-performance"
+    });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
+    renderer.gammaFactor = 2.2;
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     const mount = mountRef.current;
     if (!mount) return;

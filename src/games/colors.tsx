@@ -1,33 +1,42 @@
 import * as THREE from 'three';
 
 export const COLORS = [
-    0x00ffff,
-    0xffff00,
-    0x800080,
-    0x00ff00,
-    0xff0000,
-    0x0000ff,
-    0xffa500,
+    0x00ffff, // Cyan
+    0xff1493, // Deep Pink
+    0x7fff00, // Chartreuse
+    0xff4500, // Orange Red
+    0x4169e1, // Royal Blue
+    0xffd700, // Gold
+    0x9400d3, // Violet
 ];
 
-export const BLOCK_GEOMETRY = new THREE.BoxGeometry(1, 1, 1);
+// Add bevel to blocks
+export const BLOCK_GEOMETRY = new THREE.BoxGeometry(0.92, 0.92, 1.2);
+
 export const MATERIALS = COLORS.map(color => 
     new THREE.MeshPhongMaterial({
         color,
-        opacity: 0.9,
+        opacity: 0.95,
         transparent: true,
-        shininess: 50,
-        specular: 0x666666,
-        emissive: new THREE.Color(color).multiplyScalar(0.2)
+        shininess: 100,
+        specular: 0xffffff,
+        emissive: new THREE.Color(color).multiplyScalar(0.3),
+        flatShading: false,
+        metalness: 0.5,
+        roughness: 0.2,
     })
 );
 
 export const SHADOW_MATERIALS = COLORS.map(color => 
     new THREE.MeshPhongMaterial({
-        color: new THREE.Color(color).multiplyScalar(0.3),
-        opacity: 0.3,
+        color: color,
+        opacity: 0.2,
         transparent: true,
-        shininess: 0,
-        emissive: new THREE.Color(color).multiplyScalar(0.1)
+        shininess: 30,
+        emissive: new THREE.Color(color).multiplyScalar(0.15),
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        wireframe: true
     })
 );

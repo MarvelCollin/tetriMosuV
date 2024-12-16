@@ -15,11 +15,9 @@ class Renderer {
     }
 
     renderScene() {
-        // Clear existing blocks
         this.blocks.forEach(block => this.scene.remove(block));
         this.blocks = [];
         
-        // Render grid cells
         for (let y = 0; y < this.gridManager.height; y++) {
             for (let x = 0; x < this.gridManager.width; x++) {
                 const cell = this.gridManager.grid[y][x];
@@ -37,11 +35,9 @@ class Renderer {
     }
 
     updateShadow(tetromino: number, x: number, shadowY: number) {
-        // Clear existing shadow blocks
         this.shadowBlocks.forEach(block => this.scene.remove(block));
         this.shadowBlocks = [];
 
-        // Add new shadow blocks for shadow position
         const material = SHADOW_MATERIALS[tetromino];
         const shape = TETROMINOES[tetromino];
         

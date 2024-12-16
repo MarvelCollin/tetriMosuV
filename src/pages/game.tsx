@@ -55,7 +55,7 @@ const SHADOW_MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({
   transparent: true
 }));
 
-const dropInterval = 300;
+const dropInterval = 200; // Reduced drop interval for faster gameplay
 
 class TetrisGame {
   grid: Array<Array<{ color: number | null, filled: boolean }>>;
@@ -369,7 +369,7 @@ class TetrisGame {
         // Add landing animation
         const shape = TETROMINOES[this.currentTetromino];
         this.dropAnimation.blocks.clear();
-        this.dropAnimation.scale = 1.2; // Start with larger scale
+        this.dropAnimation.scale = 1.1; // Start with slightly larger scale
         
         // Add affected blocks to animation set
         for (let y = 0; y < shape.length; y++) {
@@ -385,7 +385,7 @@ class TetrisGame {
         // Animate the scale back to normal
         const animate = () => {
           if (this.dropAnimation.scale > 1) {
-            this.dropAnimation.scale -= 0.05;
+            this.dropAnimation.scale -= 0.1; // Faster animation
             this.updateScene();
             requestAnimationFrame(animate);
           } else {
@@ -441,7 +441,7 @@ class TetrisGame {
     if (this.currentY >= 0) {
       const shape = TETROMINOES[this.currentTetromino];
       this.dropAnimation.blocks.clear();
-      this.dropAnimation.scale = 1.2; // Reduced from 1.5 to 1.2 for subtler effect
+      this.dropAnimation.scale = 1.1; // Reduced from 1.2 to 1.1 for subtler effect
       
       // Add affected blocks to animation set
       for (let y = 0; y < shape.length; y++) {
@@ -454,10 +454,10 @@ class TetrisGame {
         }
       }
 
-      // Slower, more subtle animation
+      // Faster, more subtle animation
       const animate = () => {
         if (this.dropAnimation.scale > 1) {
-          this.dropAnimation.scale -= 0.05; // Reduced from 0.1 to 0.05 for smoother animation
+          this.dropAnimation.scale -= 0.1; // Faster animation
           this.updateScene();
           requestAnimationFrame(animate);
         } else {
@@ -555,11 +555,11 @@ class TetrisGame {
           blocksToAnimate.push({
             mesh: block,
             velocity: new THREE.Vector3(
-              (Math.random() - 0.5) * 0.1,
-              (Math.random() - 0.5) * 0.1,
-              (Math.random() - 0.5) * 0.1
+              (Math.random() - 0.5) * 2, // Further increased velocity
+              (Math.random() - 0.5) * 2, // Further increased velocity
+              (Math.random() - 0.5) * 2  // Further increased velocity
             ),
-            life: 1.0
+            life: 3 // Increased life for longer effect
           });
         }
       }
@@ -571,7 +571,7 @@ class TetrisGame {
     this.lineClearEffect.forEach((block, index) => {
       block.mesh.position.add(block.velocity);
       block.mesh.material.opacity = block.life;
-      block.life -= 0.02;
+      block.life -= 0.07; // Faster fade out
       if (block.life <= 0) {
         this.scene.remove(block.mesh);
         this.lineClearEffect.splice(index, 1);

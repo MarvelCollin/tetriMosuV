@@ -48,12 +48,12 @@ const MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({
   shininess: 30
 }));
 
-// Add shadow material
-const SHADOW_MATERIAL = new THREE.MeshPhongMaterial({
-  color: 0x666666,
-  opacity: 0.3,
+// Modify shadow material to be a darker version of the tetromino color
+const SHADOW_MATERIALS = COLORS.map(color => new THREE.MeshPhongMaterial({
+  color: new THREE.Color(color).multiplyScalar(0.5),
+  opacity: 0.5,
   transparent: true
-});
+}));
 
 const dropInterval = 300;
 
@@ -68,7 +68,9 @@ class TetrisGame {
   gameOver: boolean;
   private lastRenderTime: number;
   private blockInstances: THREE.InstancedMesh[];
-  private shadowBlockInstance: THREE.InstancedMesh;
+  private shadowBlockInstances: THREE.InstancedMesh[];
+  private hardDropPressed: boolean;
+  private dropAnimation: { scale: number, blocks: Set<string> } = { scale: 1, blocks: new Set() };
 
   constructor(scene: THREE.Scene, setTetrominoState: (state: { tetromino: number, startX: number, startY: number }) => void) {
     this.grid = this.createGrid(10, 20);
@@ -82,11 +84,11 @@ class TetrisGame {
     this.lastRenderTime = 0;
     this.blockInstances = this.initializeBlockInstances();
     this.scene.add(...this.blockInstances);
-    this.shadowBlockInstance = new THREE.InstancedMesh(BLOCK_GEOMETRY, SHADOW_MATERIAL, 4);
-    this.shadowBlockInstance.count = 0;
-    this.scene.add(this.shadowBlockInstance);
+    this.shadowBlockInstances = this.initializeShadowBlockInstances();
+    this.scene.add(...this.shadowBlockInstances);
     this.startAutoDrop();
     this.setupLighting();
+    this.hardDropPressed = false;
   }
 
   private setupLighting() {
@@ -100,7 +102,7 @@ class TetrisGame {
 
   createGrid(width: number, height: number) {
     const grid: Array<Array<{ color: number | null, filled: boolean }>> = [];
-    for (let y = 0; y < height; y++) {
+    for (let y = 0; y < height + 1; y++) { // Adjust height to remove the bottom row
       const row: Array<{ color: number | null, filled: boolean }> = [];
       for (let x = 0; x < width; x++) {
         row.push({ color: null, filled: false });
@@ -155,6 +157,18 @@ class TetrisGame {
     });
   }
 
+  private initializeShadowBlockInstances(): THREE.InstancedMesh[] {
+    return SHADOW_MATERIALS.map((_, index) => {
+      const instancedMesh = new THREE.InstancedMesh(
+        BLOCK_GEOMETRY,
+        SHADOW_MATERIALS[index],
+        200
+      );
+      instancedMesh.count = 0;
+      return instancedMesh;
+    });
+  }
+
   private updateActivePiece() {
     this.activePiece = {
       shape: [...TETROMINOES[this.currentTetromino]],
@@ -191,18 +205,26 @@ class TetrisGame {
               -shadowY - y + 0.5,
               0
             );
-            this.shadowBlockInstance.setMatrixAt(instanceCount++, matrix);
+            this.shadowBlockInstances[this.currentTetromino].setMatrixAt(instanceCount++, matrix);
           }
         }
       }
     }
 
-    this.shadowBlockInstance.count = instanceCount;
-    this.shadowBlockInstance.instanceMatrix.needsUpdate = true;
+    this.shadowBlockInstances[this.currentTetromino].count = instanceCount;
+    this.shadowBlockInstances[this.currentTetromino].instanceMatrix.needsUpdate = true;
+  }
+
+  private clearShadow() {
+    this.shadowBlockInstances.forEach(mesh => {
+      mesh.count = 0;
+      mesh.instanceMatrix.needsUpdate = true;
+    });
   }
 
   renderGrid() {
     const matrix = new THREE.Matrix4();
+    const scale = new THREE.Matrix4();
     const instanceCounts = new Array(COLORS.length).fill(0);
     this.blockInstances.forEach(mesh => mesh.count = 0);
 
@@ -212,11 +234,14 @@ class TetrisGame {
         if (cell.filled && cell.color !== null) {
           const colorIndex = COLORS.indexOf(cell.color);
           if (colorIndex !== -1) {
-            matrix.setPosition(
-              x + 0.5,
-              -y + 0.5,
-              0
-            );
+            const blockKey = `${x},${y}`;
+            const isAnimating = this.dropAnimation.blocks.has(blockKey);
+            const currentScale = isAnimating ? this.dropAnimation.scale : 1;
+
+            matrix.setPosition(x + 0.5, -y + 0.5, 0);
+            scale.makeScale(currentScale, currentScale, currentScale);
+            matrix.multiply(scale);
+
             this.blockInstances[colorIndex].setMatrixAt(
               instanceCounts[colorIndex]++,
               matrix
@@ -231,6 +256,17 @@ class TetrisGame {
         mesh.instanceMatrix.needsUpdate = true;
       }
     });
+
+    if (this.hardDropPressed) {
+      this.blockInstances.forEach(mesh => {
+        mesh.material.opacity = 1.0; // Increase opacity for pressed effect
+      });
+    } else {
+      this.blockInstances.forEach(mesh => {
+        mesh.material.opacity = 0.8; // Reset opacity
+      });
+    }
+
     this.renderShadow();
   }
 
@@ -328,6 +364,36 @@ class TetrisGame {
     } else {
       this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
       if (this.currentY >= 0) {
+        // Add landing animation
+        const shape = TETROMINOES[this.currentTetromino];
+        this.dropAnimation.blocks.clear();
+        this.dropAnimation.scale = 1.2; // Start with larger scale
+        
+        // Add affected blocks to animation set
+        for (let y = 0; y < shape.length; y++) {
+          for (let x = 0; x < shape[y].length; x++) {
+            if (shape[y][x] === 1) {
+              const gridX = this.currentX + x;
+              const gridY = this.currentY + y;
+              this.dropAnimation.blocks.add(`${gridX},${gridY}`);
+            }
+          }
+        }
+
+        // Animate the scale back to normal
+        const animate = () => {
+          if (this.dropAnimation.scale > 1) {
+            this.dropAnimation.scale -= 0.05;
+            this.updateScene();
+            requestAnimationFrame(animate);
+          } else {
+            this.dropAnimation.blocks.clear();
+            this.dropAnimation.scale = 1;
+            this.updateScene();
+          }
+        };
+        requestAnimationFrame(animate);
+
         this.activePiece = null;
         this.checkAndClearLines(); // Check and clear lines after placing a tetromino
         this.spawnNewTetromino();
@@ -360,8 +426,10 @@ class TetrisGame {
   }
 
   hardDrop() {
+    this.hardDropPressed = true;
     this.clearTetrominoFromGrid(this.currentTetromino, this.currentX, this.currentY);
     
+    // Find final position
     while (!this.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
       this.currentY++;
     }
@@ -369,10 +437,40 @@ class TetrisGame {
     this.placeTetrominoOnGrid(this.currentTetromino, this.currentX, this.currentY);
     
     if (this.currentY >= 0) {
-      this.checkAndClearLines(); // Check and clear lines after hard drop
+      const shape = TETROMINOES[this.currentTetromino];
+      this.dropAnimation.blocks.clear();
+      this.dropAnimation.scale = 1.2; // Reduced from 1.5 to 1.2 for subtler effect
+      
+      // Add affected blocks to animation set
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x] === 1) {
+            const gridX = this.currentX + x;
+            const gridY = this.currentY + y;
+            this.dropAnimation.blocks.add(`${gridX},${gridY}`);
+          }
+        }
+      }
+
+      // Slower, more subtle animation
+      const animate = () => {
+        if (this.dropAnimation.scale > 1) {
+          this.dropAnimation.scale -= 0.05; // Reduced from 0.1 to 0.05 for smoother animation
+          this.updateScene();
+          requestAnimationFrame(animate);
+        } else {
+          this.dropAnimation.blocks.clear();
+          this.dropAnimation.scale = 1;
+          this.updateScene();
+        }
+      };
+      requestAnimationFrame(animate);
+
+      this.checkAndClearLines();
       this.spawnNewTetromino();
     }
     
+    this.hardDropPressed = false;
     requestAnimationFrame(() => this.updateScene());
   }
 
@@ -432,6 +530,7 @@ class TetrisGame {
     this.grid = newGrid;
     if (linesCleared > 0) {
       console.log(`${linesCleared} line(s) cleared!`);
+      this.clearShadow(); // Clear shadow when lines are cleared
     }
   }
 
@@ -470,7 +569,6 @@ const Game = () => {
     const gridBorders = tetrisGame.renderGridBorders(10, 20);
     scene.add(gridBorders);
     camera.position.set(5, -10, 20);
-    camera.lookAt(5, -10, 0);
     let lastTime = 0;
     const animate = (currentTime: number) => {
       if (currentTime - lastTime >= 16) {

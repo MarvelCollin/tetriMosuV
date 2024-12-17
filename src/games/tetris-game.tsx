@@ -463,8 +463,6 @@ class TetrisGame {
                 console.log("Center hit!");
                 this.hitTargets++;
                 
-                this.circleTargets.forEach(t => t.resetTime());
-                
                 this.triggerCameraShake(0.4);
                 
                 const flashGeometry = new THREE.CircleGeometry(0.5, 32);

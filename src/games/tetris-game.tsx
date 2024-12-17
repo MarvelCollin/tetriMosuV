@@ -555,22 +555,28 @@ class TetrisGame {
     private completeTargetMode(success: boolean) {
         this.isInTargetMode = false;
         
+        // Store current tetromino state and remove it temporarily
         const currentPiece = {
             tetromino: this.currentTetromino,
             x: this.currentX,
             y: this.currentY
         };
-
+        
+        // Clear current piece to prevent it from being affected by line clear
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
-        this.circleTargets.forEach(target => {
-            target.destroy(this.scene);
-        });
+        // Remove targets
+        this.circleTargets.forEach(target => target.destroy(this.scene));
         this.circleTargets = [];
 
         if (success) {
+            // Find the line to clear
             for (let y = this.gridManager.height - 1; y >= 0; y--) {
                 if (this.gridManager.grid[y].every(cell => cell.filled)) {
+                    // Create visual effects
+                    this.createLineClearEffects(y);
+                    
+                    // Clear the line and shift blocks down
                     for (let moveY = y; moveY > 0; moveY--) {
                         this.gridManager.grid[moveY] = [...this.gridManager.grid[moveY - 1]];
                     }
@@ -580,7 +586,6 @@ class TetrisGame {
                     
                     this.score += 100;
                     this.renderer.updateScore(this.score);
-                    break;
                 }
             }
         } else {

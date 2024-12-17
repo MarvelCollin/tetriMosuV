@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// Add these imports at the top
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { BLOCK_GEOMETRY, MATERIALS, SHADOW_MATERIALS } from './colors';
@@ -13,7 +12,6 @@ class Renderer {
     private shadowBlocks: THREE.Mesh[] = [];
     private previewBlocks: THREE.Mesh[] = [];
     private directionLabels: THREE.Mesh[] = [];
-    // Add new property
     private scoreText: THREE.Mesh | null = null;
     private keybindText: THREE.Mesh | null = null;
 
@@ -78,7 +76,6 @@ class Renderer {
     }
 
     updateNextPiecePreview(nextTetromino: number) {
-        // Clear existing preview and labels
         this.previewBlocks.forEach(block => this.scene.remove(block));
         this.previewBlocks = [];
         this.directionLabels.forEach(label => this.scene.remove(label));
@@ -89,10 +86,8 @@ class Renderer {
         const previewX = 12;
         const previewY = 2;
 
-        // Load font from public directory
         const loader = new FontLoader();
         loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
-            // Create NEXT PIECE text
             const titleGeometry = new TextGeometry('NEXT PIECE', {
                 font: font,
                 size: 0.4,
@@ -115,7 +110,6 @@ class Renderer {
             this.scene.add(titleMesh);
             this.directionLabels.push(titleMesh);
 
-            // Add swap instruction text
             const subtitleGeometry = new TextGeometry('Press R to swap', {
                 font: font,
                 size: 0.25,
@@ -151,7 +145,6 @@ class Renderer {
             });
         });
 
-        // Preview border
         const borderGeometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(previewX - 0.5, -previewY + 1.5, 0),
             new THREE.Vector3(previewX + shape[0].length + 0.5, -previewY + 1.5, 0),
@@ -197,10 +190,9 @@ class Renderer {
             });
             
             this.scoreText = new THREE.Mesh(textGeometry, material);
-            this.scoreText.position.set(-5, 1, 0); // Position to the left of grid
+            this.scoreText.position.set(-5, 1, 0); 
             this.scene.add(this.scoreText);
 
-            // Add keybinds if not already added
             if (!this.keybindText) {
                 const keybindsGeometry = new TextGeometry(
                     "CONTROLS:\n\n" +
@@ -220,7 +212,7 @@ class Renderer {
                 const keybindsMaterial = material.clone();
                 keybindsMaterial.opacity = 0.7;
                 this.keybindText = new THREE.Mesh(keybindsGeometry, keybindsMaterial);
-                this.keybindText.position.set(12, -8, 0); // Position to the right of grid
+                this.keybindText.position.set(12, -8, 0); 
                 this.scene.add(this.keybindText);
             }
         });

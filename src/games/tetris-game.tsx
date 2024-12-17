@@ -35,6 +35,7 @@ class TetrisGame {
     private isInTargetMode: boolean = false;
     private requiredTargets: number = 0;
     private hitTargets: number = 0;
+    private timeoutId: NodeJS.Timeout | null = null;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -60,7 +61,7 @@ class TetrisGame {
         this.originalCameraPosition = camera.position.clone();
         this.cameraShake = {
             enabled: false,
-            intensity: 0,
+            intensity: 1,
             decay: 0.9
         };
 
@@ -76,25 +77,20 @@ class TetrisGame {
     }
 
     private setupLighting() {
-        // Ambient light
         const ambientLight = new THREE.AmbientLight(0x222222, 0.6);
         
-        // Main directional light
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
         directionalLight.position.set(5, 15, 10);
         directionalLight.castShadow = true;
         
-        // Blue rim light
         const rimLight = new THREE.DirectionalLight(0x2244ff, 0.8);
         rimLight.position.set(-5, 5, -10);
         
-        // Ground glow
         const groundLight = new THREE.PointLight(0x00ffff, 1.2);
         groundLight.position.set(5, -22, 10);
         groundLight.distance = 35;
         groundLight.decay = 2;
         
-        // Top spotlight
         const spotlight = new THREE.SpotLight(0x7744ff, 0.8);
         spotlight.position.set(5, 25, 5);
         spotlight.angle = Math.PI / 4;
@@ -102,7 +98,6 @@ class TetrisGame {
         spotlight.decay = 1.5;
         spotlight.distance = 40;
         
-        // Side accent lights
         const leftAccent = new THREE.PointLight(0xff00ff, 0.4);
         leftAccent.position.set(-15, -10, 15);
         
@@ -149,7 +144,7 @@ class TetrisGame {
             if (!this.gameOver) {
                 this.moveDown();
             }
-        }, 200);
+        }, 700);
     }
 
     spawnNewTetromino() {
@@ -173,18 +168,18 @@ class TetrisGame {
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
             this.currentY++;
+            this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+            this.gridManager.checkAndClearLines(this.particleSystem);
         } else {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
             if (linesCleared > 0) {
-                // Add score based on lines cleared
                 this.score += linesCleared * 100;
                 this.renderer.updateScore(this.score);
-                this.triggerCameraShake(0.5);
+                this.triggerCameraShake(3);
             }
             this.spawnNewTetromino();
         }
-        this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
         this.renderer.renderScene();
     }
 
@@ -220,7 +215,6 @@ class TetrisGame {
             const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
             if (linesCleared > 0) {
                 this.triggerCameraShake(0.4);
-                // Add flash effect
                 const flashGeometry = new THREE.PlaneGeometry(15, 25);
                 const flashMaterial = new THREE.MeshBasicMaterial({
                     color: 0xffffff,
@@ -233,7 +227,6 @@ class TetrisGame {
                 flash.position.set(5, -10, 0.1);
                 this.scene.add(flash);
                 
-                // Fade out and remove flash
                 const fadeOut = () => {
                     if (flash.material.opacity > 0) {
                         flash.material.opacity -= 0.05;
@@ -446,16 +439,18 @@ class TetrisGame {
         for (let i = this.circleTargets.length - 1; i >= 0; i--) {
             const target = this.circleTargets[i];
             if (raycaster.intersectObject(target.hitbox).length > 0) {
-                console.log("Circle clicked!");
+                console.log("Center hit!");
                 this.hitTargets++;
                 
-                this.triggerCameraShake(0.15);
+                this.circleTargets.forEach(t => t.resetTime());
                 
-                const flashGeometry = new THREE.CircleGeometry(1.5, 32);
+                this.triggerCameraShake(0.4);
+                
+                const flashGeometry = new THREE.CircleGeometry(0.5, 32);
                 const flashMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x00ffff,
+                    color: 0xff0000,
                     transparent: true,
-                    opacity: 0.8,
+                    opacity: 1,
                     blending: THREE.AdditiveBlending,
                     side: THREE.DoubleSide,
                     depthTest: false
@@ -465,10 +460,9 @@ class TetrisGame {
                 flash.lookAt(this.camera.position);
                 this.scene.add(flash);
 
-                // Expand and fade out flash
                 const expandFlash = () => {
-                    flash.scale.multiplyScalar(1.1);
-                    flash.material.opacity *= 0.9;
+                    flash.scale.multiplyScalar(1.2);
+                    flash.material.opacity *= 0.85;
                     if (flash.material.opacity > 0.01) {
                         requestAnimationFrame(expandFlash);
                     } else {
@@ -477,19 +471,16 @@ class TetrisGame {
                 };
                 expandFlash();
 
-                // Add particles
-                for (let j = 0; j < 12; j++) {
+                for (let j = 0; j < 8; j++) {
                     this.particleSystem.addImpactParticles(
                         target.position.x,
                         target.position.y,
-                        0x00ffff
+                        0xff0000
                     );
                 }
                 
                 target.destroy(this.scene);
                 this.circleTargets.splice(i, 1);
-
-                // Sound effect would go here if we had audio
                 
                 if (this.hitTargets === this.requiredTargets) {
                     this.completeTargetMode(true);
@@ -550,8 +541,11 @@ class TetrisGame {
             this.targetedBlocks.add(`${x},${targetLineY}`);
         }
 
-        // Set timeout for failing
-        setTimeout(() => {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+
+        this.timeoutId = setTimeout(() => {
             if (this.isInTargetMode) {
                 this.completeTargetMode(false);
             }
@@ -561,7 +555,6 @@ class TetrisGame {
     private completeTargetMode(success: boolean) {
         this.isInTargetMode = false;
         
-        // Store current tetromino state
         const currentPiece = {
             tetromino: this.currentTetromino,
             x: this.currentX,

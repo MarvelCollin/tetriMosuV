@@ -12,13 +12,14 @@ class CircleTarget {
         this.position = position;
         this.startTime = Date.now();
 
-        const innerGeometry = new THREE.CircleGeometry(0.6, 32);
+        // Make inner circle smaller for precise clicking
+        const innerGeometry = new THREE.CircleGeometry(0.3, 32);
         const outerGeometry = new THREE.CircleGeometry(3, 32);
         
         this.innerCircle = new THREE.Mesh(
             innerGeometry,
             new THREE.MeshBasicMaterial({
-                color: 0xffffff,
+                color: 0xff0000, // Make inner circle red for better visibility
                 transparent: true,
                 opacity: 1,
                 side: THREE.DoubleSide,
@@ -39,13 +40,8 @@ class CircleTarget {
             })
         );
 
-        this.innerCircle.position.copy(position);
-        this.outerCircle.position.copy(position);
-
-        this.innerCircle.lookAt(cameraPos);
-        this.outerCircle.lookAt(cameraPos);
-
-        const hitboxGeometry = new THREE.PlaneGeometry(6, 6);
+        // Make hitbox match inner circle size
+        const hitboxGeometry = new THREE.PlaneGeometry(0.6, 0.6);
         this.hitbox = new THREE.Mesh(
             hitboxGeometry,
             new THREE.MeshBasicMaterial({
@@ -55,7 +51,15 @@ class CircleTarget {
                 depthTest: false
             })
         );
+
+        // Position everything
+        this.innerCircle.position.copy(position);
+        this.outerCircle.position.copy(position);
         this.hitbox.position.copy(position);
+
+        // Make everything face camera
+        this.innerCircle.lookAt(cameraPos);
+        this.outerCircle.lookAt(cameraPos);
         this.hitbox.lookAt(cameraPos);
 
         scene.add(this.innerCircle);
@@ -63,9 +67,14 @@ class CircleTarget {
         scene.add(this.hitbox);
     }
 
+    resetTime() {
+        this.startTime = Date.now();
+    }
+
     update() {
         const elapsed = (Date.now() - this.startTime) / 1000;
-        const scale = Math.max(0.2, 1 - elapsed * 0.3);
+        // Slower shrinking speed
+        const scale = Math.max(0.2, 1 - elapsed * 0.2); // Reduced from 0.3 to 0.2
         this.outerCircle.scale.set(scale, scale, 1);
 
         const pulse = 1 + Math.sin(elapsed * 8) * 0.2;
@@ -76,15 +85,64 @@ class CircleTarget {
     }
 
     checkHit(raycaster: THREE.Raycaster): boolean {
-        // Simply check for intersection, no timing check
+        // Only check intersection with inner circle's hitbox
         return raycaster.intersectObject(this.hitbox).length > 0;
     }
 
     destroy(scene: THREE.Scene) {
-        // Add explosion effect before removing
-        const explodeGeometry = new THREE.CircleGeometry(0.5, 32);
-        const explodeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x00ffff,
+        // Create rotating particle explosion
+        const particleCount = 16;
+        const radius = 1;
+        const particles: THREE.Mesh[] = [];
+
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (i / particleCount) * Math.PI * 2;
+            const geometry = new THREE.CircleGeometry(0.1, 8);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xff0000,
+                transparent: true,
+                opacity: 1,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide,
+                depthTest: false
+            });
+
+            const particle = new THREE.Mesh(geometry, material);
+            particle.position.copy(this.position);
+            particle.lookAt(scene.position);
+            scene.add(particle);
+            particles.push(particle);
+
+            // Animate particle
+            const startTime = Date.now();
+            const animate = () => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const scale = Math.max(0, 1 - elapsed);
+                
+                // Spiral outward motion
+                const currentAngle = angle + elapsed * 10;
+                const currentRadius = radius * elapsed;
+                particle.position.x = this.position.x + Math.cos(currentAngle) * currentRadius;
+                particle.position.y = this.position.y + Math.sin(currentAngle) * currentRadius;
+                particle.position.z = this.position.z;
+                
+                particle.scale.set(scale, scale, 1);
+                particle.material.opacity = scale;
+                particle.rotation.z = currentAngle;
+
+                if (scale > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    scene.remove(particle);
+                }
+            };
+            animate();
+        }
+
+        // Create center flash
+        const flashGeometry = new THREE.CircleGeometry(0.3, 32);
+        const flashMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
             transparent: true,
             opacity: 1,
             blending: THREE.AdditiveBlending,
@@ -92,32 +150,26 @@ class CircleTarget {
             depthTest: false
         });
 
-        // Create multiple explosion rings
-        for (let i = 0; i < 3; i++) {
-            const explodeRing = new THREE.Mesh(explodeGeometry, explodeMaterial.clone());
-            explodeRing.position.copy(this.position);
-            explodeRing.lookAt(scene.position);
-            scene.add(explodeRing);
+        const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+        flash.position.copy(this.position);
+        flash.lookAt(scene.position);
+        scene.add(flash);
 
-            // Animate each ring
-            const startScale = 0.5 + i * 0.5;
-            const expandRing = () => {
-                explodeRing.scale.multiplyScalar(1.1);
-                explodeRing.material.opacity *= 0.95;
-                if (explodeRing.material.opacity > 0.01) {
-                    requestAnimationFrame(expandRing);
-                } else {
-                    scene.remove(explodeRing);
-                }
-            };
-            explodeRing.scale.set(startScale, startScale, 1);
-            expandRing();
-        }
+        // Animate flash
+        const expandFlash = () => {
+            flash.scale.multiplyScalar(1.1);
+            flash.material.opacity *= 0.9;
+            if (flash.material.opacity > 0.01) {
+                requestAnimationFrame(expandFlash);
+            } else {
+                scene.remove(flash);
+            }
+        };
+        expandFlash();
 
         // Remove original meshes
         scene.remove(this.innerCircle);
         scene.remove(this.outerCircle);
-        scene.remove(this.ring);
         scene.remove(this.hitbox);
     }
 }

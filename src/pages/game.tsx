@@ -10,10 +10,10 @@ const Game = () => {
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(currentTheme.background);  // Use theme background color
+    scene.background = new THREE.Color(currentTheme.background);  
     
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(5, -10, 16);  // Adjusted camera position
+    camera.position.set(5, -10, 16); 
     camera.lookAt(5, -10, 0);
     
     const renderer = new THREE.WebGLRenderer({ 
@@ -27,14 +27,13 @@ const Game = () => {
     renderer.gammaFactor = 2.2;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
-    // Add resize handler
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
-    handleResize(); // Initial size setup
+    handleResize(); 
 
     const mount = mountRef.current;
     if (!mount) return;

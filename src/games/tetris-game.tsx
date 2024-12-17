@@ -36,6 +36,7 @@ class TetrisGame {
     private requiredTargets: number = 0;
     private hitTargets: number = 0;
     private timeoutId: NodeJS.Timeout | null = null;
+    private tetrominoBag: number[] = [];  // Add this property for the bag of tetrominos
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -65,7 +66,8 @@ class TetrisGame {
             decay: 0.9
         };
 
-        this.nextTetromino = Math.floor(Math.random() * TETROMINOES.length);
+        this.tetrominoBag = this.generateNewBag();
+        this.nextTetromino = this.getNextTetromino();
         this.score = 0;
         this.renderer.updateScore(this.score);
 
@@ -147,9 +149,28 @@ class TetrisGame {
         }, 700);
     }
 
+    private generateNewBag(): number[] {
+        // Create array with indices 0 to 6 (for each tetromino type)
+        const bag = Array.from({ length: TETROMINOES.length }, (_, i) => i);
+        
+        // Fisher-Yates shuffle
+        for (let i = bag.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [bag[i], bag[j]] = [bag[j], bag[i]];
+        }
+        return bag;
+    }
+
+    private getNextTetromino(): number {
+        if (this.tetrominoBag.length === 0) {
+            this.tetrominoBag = this.generateNewBag();
+        }
+        return this.tetrominoBag.pop()!;
+    }
+
     spawnNewTetromino() {
         this.currentTetromino = this.nextTetromino;
-        this.nextTetromino = Math.floor(Math.random() * TETROMINOES.length);
+        this.nextTetromino = this.getNextTetromino();
         this.currentX = Math.floor((this.gridManager.width - TETROMINOES[this.currentTetromino][0].length) / 2);
         this.currentY = -2;
 
@@ -498,8 +519,7 @@ class TetrisGame {
         this.circleTargets = [];
         this.targetedBlocks.clear();
 
-        const gridDepth = 5;             
-        const yOffset = 3;               
+        const gridDepth = 1;             // Reduced from 5 to 1 to bring circles closer to grid
         const targetLineY = lineY;        
 
         const numTargets = Math.floor(Math.random() * 4) + 2; 
@@ -527,9 +547,9 @@ class TetrisGame {
             const x = filledPositions.splice(randomIndex, 1)[0];
 
             const circlePosition = new THREE.Vector3(
-                x + 0.5,                      
-                -targetLineY + yOffset,       
-                gridDepth                    
+                x + 0.5,                      // X position centered on block
+                -targetLineY + 0.5,           // Y position centered on block
+                gridDepth                     // Z position (distance from grid) - adjust this value
             );
 
             const target = new CircleTarget(
@@ -567,34 +587,27 @@ class TetrisGame {
         this.circleTargets = [];
 
         if (success) {
-            // Find and clear completed lines
             for (let y = this.gridManager.height - 1; y >= 0; y--) {
                 if (this.gridManager.grid[y].every(cell => cell.filled)) {
-                    // Create visual effects before clearing
                     this.createLineClearEffects(y);
                     
-                    // Clear the line
                     this.gridManager.clearLine(y);
                     
-                    // Update score
                     this.score += 100;
                     this.renderer.updateScore(this.score);
                     
-                    // Add a small delay to make the effect visible
                     setTimeout(() => {
                         this.renderer.renderScene();
                     }, 100);
                 }
             }
         } else {
-            // Only clear targeted blocks
             this.targetedBlocks.forEach(pos => {
                 const [x, y] = pos.split(',').map(Number);
                 this.gridManager.grid[y][x] = { color: null, filled: false };
             });
         }
 
-        // Replace current piece
         this.gridManager.placeTetromino(
             currentPiece.tetromino,
             currentPiece.x,
@@ -605,7 +618,6 @@ class TetrisGame {
     }
 
     private createLineClearEffects(y: number) {
-        // Sweep effect
         const sweepGeometry = new THREE.PlaneGeometry(12, 0.8);
         const sweepMaterial = new THREE.MeshBasicMaterial({
             color: 0xffffff,
@@ -619,7 +631,6 @@ class TetrisGame {
         sweep.position.set(-2, -y + 0.5, 0.1);
         this.scene.add(sweep);
 
-        // Animate sweep
         const startTime = Date.now();
         const animateSweep = () => {
             const elapsed = (Date.now() - startTime) / 300;
@@ -633,7 +644,6 @@ class TetrisGame {
         };
         animateSweep();
 
-        // Add light beams
         for (let x = 0; x < this.gridManager.width; x++) {
             if (this.gridManager.grid[y][x].filled && this.gridManager.grid[y][x].color !== null) {
                 setTimeout(() => {

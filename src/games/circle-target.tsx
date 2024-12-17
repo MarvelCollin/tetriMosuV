@@ -84,7 +84,6 @@ class CircleTarget {
     }
 
     destroy(scene: THREE.Scene) {
-        // Create expanding rings effect
         const ringCount = 3;
         for (let i = 0; i < ringCount; i++) {
             const ringGeo = new THREE.RingGeometry(0.2, 0.3, 32);
@@ -157,7 +156,7 @@ class CircleTarget {
                 particle.position.x = this.position.x + Math.cos(currentAngle) * radius;
                 particle.position.y = this.position.y + Math.sin(currentAngle) * radius - elapsed * elapsed * 2;
                 
-                particle.rotation.z = currentAngle;
+                particle.rotation.z = currentAngle;     
                 particle.scale.set(scale, scale, 1);
                 particle.material.opacity = scale;
 

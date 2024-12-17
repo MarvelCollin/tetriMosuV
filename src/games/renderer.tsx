@@ -139,7 +139,6 @@ class Renderer {
             this.directionLabels.push(subtitleMesh);
         });
 
-        // Preview blocks
         shape.forEach((row, dy) => {
             row.forEach((value, dx) => {
                 if (value === 1) {

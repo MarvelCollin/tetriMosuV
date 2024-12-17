@@ -5,11 +5,16 @@ class GridManager {
     grid: Array<Array<{ color: number | null; filled: boolean }>>;
     width: number;
     height: number;
+    game: any; // Add this property
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height + 1;
         this.grid = this.createGrid();
+    }
+
+    setGame(game: any) {
+        this.game = game;
     }
 
     createGrid() {
@@ -71,20 +76,22 @@ class GridManager {
     }
 
     checkAndClearLines(particleSystem: ParticleSystem): number {
-        const newGrid = this.grid.filter((row) => !row.every((cell) => cell.filled));
-        const clearedLines = (this.height) - newGrid.length; 
+        let completedLines = [];
         
-        while (newGrid.length < this.height) {
-            newGrid.unshift(Array(this.width).fill({ color: null, filled: false }));
+        // First, find all completed lines
+        for (let y = this.height - 1; y >= 0; y--) {
+            if (this.grid[y].every(cell => cell.filled)) {
+                completedLines.push(y);
+            }
+        }
+
+        // If we have completed lines, start target mode for the bottom-most line
+        if (completedLines.length > 0 && this.game) {
+            this.game.startTargetMode(completedLines[0]);
+            return completedLines.length;
         }
         
-        this.grid = newGrid;
-        
-        for (let i = 0; i < clearedLines; i++) {
-            particleSystem.addParticlesForLine(this.height - i - 1, this.grid);
-        }
-        
-        return clearedLines;
+        return 0;
     }
 }
 

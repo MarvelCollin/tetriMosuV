@@ -5,6 +5,7 @@ import ParticleSystem from './particle-system';
 import GridManager from './grid-manager';
 import InputHandler from './input-handler';
 import Renderer from './renderer';
+import CircleTarget from './circle-target';
 
 class TetrisGame {
     gridManager: GridManager;
@@ -29,11 +30,17 @@ class TetrisGame {
     private originalCameraPosition: THREE.Vector3;
     private nextTetromino: number;
     private score: number = 0;
+    private circleTargets: CircleTarget[] = [];
+    private targetedBlocks: Set<string> = new Set();
+    private isInTargetMode: boolean = false;
+    private requiredTargets: number = 0;
+    private hitTargets: number = 0;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
         this.setTetrominoState = setTetrominoState;
         this.gridManager = new GridManager(10, 20);
+        this.gridManager.setGame(this);
         this.renderer = new Renderer(scene, this.gridManager);
         this.particleSystem = new ParticleSystem(scene);
         this.inputHandler = new InputHandler(this);
@@ -64,6 +71,8 @@ class TetrisGame {
         this.setupLighting();
         this.startAutoDrop();
         this.spawnNewTetromino();
+
+        window.addEventListener('click', this.handleClick.bind(this));
     }
 
     private setupLighting() {
@@ -431,6 +440,133 @@ class TetrisGame {
         this.cameraShake.intensity = intensity;
     }
 
+    private handleClick = (event: MouseEvent) => {
+        if (!this.isInTargetMode) return;
+
+        // Get canvas-relative coordinates
+        const canvas = event.target as HTMLCanvasElement;
+        const rect = canvas.getBoundingClientRect();
+        const mouse = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, this.camera);
+
+        // Check each target
+        for (let i = this.circleTargets.length - 1; i >= 0; i--) {
+            const target = this.circleTargets[i];
+            if (target.checkHit(raycaster)) {
+                console.log("Hit successful!");
+                this.hitTargets++;
+                
+                // Visual and audio feedback
+                this.triggerCameraShake(0.2);
+                
+                // Remove hit target
+                target.destroy(this.scene);
+                this.circleTargets.splice(i, 1);
+
+                // Add hit effect
+                this.particleSystem.addImpactParticles(
+                    target.position.x,
+                    target.position.y,
+                    0x00ffff
+                );
+
+                if (this.hitTargets === this.requiredTargets) {
+                    this.completeTargetMode(true);
+                }
+                break; // Exit after first hit
+            }
+        }
+    }
+
+    private startTargetMode(lineY: number) {
+        if (this.isInTargetMode) return;
+
+        this.isInTargetMode = true;
+        this.hitTargets = 0;
+        this.circleTargets = [];
+        this.targetedBlocks.clear();
+
+        const gridDepth = 5;              // Distance from grid
+        const yOffset = 1;                // Move circles up by 1 unit
+        const targetLineY = lineY;        // Use the actual line Y position
+
+        // Adjust these values to position circles
+        const numTargets = 3;
+        this.requiredTargets = numTargets;
+
+        const cameraPos = this.camera.position.clone();
+        const filledPositions = [];
+
+        // Find filled positions in the target line
+        for (let x = 0; x < this.gridManager.width; x++) {
+            if (this.gridManager.grid[targetLineY][x].filled) {
+                filledPositions.push(x);
+            }
+        }
+
+        // Create targets with adjusted Y position
+        for (let i = 0; i < numTargets && filledPositions.length > 0; i++) {
+            const randomIndex = Math.floor(Math.random() * filledPositions.length);
+            const x = filledPositions.splice(randomIndex, 1)[0];
+
+            const circlePosition = new THREE.Vector3(
+                x + 0.5,                      // Center X on block
+                -targetLineY + yOffset,       // Raised Y position
+                gridDepth                     // Forward depth
+            );
+
+            console.log(`Creating target at: x=${x + 0.5}, y=${-targetLineY + yOffset}, z=${gridDepth}`);
+
+            const target = new CircleTarget(
+                circlePosition,
+                this.scene,
+                cameraPos
+            );
+            this.circleTargets.push(target);
+            this.targetedBlocks.add(`${x},${targetLineY}`);
+        }
+
+        // Set timeout for failing
+        setTimeout(() => {
+            if (this.isInTargetMode) {
+                this.completeTargetMode(false);
+            }
+        }, 4000);
+    }
+
+    private completeTargetMode(success: boolean) {
+        this.isInTargetMode = false;
+        
+        // Remove all remaining targets
+        this.circleTargets.forEach(target => {
+            this.scene.remove(target.outerCircle);
+            this.scene.remove(target.innerCircle);
+        });
+        this.circleTargets = [];
+
+        if (success) {
+            // Clear the entire line
+            const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
+            this.score += linesCleared * 100;
+            this.renderer.updateScore(this.score);
+        } else {
+            // Only clear the targeted blocks
+            this.targetedBlocks.forEach(pos => {
+                const [x, y] = pos.split(',').map(Number);
+                this.gridManager.grid[y][x] = { color: null, filled: false };
+            });
+        }
+        this.renderer.renderScene();
+
+        // Resume normal game speed
+        this.startAutoDrop();
+    }
+
     updateScene() {
         const now = performance.now();
         if (now - this.lastRenderTime < 16) {
@@ -462,6 +598,7 @@ class TetrisGame {
         });
 
         this.updateCameraShake();
+        this.circleTargets.forEach(target => target.update());
     }
 }
 

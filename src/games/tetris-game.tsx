@@ -555,41 +555,39 @@ class TetrisGame {
     private completeTargetMode(success: boolean) {
         this.isInTargetMode = false;
         
-        // Store current tetromino state and remove it temporarily
         const currentPiece = {
             tetromino: this.currentTetromino,
             x: this.currentX,
             y: this.currentY
         };
         
-        // Clear current piece to prevent it from being affected by line clear
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
-        // Remove targets
         this.circleTargets.forEach(target => target.destroy(this.scene));
         this.circleTargets = [];
 
         if (success) {
-            // Find the line to clear
+            // Find and clear completed lines
             for (let y = this.gridManager.height - 1; y >= 0; y--) {
                 if (this.gridManager.grid[y].every(cell => cell.filled)) {
-                    // Create visual effects
+                    // Create visual effects before clearing
                     this.createLineClearEffects(y);
                     
-                    // Clear the line and shift blocks down
-                    for (let moveY = y; moveY > 0; moveY--) {
-                        this.gridManager.grid[moveY] = [...this.gridManager.grid[moveY - 1]];
-                    }
-                    this.gridManager.grid[0] = Array(this.gridManager.width)
-                        .fill(null)
-                        .map(() => ({ color: null, filled: false }));
+                    // Clear the line
+                    this.gridManager.clearLine(y);
                     
+                    // Update score
                     this.score += 100;
                     this.renderer.updateScore(this.score);
+                    
+                    // Add a small delay to make the effect visible
+                    setTimeout(() => {
+                        this.renderer.renderScene();
+                    }, 100);
                 }
             }
         } else {
-            // Only clear the targeted blocks
+            // Only clear targeted blocks
             this.targetedBlocks.forEach(pos => {
                 const [x, y] = pos.split(',').map(Number);
                 this.gridManager.grid[y][x] = { color: null, filled: false };
@@ -604,6 +602,47 @@ class TetrisGame {
         );
 
         this.renderer.renderScene();
+    }
+
+    private createLineClearEffects(y: number) {
+        // Sweep effect
+        const sweepGeometry = new THREE.PlaneGeometry(12, 0.8);
+        const sweepMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const sweep = new THREE.Mesh(sweepGeometry, sweepMaterial);
+        sweep.position.set(-2, -y + 0.5, 0.1);
+        this.scene.add(sweep);
+
+        // Animate sweep
+        const startTime = Date.now();
+        const animateSweep = () => {
+            const elapsed = (Date.now() - startTime) / 300;
+            if (elapsed < 1) {
+                sweep.position.x = -2 + elapsed * 14;
+                sweep.material.opacity = 0.6 * (1 - elapsed);
+                requestAnimationFrame(animateSweep);
+            } else {
+                this.scene.remove(sweep);
+            }
+        };
+        animateSweep();
+
+        // Add light beams
+        for (let x = 0; x < this.gridManager.width; x++) {
+            if (this.gridManager.grid[y][x].filled && this.gridManager.grid[y][x].color !== null) {
+                setTimeout(() => {
+                    this.particleSystem.addLightBeam(x, y, this.gridManager.grid[y][x].color!);
+                }, x * 50);
+            }
+        }
+
+        this.triggerCameraShake(0.2);
     }
 
     updateScene() {

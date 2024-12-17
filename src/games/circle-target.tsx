@@ -6,7 +6,7 @@ class CircleTarget {
     ring: THREE.Mesh;
     private startTime: number;
     position: THREE.Vector3; 
-    private hitbox: THREE.Mesh;
+    hitbox: THREE.Mesh; // Make hitbox public
 
     constructor(position: THREE.Vector3, scene: THREE.Scene, cameraPos: THREE.Vector3) {
         this.position = position;
@@ -76,15 +76,45 @@ class CircleTarget {
     }
 
     checkHit(raycaster: THREE.Raycaster): boolean {
-        const intersects = raycaster.intersectObject(this.hitbox);
-        if (intersects.length === 0) return false;
-
-        const outerScale = this.outerCircle.scale.x;
-        const diff = Math.abs(outerScale - 0.2);
-        return diff < 0.3; 
+        // Simply check for intersection, no timing check
+        return raycaster.intersectObject(this.hitbox).length > 0;
     }
 
     destroy(scene: THREE.Scene) {
+        // Add explosion effect before removing
+        const explodeGeometry = new THREE.CircleGeometry(0.5, 32);
+        const explodeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 1,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            depthTest: false
+        });
+
+        // Create multiple explosion rings
+        for (let i = 0; i < 3; i++) {
+            const explodeRing = new THREE.Mesh(explodeGeometry, explodeMaterial.clone());
+            explodeRing.position.copy(this.position);
+            explodeRing.lookAt(scene.position);
+            scene.add(explodeRing);
+
+            // Animate each ring
+            const startScale = 0.5 + i * 0.5;
+            const expandRing = () => {
+                explodeRing.scale.multiplyScalar(1.1);
+                explodeRing.material.opacity *= 0.95;
+                if (explodeRing.material.opacity > 0.01) {
+                    requestAnimationFrame(expandRing);
+                } else {
+                    scene.remove(explodeRing);
+                }
+            };
+            explodeRing.scale.set(startScale, startScale, 1);
+            expandRing();
+        }
+
+        // Remove original meshes
         scene.remove(this.innerCircle);
         scene.remove(this.outerCircle);
         scene.remove(this.ring);

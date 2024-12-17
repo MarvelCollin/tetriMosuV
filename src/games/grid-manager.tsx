@@ -78,17 +78,21 @@ class GridManager {
     checkAndClearLines(particleSystem: ParticleSystem): number {
         let completedLines = [];
         
-        // First, find all completed lines
+        // Find completed lines from bottom to top
         for (let y = this.height - 1; y >= 0; y--) {
             if (this.grid[y].every(cell => cell.filled)) {
                 completedLines.push(y);
             }
         }
 
-        // If we have completed lines, start target mode for the bottom-most line
+        // Start target mode for the bottom-most line only
         if (completedLines.length > 0 && this.game) {
-            this.game.startTargetMode(completedLines[0]);
-            return completedLines.length;
+            // Store the line to be cleared
+            const lineY = completedLines[0];
+            
+            // Start target mode for this line only
+            this.game.startTargetMode(lineY);
+            return 1;
         }
         
         return 0;

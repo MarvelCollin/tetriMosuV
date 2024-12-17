@@ -279,17 +279,14 @@ class TetrisGame {
         
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
-        // Swap current and next tetromino
         const temp = this.currentTetromino;
         this.currentTetromino = this.nextTetromino;
         this.nextTetromino = temp;
         
-        // Check if new position is valid
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             this.renderer.updateNextPiecePreview(this.nextTetromino);
             
-            // Add a small visual effect for the swap
             const flashGeometry = new THREE.PlaneGeometry(2, 2);
             const flashMaterial = new THREE.MeshBasicMaterial({
                 color: COLORS[this.currentTetromino],
@@ -302,7 +299,6 @@ class TetrisGame {
             flash.position.set(this.currentX + 1, -this.currentY - 1, 0.1);
             this.scene.add(flash);
             
-            // Fade out and remove flash
             const fadeOut = () => {
                 if (flash.material.opacity > 0) {
                     flash.material.opacity -= 0.1;
@@ -313,7 +309,6 @@ class TetrisGame {
             };
             fadeOut();
         } else {
-            // If collision, revert the swap
             const temp = this.currentTetromino;
             this.currentTetromino = this.nextTetromino;
             this.nextTetromino = temp;
@@ -330,7 +325,6 @@ class TetrisGame {
     renderGridBorders(width: number, height: number) {
         const group = new THREE.Group();
         
-        // Main grid lines with glow effect
         const material = new THREE.LineBasicMaterial({ 
             color: currentTheme.grid,
             opacity: 0.2,
@@ -338,7 +332,6 @@ class TetrisGame {
             blending: THREE.AdditiveBlending
         });
 
-        // Create horizontal lines with varying opacity
         for (let y = 0; y <= height; y++) {
             const opacity = y % 2 === 0 ? 0.3 : 0.15;
             const lineMaterial = material.clone();
@@ -352,7 +345,6 @@ class TetrisGame {
             group.add(line);
         }
 
-        // Create vertical lines with varying opacity
         for (let x = 0; x <= width; x++) {
             const opacity = x % 2 === 0 ? 0.3 : 0.15;
             const lineMaterial = material.clone();
@@ -366,7 +358,6 @@ class TetrisGame {
             group.add(line);
         }
 
-        // Add outer border with glow effect
         const borderMaterial = new THREE.LineBasicMaterial({ 
             color: currentTheme.border,
             opacity: 0.8,
@@ -384,7 +375,6 @@ class TetrisGame {
         
         const border = new THREE.Line(borderGeometry, borderMaterial);
         
-        // Add second border for stronger glow effect
         const outerBorderMaterial = new THREE.LineBasicMaterial({ 
             color: 0x00ffff,
             opacity: 0.4,
@@ -443,7 +433,6 @@ class TetrisGame {
     private handleClick = (event: MouseEvent) => {
         if (!this.isInTargetMode) return;
 
-        // Get canvas-relative coordinates
         const canvas = event.target as HTMLCanvasElement;
         const rect = canvas.getBoundingClientRect();
         const mouse = new THREE.Vector2(
@@ -454,31 +443,58 @@ class TetrisGame {
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(mouse, this.camera);
 
-        // Check each target
         for (let i = this.circleTargets.length - 1; i >= 0; i--) {
             const target = this.circleTargets[i];
-            if (target.checkHit(raycaster)) {
-                console.log("Hit successful!");
+            if (raycaster.intersectObject(target.hitbox).length > 0) {
+                console.log("Circle clicked!");
                 this.hitTargets++;
                 
-                // Visual and audio feedback
-                this.triggerCameraShake(0.2);
+                this.triggerCameraShake(0.15);
                 
-                // Remove hit target
+                const flashGeometry = new THREE.CircleGeometry(1.5, 32);
+                const flashMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.DoubleSide,
+                    depthTest: false
+                });
+                const flash = new THREE.Mesh(flashGeometry, flashMaterial);
+                flash.position.copy(target.position);
+                flash.lookAt(this.camera.position);
+                this.scene.add(flash);
+
+                // Expand and fade out flash
+                const expandFlash = () => {
+                    flash.scale.multiplyScalar(1.1);
+                    flash.material.opacity *= 0.9;
+                    if (flash.material.opacity > 0.01) {
+                        requestAnimationFrame(expandFlash);
+                    } else {
+                        this.scene.remove(flash);
+                    }
+                };
+                expandFlash();
+
+                // Add particles
+                for (let j = 0; j < 12; j++) {
+                    this.particleSystem.addImpactParticles(
+                        target.position.x,
+                        target.position.y,
+                        0x00ffff
+                    );
+                }
+                
                 target.destroy(this.scene);
                 this.circleTargets.splice(i, 1);
 
-                // Add hit effect
-                this.particleSystem.addImpactParticles(
-                    target.position.x,
-                    target.position.y,
-                    0x00ffff
-                );
-
+                // Sound effect would go here if we had audio
+                
                 if (this.hitTargets === this.requiredTargets) {
                     this.completeTargetMode(true);
                 }
-                break; // Exit after first hit
+                break;
             }
         }
     }
@@ -491,36 +507,39 @@ class TetrisGame {
         this.circleTargets = [];
         this.targetedBlocks.clear();
 
-        const gridDepth = 5;              // Distance from grid
-        const yOffset = 1;                // Move circles up by 1 unit
-        const targetLineY = lineY;        // Use the actual line Y position
+        const gridDepth = 5;             
+        const yOffset = 3;               
+        const targetLineY = lineY;        
 
-        // Adjust these values to position circles
-        const numTargets = 3;
+        const numTargets = Math.floor(Math.random() * 4) + 2; 
         this.requiredTargets = numTargets;
+
+        console.log(`Creating ${numTargets} targets for line ${lineY}`);
 
         const cameraPos = this.camera.position.clone();
         const filledPositions = [];
 
-        // Find filled positions in the target line
         for (let x = 0; x < this.gridManager.width; x++) {
             if (this.gridManager.grid[targetLineY][x].filled) {
                 filledPositions.push(x);
             }
         }
 
-        // Create targets with adjusted Y position
-        for (let i = 0; i < numTargets && filledPositions.length > 0; i++) {
+        if (filledPositions.length < numTargets) {
+            console.log("Not enough filled positions for targets");
+            this.completeTargetMode(false);
+            return;
+        }
+
+        for (let i = 0; i < numTargets; i++) {
             const randomIndex = Math.floor(Math.random() * filledPositions.length);
             const x = filledPositions.splice(randomIndex, 1)[0];
 
             const circlePosition = new THREE.Vector3(
-                x + 0.5,                      // Center X on block
-                -targetLineY + yOffset,       // Raised Y position
-                gridDepth                     // Forward depth
+                x + 0.5,                      
+                -targetLineY + yOffset,       
+                gridDepth                    
             );
-
-            console.log(`Creating target at: x=${x + 0.5}, y=${-targetLineY + yOffset}, z=${gridDepth}`);
 
             const target = new CircleTarget(
                 circlePosition,
@@ -542,18 +561,35 @@ class TetrisGame {
     private completeTargetMode(success: boolean) {
         this.isInTargetMode = false;
         
-        // Remove all remaining targets
+        // Store current tetromino state
+        const currentPiece = {
+            tetromino: this.currentTetromino,
+            x: this.currentX,
+            y: this.currentY
+        };
+
+        this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
+        
         this.circleTargets.forEach(target => {
-            this.scene.remove(target.outerCircle);
-            this.scene.remove(target.innerCircle);
+            target.destroy(this.scene);
         });
         this.circleTargets = [];
 
         if (success) {
-            // Clear the entire line
-            const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
-            this.score += linesCleared * 100;
-            this.renderer.updateScore(this.score);
+            for (let y = this.gridManager.height - 1; y >= 0; y--) {
+                if (this.gridManager.grid[y].every(cell => cell.filled)) {
+                    for (let moveY = y; moveY > 0; moveY--) {
+                        this.gridManager.grid[moveY] = [...this.gridManager.grid[moveY - 1]];
+                    }
+                    this.gridManager.grid[0] = Array(this.gridManager.width)
+                        .fill(null)
+                        .map(() => ({ color: null, filled: false }));
+                    
+                    this.score += 100;
+                    this.renderer.updateScore(this.score);
+                    break;
+                }
+            }
         } else {
             // Only clear the targeted blocks
             this.targetedBlocks.forEach(pos => {
@@ -561,10 +597,15 @@ class TetrisGame {
                 this.gridManager.grid[y][x] = { color: null, filled: false };
             });
         }
-        this.renderer.renderScene();
 
-        // Resume normal game speed
-        this.startAutoDrop();
+        // Replace current piece
+        this.gridManager.placeTetromino(
+            currentPiece.tetromino,
+            currentPiece.x,
+            currentPiece.y
+        );
+
+        this.renderer.renderScene();
     }
 
     updateScene() {
@@ -603,3 +644,4 @@ class TetrisGame {
 }
 
 export default TetrisGame;
+

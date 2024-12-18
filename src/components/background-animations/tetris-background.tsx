@@ -1,8 +1,69 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+const themes = [
+    {
+        name: 'cyberpunk',
+        colors: ['#FF00FF', '#00FFFF', '#FF0000', '#FFFF00', '#7FFF00', '#FF1493', '#00FF7F'],
+        background: 'radial-gradient(circle at center, #000428 0%, #004e92 100%)',
+        particleColor: '#00FFFF'
+    },
+    {
+        name: 'midnight',
+        colors: ['#191970', '#000080', '#00008B', '#0000CD', '#483D8B', '#4169E1', '#6495ED'],
+        background: 'linear-gradient(to bottom, #0f2027, #203a43, #2c5364)',
+        particleColor: '#4169E1'
+    },
+    {
+        name: 'neon',
+        colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FF0000', '#0000FF', '#FFFF00', '#FF8000'],
+        background: 'linear-gradient(to right, #000000, #1a0f2e)',
+        particleColor: '#FF00FF'
+    },
+    {
+        name: 'synthwave',
+        colors: ['#FF1493', '#00FFFF', '#FF69B4', '#4B0082', '#9400D3', '#FF00FF'],
+        background: 'linear-gradient(45deg, #200122, #6f0000)',
+        particleColor: '#FF1493'
+    }
+];
+
+// Add new particle system
+class ParticleSystem {
+    particles: any[];
+    
+    constructor(count: number) {
+        this.particles = Array.from({ length: count }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 2 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: (Math.random() - 0.5) * 0.5
+        }));
+    }
+
+    update(context: CanvasRenderingContext2D, particleColor: string) {
+        this.particles.forEach(particle => {
+            particle.x += particle.speedX;
+            particle.y += particle.speedY;
+
+            if (particle.x < 0) particle.x = window.innerWidth;
+            if (particle.x > window.innerWidth) particle.x = 0;
+            if (particle.y < 0) particle.y = window.innerHeight;
+            if (particle.y > window.innerHeight) particle.y = 0;
+
+            context.beginPath();
+            context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            context.fillStyle = particleColor;
+            context.fill();
+        });
+    }
+}
+
 const TetrisBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isPaused, setIsPaused] = useState(false);
+    const [selectedTheme] = useState(themes[Math.floor(Math.random() * themes.length)]);
+    const particleSystemRef = useRef<ParticleSystem | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -26,61 +87,6 @@ const TetrisBackground = () => {
             [[0, 1, 1], [1, 1, 0]], // Z
             [[1, 1, 1], [1, 0, 0]], // L
             [[1, 1, 1], [0, 0, 1]], // J
-        ];
-
-        const themes = [
-            {
-                name: 'classic',
-                colors: ['#FF0D72', '#0DC2FF', '#0DFF72', '#F538FF', '#FF8E0D', '#FFE138', '#3877FF']
-            },
-            {
-                name: 'pastel',
-                colors: ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFB3F7', '#B3F7FF', '#F7B3FF']
-            },
-            {
-                name: 'neon',
-                colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FF0000', '#0000FF', '#FFFF00', '#FF8000']
-            },
-            {
-                name: 'monochrome',
-                colors: ['#000000', '#1A1A1A', '#333333', '#4D4D4D', '#666666', '#808080', '#999999']
-            },
-            {
-                name: 'earth',
-                colors: ['#8B4513', '#228B22', '#4682B4', '#CD853F', '#556B2F', '#8B0000', '#2F4F4F']
-            },
-            {
-                name: 'sunset',
-                colors: ['#FF7F50', '#FF6B6B', '#FFA07A', '#FF4500', '#FF8C00', '#FFD700', '#FFA500']
-            },
-            {
-                name: 'ocean',
-                colors: ['#00008B', '#000080', '#0000CD', '#0000FF', '#1E90FF', '#00BFFF', '#87CEEB']
-            },
-            {
-                name: 'forest',
-                colors: ['#006400', '#228B22', '#32CD32', '#90EE90', '#98FB98', '#3CB371', '#2E8B57']
-            },
-            {
-                name: 'candy',
-                colors: ['#FF69B4', '#FF1493', '#FF00FF', '#DA70D6', '#BA55D3', '#9370DB', '#8A2BE2']
-            },
-            {
-                name: 'retro',
-                colors: ['#DEB887', '#D2691E', '#CD853F', '#D2B48C', '#BC8F8F', '#F4A460', '#DAA520']
-            },
-            {
-                name: 'cyberpunk',
-                colors: ['#FF00FF', '#00FFFF', '#FF0000', '#FFFF00', '#7FFF00', '#FF1493', '#00FF7F']
-            },
-            {
-                name: 'grayscale',
-                colors: ['#141414', '#292929', '#3D3D3D', '#525252', '#666666', '#7A7A7A', '#8F8F8F']
-            },
-            {
-                name: 'midnight',
-                colors: ['#191970', '#000080', '#00008B', '#0000CD', '#483D8B', '#4169E1', '#6495ED']
-            }
         ];
 
         const themeSpecificAnimations = {
@@ -193,7 +199,6 @@ const TetrisBackground = () => {
         };
 
         const shapes = [];
-        const selectedTheme = themes[Math.floor(Math.random() * themes.length)];
         const themeAnimations = themeSpecificAnimations[selectedTheme.name as keyof typeof themeSpecificAnimations];
 
         for (let i = 0; i < 20; i++) {
@@ -231,10 +236,27 @@ const TetrisBackground = () => {
             context.restore();
         };
 
+        // Initialize particle system
+        particleSystemRef.current = new ParticleSystem(50);
+
+        // Apply theme background to container
+        document.body.style.background = selectedTheme.background;
+
+        // Add glow effect to shapes
+        context.shadowBlur = 15;
+        context.shadowColor = selectedTheme.colors[0];
+
         const animate = () => {
             if (isPaused) return;
             context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw particles
+            particleSystemRef.current?.update(context, selectedTheme.particleColor);
+
+            // Draw shapes with glow
             shapes.forEach(shapeObj => {
+                context.shadowBlur = 15;
+                context.shadowColor = shapeObj.color;
                 animationPatterns[shapeObj.pattern as keyof typeof animationPatterns](shapeObj);
                 drawShape(
                     shapeObj.shape, 
@@ -267,13 +289,24 @@ const TetrisBackground = () => {
             canvas.removeEventListener('mouseenter', handleMouseEnter);
             canvas.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isPaused]);
+    }, [isPaused, selectedTheme]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute top-0 left-0 w-full h-full"
-    ></canvas>
+    <>
+        <div 
+            className="fixed top-0 left-0 w-full h-full"
+            style={{
+                background: selectedTheme.background,
+                opacity: 0.8,
+                zIndex: -1
+            }}
+        />
+        <canvas
+            ref={canvasRef}
+            className="absolute top-0 left-0 w-full h-full"
+            style={{ zIndex: 0 }}
+        />
+    </>
   );
 };
 

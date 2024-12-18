@@ -27,7 +27,6 @@ const themes = [
     }
 ];
 
-// Add new particle system
 class ParticleSystem {
     particles: any[];
     
@@ -59,11 +58,34 @@ class ParticleSystem {
     }
 }
 
+// Add grid overlay class
+class GridOverlay {
+    draw(context: CanvasRenderingContext2D, width: number, height: number) {
+        context.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+        context.lineWidth = 1;
+
+        for (let x = 0; x < width; x += 50) {
+            context.beginPath();
+            context.moveTo(x, 0);
+            context.lineTo(x, height);
+            context.stroke();
+        }
+
+        for (let y = 0; y < height; y += 50) {
+            context.beginPath();
+            context.moveTo(0, y);
+            context.lineTo(width, y);
+            context.stroke();
+        }
+    }
+}
+
 const TetrisBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isPaused, setIsPaused] = useState(false);
     const [selectedTheme] = useState(themes[Math.floor(Math.random() * themes.length)]);
     const particleSystemRef = useRef<ParticleSystem | null>(null);
+    const gridRef = useRef<GridOverlay>(new GridOverlay());
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -104,6 +126,16 @@ const TetrisBackground = () => {
             grayscale: ['straight', 'fade'],
             midnight: ['float', 'spiral']
         };
+
+        const defaultAnimations = ['straight', 'zigzag', 'bounce'];
+        
+        const shapes = [];
+        const themeAnimations = themeSpecificAnimations[selectedTheme.name as keyof typeof themeSpecificAnimations] || defaultAnimations;
+
+        if (!themeAnimations || themeAnimations.length === 0) {
+            console.warn('No animations available for theme:', selectedTheme.name);
+            return;
+        }
 
         const animationPatterns = {
             straight: (shapeObj: any) => {
@@ -198,14 +230,12 @@ const TetrisBackground = () => {
             }
         };
 
-        const shapes = [];
-        const themeAnimations = themeSpecificAnimations[selectedTheme.name as keyof typeof themeSpecificAnimations];
-
         for (let i = 0; i < 20; i++) {
             const shape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
             const color = selectedTheme.colors[Math.floor(Math.random() * selectedTheme.colors.length)];
             const x = Math.random() * canvas.width;
             const y = Math.random() * canvas.height;
+            // Safely get a random animation pattern
             const pattern = themeAnimations[Math.floor(Math.random() * themeAnimations.length)];
             shapes.push({ 
                 shape, 
@@ -250,23 +280,34 @@ const TetrisBackground = () => {
             if (isPaused) return;
             context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw particles
-            particleSystemRef.current?.update(context, selectedTheme.particleColor);
+            // Draw grid overlay
+            gridRef.current.draw(context, canvas.width, canvas.height);
 
-            // Draw shapes with glow
+            // Draw enhanced particles with glow
+            context.shadowBlur = 10;
+            context.shadowColor = selectedTheme.particleColor;
+            particleSystemRef.current?.update(context, selectedTheme.particleColor);
+            context.shadowBlur = 0;
+
+            // Draw shapes with enhanced glow
             shapes.forEach(shapeObj => {
-                context.shadowBlur = 15;
+                context.shadowBlur = 20;
                 context.shadowColor = shapeObj.color;
+                // Add pulse effect
+                const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
+                context.shadowBlur *= pulse;
+                
                 animationPatterns[shapeObj.pattern as keyof typeof animationPatterns](shapeObj);
                 drawShape(
-                    shapeObj.shape, 
-                    shapeObj.x, 
-                    shapeObj.y, 
+                    shapeObj.shape,
+                    shapeObj.x,
+                    shapeObj.y,
                     shapeObj.color,
                     shapeObj.pattern === 'rotate' ? shapeObj.rotation : 0,
-                    shapeObj.opacity
+                    shapeObj.opacity * pulse
                 );
             });
+
             requestAnimationFrame(animate);
         };
 
@@ -299,6 +340,13 @@ const TetrisBackground = () => {
                 background: selectedTheme.background,
                 opacity: 0.8,
                 zIndex: -1
+            }}
+        />
+        <div 
+            className="fixed top-0 left-0 w-full h-full pointer-events-none"
+            style={{
+                background: `radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.3) 100%)`,
+                zIndex: 1
             }}
         />
         <canvas

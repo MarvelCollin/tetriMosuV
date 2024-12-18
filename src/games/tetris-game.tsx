@@ -708,64 +708,77 @@ class TetrisGame {
         this.circleTargets.forEach(target => target.update());
     }
 
-    onRotationStart() {
-        CircleTarget.setGameRotation(true);
-        this.circleTargets.forEach(target => {
-            target.updatePositionWithCamera(this.camera.rotation.y);
-        });
-        if (this.rotatingText && this.countdownText) {
-            this.rotatingText.material.opacity = 1;
-            this.countdownText.material.opacity = 1;
-            
-            let count = 3;
-            const animateCountdown = () => {
-                if (count > 0) {
-                    this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
-                        const newGeometry = new TextGeometry(count.toString(), {
-                            font: font,
-                            size: 1.2,
-                            height: 0.1,
-                            curveSegments: 12,
-                            bevelEnabled: true,
-                            bevelThickness: 0.03,
-                            bevelSize: 0.02,
-                            bevelOffset: 0,
-                            bevelSegments: 5
-                        });
-                        this.countdownText!.geometry.dispose();
-                        this.countdownText!.geometry = newGeometry;
+    async onRotationStart() {
+        return new Promise<void>((resolve) => {
+            CircleTarget.setGameRotation(true);
+            this.circleTargets.forEach(target => {
+                target.updatePositionWithCamera(this.camera.rotation.y);
+            });
 
-                        // Add pulse animation
-                        this.countdownText!.scale.set(1.5, 1.5, 1.5);
-                        const shrink = () => {
-                            this.countdownText!.scale.multiplyScalar(0.95);
-                            if (this.countdownText!.scale.x > 1) {
-                                requestAnimationFrame(shrink);
+            if (this.rotatingText && this.countdownText) {
+                this.rotatingText.material.opacity = 1;
+                this.countdownText.material.opacity = 1;
+
+                let count = 3;
+                const animateCountdown = () => {
+                    if (count > 0) {
+                        this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+                            const newGeometry = new TextGeometry(count.toString(), {
+                                font: font,
+                                size: 1.2,
+                                height: 0.1,
+                                curveSegments: 12,
+                                bevelEnabled: true,
+                                bevelThickness: 0.03,
+                                bevelSize: 0.02,
+                                bevelOffset: 0,
+                                bevelSegments: 5
+                            });
+                            
+                            if (this.countdownText) {
+                                this.countdownText.geometry.dispose();
+                                this.countdownText.geometry = newGeometry;
+                                this.countdownText.scale.set(1.5, 1.5, 1.5);
+                                
+                                // Add pulse animation
+                                const shrink = () => {
+                                    if (this.countdownText) {
+                                        this.countdownText.scale.multiplyScalar(0.95);
+                                        if (this.countdownText.scale.x > 1) {
+                                            requestAnimationFrame(shrink);
+                                        }
+                                    }
+                                };
+                                shrink();
+                            }
+                        });
+                        count--;
+                        setTimeout(animateCountdown, 1000);
+                    } else {
+                        // After countdown reaches 0, fade out text and resolve
+                        const fadeOut = () => {
+                            if (this.rotatingText && this.rotatingText.material.opacity > 0) {
+                                this.rotatingText.material.opacity -= 0.05;
+                                if (this.countdownText) {
+                                    this.countdownText.material.opacity -= 0.05;
+                                }
+                                this.rotatingText.material.emissiveIntensity += 0.1;
+                                requestAnimationFrame(fadeOut);
+                            } else {
+                                if (this.rotatingText) {
+                                    this.rotatingText.material.emissiveIntensity = 0.5;
+                                }
+                                resolve();
                             }
                         };
-                        shrink();
-                    });
-                    count--;
-                    setTimeout(animateCountdown, 1000);
-                }
-            };
-            animateCountdown();
-            
-            // Fade out with glow effect
-            setTimeout(() => {
-                const fadeOut = () => {
-                    if (this.rotatingText && this.rotatingText.material.opacity > 0) {
-                        this.rotatingText.material.opacity -= 0.05;
-                        this.countdownText!.material.opacity -= 0.05;
-                        this.rotatingText.material.emissiveIntensity += 0.1;
-                        requestAnimationFrame(fadeOut);
-                    } else {
-                        this.rotatingText.material.emissiveIntensity = 0.5;
+                        fadeOut();
                     }
                 };
-                fadeOut();
-            }, 3000);
-        }
+                animateCountdown();
+            } else {
+                resolve(); 
+            }
+        });
     }
 
     onRotationEnd() {
@@ -840,7 +853,6 @@ class TetrisGame {
 
     private setupRotatingText() {
         this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
-            // Create "Rotating in" text
             const rotatingGeometry = new TextGeometry('ROTATING IN', {
                 font: font,
                 size: 0.6,
@@ -864,7 +876,6 @@ class TetrisGame {
             this.rotatingText.position.set(-6, -5, 0);
             this.scene.add(this.rotatingText);
 
-            // Create "Rotating back" text with same style
             const rotatingBackGeometry = new TextGeometry('ROTATING BACK', {
                 font: font,
                 size: 0.6,
@@ -882,7 +893,6 @@ class TetrisGame {
             this.rotatingBackText.rotation.y = Math.PI;
             this.scene.add(this.rotatingBackText);
 
-            // Create enhanced countdown text
             const countdownMaterial = new THREE.MeshPhongMaterial({
                 color: 0xff3366,
                 transparent: true,
@@ -905,7 +915,7 @@ class TetrisGame {
                 }),
                 countdownMaterial
             );
-            this.countdownText.position.set(-2.5, -5, 0);
+            this.countdownText.position.set(-4, -7, 0);
             this.scene.add(this.countdownText);
         });
     }

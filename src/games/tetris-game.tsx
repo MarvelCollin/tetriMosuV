@@ -36,7 +36,9 @@ class TetrisGame {
     private requiredTargets: number = 0;
     private hitTargets: number = 0;
     private timeoutId: NodeJS.Timeout | null = null;
-    private tetrominoBag: number[] = [];  // Add this property for the bag of tetrominos
+    private tetrominoBag: number[] = [];  
+    private isRotating: boolean = false;
+    private pivotPoint: THREE.Vector3;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -76,6 +78,7 @@ class TetrisGame {
         this.spawnNewTetromino();
 
         window.addEventListener('click', this.handleClick.bind(this));
+        this.pivotPoint = new THREE.Vector3(5, -10, 0);
     }
 
     private setupLighting() {
@@ -150,10 +153,8 @@ class TetrisGame {
     }
 
     private generateNewBag(): number[] {
-        // Create array with indices 0 to 6 (for each tetromino type)
         const bag = Array.from({ length: TETROMINOES.length }, (_, i) => i);
         
-        // Fisher-Yates shuffle
         for (let i = bag.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -517,7 +518,7 @@ class TetrisGame {
         this.circleTargets = [];
         this.targetedBlocks.clear();
 
-        const gridDepth = 1;             // Reduced from 5 to 1 to bring circles closer to grid
+        const gridDepth = 1;            
         const targetLineY = lineY;        
 
         const numTargets = Math.floor(Math.random() * 4) + 2; 
@@ -545,15 +546,16 @@ class TetrisGame {
             const x = filledPositions.splice(randomIndex, 1)[0];
 
             const circlePosition = new THREE.Vector3(
-                x + 0.5,                      // X position centered on block
-                -targetLineY + 0.5,           // Y position centered on block
-                gridDepth                     // Z position (distance from grid) - adjust this value
+                x + 0.5,                      
+                -targetLineY + 0.5,           
+                CircleTarget.getCurrentZ() // Use static Z value
             );
 
             const target = new CircleTarget(
                 circlePosition,
                 this.scene,
-                cameraPos
+                this.camera.position,
+                this
             );
             this.circleTargets.push(target);
             this.targetedBlocks.add(`${x},${targetLineY}`);
@@ -660,6 +662,16 @@ class TetrisGame {
         }
         this.lastRenderTime = now;
 
+        const isCurrentlyRotating = Math.abs(this.camera.rotation.y) > 0.01;
+        if (isCurrentlyRotating !== this.isRotating) {
+            this.isRotating = isCurrentlyRotating;
+            CircleTarget.setGameRotation(isCurrentlyRotating);
+        }
+
+        this.circleTargets.forEach(target => {
+            target.updatePositionWithCamera(this.camera.rotation.y);
+        });
+
         const shadowY = this.calculateShadowPosition();
         this.renderer.updateShadow(this.currentTetromino, this.currentX, shadowY);
         
@@ -685,6 +697,20 @@ class TetrisGame {
 
         this.updateCameraShake();
         this.circleTargets.forEach(target => target.update());
+    }
+
+    onRotationStart() {
+        CircleTarget.setGameRotation(true);
+        this.circleTargets.forEach(target => {
+            target.updatePositionWithCamera(this.camera.rotation.y);
+        });
+    }
+
+    onRotationEnd() {
+        CircleTarget.setGameRotation(false);
+        this.circleTargets.forEach(target => {
+            target.updatePositionWithCamera(this.camera.rotation.y);
+        });
     }
 }
 

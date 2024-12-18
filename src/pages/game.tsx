@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import TetrisGame from '../games/tetris-game';
 import { currentTheme } from '../games/colors';
+import { log } from 'three/tsl';
 
 const Game = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -106,13 +107,15 @@ const Game = () => {
 
       const rotateAndReturn = async () => {
         if (!isRotatingRef.current && cameraPivotRef.current) {
-          // Rotate to 180 degrees
+          if (gameInstanceRef.current) {
+            gameInstanceRef.current.onRotationStart();
+          }
+
           isRotatingRef.current = true;
           const targetAngle = cameraAngleRef.current + Math.PI;
           
-          // First rotation (2 seconds)
           const startTime = Date.now();
-          const duration = 2000;
+          const duration = 1000;
 
           function animate() {
             const elapsed = Date.now() - startTime;
@@ -128,9 +131,7 @@ const Game = () => {
             } else {
               cameraAngleRef.current = targetAngle;
               
-              // Wait random time (5-10 seconds) before rotating back
               setTimeout(() => {
-                // Rotate back to original position
                 const startTimeReturn = Date.now();
                 
                 function animateReturn() {
@@ -147,11 +148,15 @@ const Game = () => {
                   } else {
                     cameraAngleRef.current = targetAngle - Math.PI;
                     isRotatingRef.current = false;
+                    if (gameInstanceRef.current) {
+                      console.log('rotation end');
+                      gameInstanceRef.current.onRotationEnd();
+                    }
                   }
                 }
                 
                 animateReturn();
-              }, 5000 + Math.random() * 5000); 
+              }, 5000 + Math.random() * 10000); 
             }
           }
 

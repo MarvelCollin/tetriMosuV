@@ -269,7 +269,12 @@ const TetrisBackground = () => {
         };
     }, [isPaused]);
 
-    return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full"></canvas>;
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute top-0 left-0 w-full h-full"
+    ></canvas>
+  );
 };
 
 export default TetrisBackground;

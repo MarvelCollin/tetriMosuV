@@ -1,168 +1,218 @@
-import { Link } from 'react-router-dom';
-import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { useEffect, useRef, useState } from 'react';
+import TetrisGame from '../games/tetris-game';
+import { currentTheme } from '../games/colors';
+import { log } from 'three/tsl';
 
-function Game() {
-  const colors = ['yellow', 'green', 'purple'];
-  const mountRef = useRef(null);
+const Game = () => {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const [tetrominoState, setTetrominoState] = useState({ tetromino: 0, startX: 3, startY: 0 });
+  const gameInstanceRef = useRef<TetrisGame | null>(null);
+  const cameraAngleRef = useRef(0);
+  const isRotatingRef = useRef(false);
+  const rotationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const cameraPivotRef = useRef<THREE.Object3D | null>(null); 
 
-  useEffect(() => {
-    const currentMount = mountRef.current;
-
+  const initializeGame = () => {
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    const renderer = new THREE.WebGLRenderer();
+    scene.background = new THREE.Color(currentTheme.background);  
+    
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(5, -10, 16); 
+    camera.lookAt(5, -10, 0);
 
+    const cameraPivot = new THREE.Object3D();
+    cameraPivot.position.set(5, -10, 0);  
+    scene.add(cameraPivot);
+    cameraPivot.add(camera);
+    camera.position.set(0, 0, 16);
+    cameraPivotRef.current = cameraPivot;
+
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: "high-performance"
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    currentMount.appendChild(renderer.domElement);
-
-    renderer.setClearColor(0x000000);
-
-    camera.position.z = 5;
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.mouseButtons = {
-      LEFT: THREE.MOUSE.ROTATE,
-      MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: null
-    };
-
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-
-    scene.add(cube);
-
-    const shapes = [
-      // I shape
-      [
-        [1, 1, 1, 1]
-      ],
-      // O shape
-      [
-        [1, 1],
-        [1, 1]
-      ],
-      // T shape
-      [
-        [0, 1, 0],
-        [1, 1, 1]
-      ],
-      // S shape
-      [
-        [0, 1, 1],
-        [1, 1, 0]
-      ],
-      // Z shape
-      [
-        [1, 1, 0],
-        [0, 1, 1]
-      ],
-      // J shape
-      [
-        [1, 0, 0],
-        [1, 1, 1]
-      ],
-      // L shape
-      [
-        [0, 0, 1],
-        [1, 1, 1]
-      ]
-    ];
-
-    const grid = new Array(20).fill(null).map(() => new Array(10).fill(0));
-
-    const createShape = (shape) => {
-      const group = new THREE.Group();
-      shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.set(x - shape[0].length / 2, -y + shape.length / 2, 0);
-            group.add(cube);
-          }
-        });
-      });
-      return group;
-    };
-
-    const shape = createShape(shapes[0]);
-    scene.add(shape);
-
-    const boxGeometry = new THREE.BoxGeometry(10, 20, 1);
-    const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
-    const box = new THREE.Mesh(boxGeometry, boxMaterial);
-
-    box.position.set(0, 0, 0);
-
-    scene.add(box);
-
-    const createGrid = (width, height) => {
-      const gridGroup = new THREE.Group();
-      const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-      for (let i = -width / 2; i <= width / 2; i++) {
-        const geometry = new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(i, -height / 2, 0),
-          new THREE.Vector3(i, height / 2, 0)
-        ]);
-        const line = new THREE.Line(geometry, material);
-        gridGroup.add(line);
-      }
-
-      for (let j = -height / 2; j <= height / 2; j++) {
-        const geometry = new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(-width / 2, j, 0),
-          new THREE.Vector3(width / 2, j, 0)
-        ]);
-        const line = new THREE.Line(geometry, material);
-        gridGroup.add(line);
-      }
-
-      return gridGroup;
-    };
-
-    const tetrisGrid = createGrid(10, 20);
-    scene.add(tetrisGrid);
+    renderer.setClearColor(0x000000, 0);
+    renderer.gammaFactor = 2.2;
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     const handleResize = () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
+    handleResize(); 
 
-    const animate = () => {
+    const mount = mountRef.current;
+    if (!mount) return;
+    mount.innerHTML = '';
+    mount.appendChild(renderer.domElement);
+
+    const tetrisGame = new TetrisGame(scene, camera, setTetrominoState);
+    gameInstanceRef.current = tetrisGame;
+    tetrisGame.spawnNewTetromino();
+    const gridBorders = tetrisGame.renderGridBorders(10, 20);
+    scene.add(gridBorders);
+    let lastTime = 0;
+    const animate = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime >= 16) { 
+        renderer.render(scene, camera);
+        if (tetrisGame) {
+          tetrisGame.updateScene();
+        }
+        lastTime = currentTime;
+      }
       requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
+    };
+    requestAnimationFrame(animate);
+
+    const animateCamera = (pivot: THREE.Object3D, targetAngle: number) => {
+      const startAngle = cameraAngleRef.current;
+      const startTime = Date.now();
+      const duration = 1000;
+
+      const updateCamera = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const currentAngle = startAngle + (targetAngle - startAngle) * easeProgress;
+        
+        pivot.rotation.y = currentAngle;
+        
+        if (gameInstanceRef.current) {
+          gameInstanceRef.current.updateCircleTargetsPosition(currentAngle);
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateCamera);
+        } else {
+          cameraAngleRef.current = targetAngle;
+          isRotatingRef.current = false;
+        }
+      };
+
+      updateCamera();
     };
 
-    animate();
+    const startAutoRotation = () => {
+      if (rotationIntervalRef.current) {
+        clearInterval(rotationIntervalRef.current);
+      }
+
+      const rotateAndReturn = async () => {
+        if (!isRotatingRef.current && cameraPivotRef.current) {
+          if (gameInstanceRef.current) {
+            gameInstanceRef.current.onRotationStart();
+          }
+
+          isRotatingRef.current = true;
+          const targetAngle = cameraAngleRef.current + Math.PI;
+          
+          const startTime = Date.now();
+          const duration = 1000;
+
+          function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentAngle = cameraAngleRef.current + (Math.PI * easeProgress);
+            
+            cameraPivotRef.current!.rotation.y = currentAngle;
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              cameraAngleRef.current = targetAngle;
+              
+              setTimeout(() => {
+                const startTimeReturn = Date.now();
+                
+                function animateReturn() {
+                  const elapsedReturn = Date.now() - startTimeReturn;
+                  const progressReturn = Math.min(elapsedReturn / duration, 1);
+                  
+                  const easeProgressReturn = 1 - Math.pow(1 - progressReturn, 3);
+                  const currentAngleReturn = targetAngle - (Math.PI * easeProgressReturn);
+                  
+                  cameraPivotRef.current!.rotation.y = currentAngleReturn;
+                  
+                  if (progressReturn < 1) {
+                    requestAnimationFrame(animateReturn);
+                  } else {
+                    cameraAngleRef.current = targetAngle - Math.PI;
+                    isRotatingRef.current = false;
+                    if (gameInstanceRef.current) {
+                      console.log('rotation end');
+                      gameInstanceRef.current.onRotationEnd();
+                    }
+                  }
+                }
+                
+                animateReturn();
+              }, 5000 + Math.random() * 10000); 
+            }
+          }
+
+          animate();
+        }
+      };
+
+      const randomInterval = () => {
+        // const interval = 30000 + Math.random() * 10000; 
+        const interval = 2000; 
+        rotationIntervalRef.current = setTimeout(() => {
+          rotateAndReturn();
+          randomInterval();
+        }, interval);
+      };
+
+      randomInterval();
+    };
+
+    setTimeout(() => {
+      startAutoRotation();
+    }, 1000);
 
     return () => {
-      currentMount.removeChild(renderer.domElement);
-      scene.remove(shape);
-      scene.remove(box);
+      if (mount && mount.contains(renderer.domElement)) {
+        mount.removeChild(renderer.domElement);
+      }
       window.removeEventListener('resize', handleResize);
-      controls.dispose();
+      renderer.dispose();
+      gameInstanceRef.current = null;
+      if (rotationIntervalRef.current) {
+        clearInterval(rotationIntervalRef.current);
+        rotationIntervalRef.current = null;
+      }
+      cameraPivotRef.current = null;
+    };
+  };
+
+  useEffect(() => {
+    const cleanup = initializeGame();
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (gameInstanceRef.current) {
+        gameInstanceRef.current.handleKeyPress(event);
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      cleanup();
+      window.removeEventListener('keydown', handleKeyPress);
+      if (gameInstanceRef.current?.dropIntervalId) {
+        clearInterval(gameInstanceRef.current.dropIntervalId);
+      }
     };
   }, []);
 
-  return (
-    <div ref={mountRef} className='w-full h-screen'>
-    </div>
-  );
-}
+  return <div ref={mountRef} style={{ width: '100%', height: '100vh' }}></div>;
+};
 
 export default Game;

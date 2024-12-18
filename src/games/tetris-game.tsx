@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { TETROMINOES } from './tetrominoes';
 import { COLORS, MATERIALS, SHADOW_MATERIALS, BLOCK_GEOMETRY, currentTheme } from './colors';
 import ParticleSystem from './particle-system';
@@ -39,6 +41,10 @@ class TetrisGame {
     private tetrominoBag: number[] = [];  
     private isRotating: boolean = false;
     private pivotPoint: THREE.Vector3;
+    private rotatingText: THREE.Mesh | null = null;
+    private rotatingBackText: THREE.Mesh | null = null;
+    private countdownText: THREE.Mesh | null = null;
+    private fontLoader: FontLoader;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -72,6 +78,9 @@ class TetrisGame {
         this.nextTetromino = this.getNextTetromino();
         this.score = 0;
         this.renderer.updateScore(this.score);
+
+        this.fontLoader = new FontLoader();
+        this.setupRotatingText();
 
         this.setupLighting();
         this.startAutoDrop();
@@ -704,12 +713,200 @@ class TetrisGame {
         this.circleTargets.forEach(target => {
             target.updatePositionWithCamera(this.camera.rotation.y);
         });
+        if (this.rotatingText && this.countdownText) {
+            this.rotatingText.material.opacity = 1;
+            this.countdownText.material.opacity = 1;
+            
+            let count = 3;
+            const animateCountdown = () => {
+                if (count > 0) {
+                    this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+                        const newGeometry = new TextGeometry(count.toString(), {
+                            font: font,
+                            size: 1.2,
+                            height: 0.1,
+                            curveSegments: 12,
+                            bevelEnabled: true,
+                            bevelThickness: 0.03,
+                            bevelSize: 0.02,
+                            bevelOffset: 0,
+                            bevelSegments: 5
+                        });
+                        this.countdownText!.geometry.dispose();
+                        this.countdownText!.geometry = newGeometry;
+
+                        // Add pulse animation
+                        this.countdownText!.scale.set(1.5, 1.5, 1.5);
+                        const shrink = () => {
+                            this.countdownText!.scale.multiplyScalar(0.95);
+                            if (this.countdownText!.scale.x > 1) {
+                                requestAnimationFrame(shrink);
+                            }
+                        };
+                        shrink();
+                    });
+                    count--;
+                    setTimeout(animateCountdown, 1000);
+                }
+            };
+            animateCountdown();
+            
+            // Fade out with glow effect
+            setTimeout(() => {
+                const fadeOut = () => {
+                    if (this.rotatingText && this.rotatingText.material.opacity > 0) {
+                        this.rotatingText.material.opacity -= 0.05;
+                        this.countdownText!.material.opacity -= 0.05;
+                        this.rotatingText.material.emissiveIntensity += 0.1;
+                        requestAnimationFrame(fadeOut);
+                    } else {
+                        this.rotatingText.material.emissiveIntensity = 0.5;
+                    }
+                };
+                fadeOut();
+            }, 3000);
+        }
     }
 
     onRotationEnd() {
         CircleTarget.setGameRotation(false);
         this.circleTargets.forEach(target => {
             target.updatePositionWithCamera(this.camera.rotation.y);
+        });
+
+        if (this.rotatingBackText && this.countdownText) {
+            this.rotatingBackText.material.opacity = 0;
+            this.countdownText.material.opacity = 0;
+            this.countdownText.scale.set(1, 1, 1);
+            this.rotatingBackText.material.emissiveIntensity = 0.5;
+        }
+    }
+
+    private startRotatingBackText() {
+        if (this.rotatingBackText && this.countdownText) {
+            this.rotatingBackText.material.opacity = 1;
+            this.countdownText.material.opacity = 1;
+            
+            let count = 3;
+            const animateCountdown = () => {
+                if (count > 0) {
+                    this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+                        const newGeometry = new TextGeometry(count.toString(), {
+                            font: font,
+                            size: 1.2,
+                            height: 0.1,
+                            curveSegments: 12,
+                            bevelEnabled: true,
+                            bevelThickness: 0.03,
+                            bevelSize: 0.02,
+                            bevelOffset: 0,
+                            bevelSegments: 5
+                        });
+                        this.countdownText!.geometry.dispose();
+                        this.countdownText!.geometry = newGeometry;
+
+                        // Add pulse animation
+                        this.countdownText!.scale.set(1.5, 1.5, 1.5);
+                        const shrink = () => {
+                            this.countdownText!.scale.multiplyScalar(0.95);
+                            if (this.countdownText!.scale.x > 1) {
+                                requestAnimationFrame(shrink);
+                            }
+                        };
+                        shrink();
+                    });
+                    count--;
+                    setTimeout(animateCountdown, 1000);
+                }
+            };
+            animateCountdown();
+            
+            // Fade out with glow effect
+            setTimeout(() => {
+                const fadeOut = () => {
+                    if (this.rotatingBackText && this.rotatingBackText.material.opacity > 0) {
+                        this.rotatingBackText.material.opacity -= 0.05;
+                        this.countdownText!.material.opacity -= 0.05;
+                        this.rotatingBackText.material.emissiveIntensity += 0.1;
+                        requestAnimationFrame(fadeOut);
+                    } else {
+                        this.rotatingBackText.material.emissiveIntensity = 0.5;
+                    }
+                };
+                fadeOut();
+            }, 3000);
+        }
+    }
+
+    private setupRotatingText() {
+        this.fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+            // Create "Rotating in" text
+            const rotatingGeometry = new TextGeometry('ROTATING IN', {
+                font: font,
+                size: 0.6,
+                height: 0.05,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.01,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            const rotatingMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.5,
+                shininess: 100
+            });
+            this.rotatingText = new THREE.Mesh(rotatingGeometry, rotatingMaterial);
+            this.rotatingText.position.set(-6, -5, 0);
+            this.scene.add(this.rotatingText);
+
+            // Create "Rotating back" text with same style
+            const rotatingBackGeometry = new TextGeometry('ROTATING BACK', {
+                font: font,
+                size: 0.6,
+                height: 0.05,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.01,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            const rotatingBackMaterial = rotatingMaterial.clone();
+            this.rotatingBackText = new THREE.Mesh(rotatingBackGeometry, rotatingBackMaterial);
+            this.rotatingBackText.position.set(16, -5, 0);
+            this.rotatingBackText.rotation.y = Math.PI;
+            this.scene.add(this.rotatingBackText);
+
+            // Create enhanced countdown text
+            const countdownMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff3366,
+                transparent: true,
+                opacity: 0,
+                emissive: 0xff3366,
+                emissiveIntensity: 0.7,
+                shininess: 100
+            });
+            this.countdownText = new THREE.Mesh(
+                new TextGeometry('3', {
+                    font: font,
+                    size: 1.2,
+                    height: 0.1,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.03,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                }),
+                countdownMaterial
+            );
+            this.countdownText.position.set(-2.5, -5, 0);
+            this.scene.add(this.countdownText);
         });
     }
 }

@@ -31,7 +31,7 @@ class CircleTarget {
 
     private static materials = {
         inner: new THREE.MeshBasicMaterial({
-            color: currentTheme.border, // Use theme border color (usually bright)
+            color: currentTheme.border,
             transparent: true,
             opacity: 1,
             side: THREE.DoubleSide,
@@ -39,7 +39,7 @@ class CircleTarget {
             blending: THREE.AdditiveBlending
         }),
         outer: new THREE.MeshBasicMaterial({
-            color: currentTheme.grid, // Use theme grid color (usually accent)
+            color: currentTheme.grid, 
             transparent: true,
             opacity: 0.8,
             side: THREE.DoubleSide,

@@ -39,6 +39,7 @@ function Home() {
   const [section3Ref, section3InView] = useInView();
   const [section4Ref, section4InView] = useInView();
   const [section5Ref, section5InView] = useInView();
+  const [section6Ref, section6InView] = useInView();
 
   const handleClick = () => {
     setIsTransitioning(true);
@@ -275,9 +276,9 @@ function Home() {
             </section>
             
             <section
-              ref={section4Ref}
+              ref={section6Ref}
               className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
-                         ${section4InView ? 'slide-from-right' : ''}`}
+                         ${section6InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
@@ -369,7 +370,7 @@ function Home() {
                   </div>
                 </div>
               </div>
-              <ScrollIndicator text="Back to Top" />
+              <ScrollIndicator text="Registration" />
             </section>
 
             <section
@@ -384,7 +385,6 @@ function Home() {
                 </h1>
 
                 <div className="grid grid-cols-2 gap-12">
-                  {/* Important Dates */}
                   <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
                                hover:border-cyan-500/40 transition-all duration-300">
                     <h2 className="text-4xl mb-8" id="hero-text-static">Important Dates</h2>
@@ -407,7 +407,6 @@ function Home() {
                     </div>
                   </div>
 
-                  {/* Requirements */}
                   <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
                                hover:border-cyan-500/40 transition-all duration-300">
                     <h2 className="text-4xl mb-8" id="hero-text-static">Requirements</h2>

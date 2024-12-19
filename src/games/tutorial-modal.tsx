@@ -184,7 +184,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
 
     const handleMouseUp = () => {
-      setActiveKeys(prev => {
+      setActiveKeys(prevw => {
         const newKeys = new Set(prev);
         newKeys.delete('MOUSE1');
         return newKeys;

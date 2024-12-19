@@ -235,6 +235,82 @@ function Home() {
               <ScrollIndicator text="Back to Top" />
             </section>
 
+            {/* Add this section before the contact us section */}
+            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
+              <div className="w-full max-w-7xl relative z-10">
+                <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
+                  <span className="inline-block animate-float-title transition-all duration-300">REGISTRATION</span>
+                  <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
+                </h1>
+
+                <div className="grid grid-cols-2 gap-12">
+                  {/* Important Dates */}
+                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
+                               hover:border-cyan-500/40 transition-all duration-300">
+                    <h2 className="text-4xl mb-8" id="hero-text-static">Important Dates</h2>
+                    <div className="space-y-6">
+                      {[
+                        { date: "20 Feb 2024", event: "Registration Opens" },
+                        { date: "1 Mar 2024", event: "Registration Closes" },
+                        { date: "2 Mar 2024", event: "Initial Test" },
+                        { date: "4 Mar 2024", event: "Interview Period Starts" }
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center gap-6 group/item">
+                          <div className="bg-cyan-500/20 px-4 py-2 rounded-lg text-xl text-white/70
+                                      group-hover/item:bg-cyan-500/30 group-hover/item:text-white transition-all duration-300">
+                            {item.date}
+                          </div>
+                          <span className="text-xl text-white/70 group-hover/item:text-white transition-colors duration-300">
+                            {item.event}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Requirements */}
+                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
+                               hover:border-cyan-500/40 transition-all duration-300">
+                    <h2 className="text-4xl mb-8" id="hero-text-static">Requirements</h2>
+                    <div className="space-y-4">
+                      {[
+                        "Active BINUS Student (2023/2024)",
+                        "Minimum GPA 2.75",
+                        "Strong commitment to teach",
+                        "Excellent communication skills",
+                        "Team player mindset",
+                        "Willing to learn new technologies"
+                      ].map((req, index) => (
+                        <div key={index} className="flex items-start gap-4 group/item">
+                          <span className="text-cyan-400 text-xl">→</span>
+                          <p className="text-xl text-white/70 group-hover/item:text-white transition-colors duration-300">
+                            {req}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-12 text-center">
+                  <Link
+                    to="/register"
+                    className="inline-block bg-black/30 px-12 py-6 rounded-lg backdrop-blur-sm 
+                             hover:scale-110 transition-all duration-300 
+                             border-2 border-cyan-500/20 group
+                             relative overflow-hidden"
+                  >
+                    <span className="text-4xl glitch-text relative z-10" id="hero-text-static">
+                      Register Now
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-transparent
+                                opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                  </Link>
+                </div>
+              </div>
+              <ScrollIndicator text="Contact Us" />
+            </section>
+
             <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
               <div className="w-full max-w-7xl relative z-10">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">

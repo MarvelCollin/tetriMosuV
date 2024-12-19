@@ -307,10 +307,9 @@ function Home() {
                     <h2 className="text-4xl mb-8" id="hero-text-static">Important Dates</h2>
                     <div className="space-y-6">
                       {[
-                        { date: "20 Feb 2024", event: "Registration Opens" },
-                        { date: "1 Mar 2024", event: "Registration Closes" },
-                        { date: "2 Mar 2024", event: "Initial Test" },
-                        { date: "4 Mar 2024", event: "Interview Period Starts" }
+                        { date: "14 Jan 2024", event: "Registration Opens" },
+                        { date: "20 Mar 2024", event: "Registration Closes" },
+                        { date: "27 Mar 2024", event: "Initial Test" },
                       ].map((item, index) => (
                         <div key={index} className="flex items-center gap-6 group/item">
                           <div className="bg-cyan-500/20 px-4 py-2 rounded-lg text-xl text-white/70
@@ -349,7 +348,7 @@ function Home() {
 
                 <div className="mt-12 text-center">
                   <Link
-                    to="/register"
+                    to="https://bluejack.binus.ac.id/nar/home/registration"
                     className="inline-block bg-black/30 px-12 py-6 rounded-lg backdrop-blur-sm 
                              hover:scale-110 transition-all duration-300 
                              border-2 border-cyan-500/20 group

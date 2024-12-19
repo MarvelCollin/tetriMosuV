@@ -27,7 +27,7 @@ const themes = [
     },
     {
         name: 'neon',
-        colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FF0000', '#FFFF00', '#FF8000'],
+        colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FFFF00', '#FF8000'],
         background: `
             linear-gradient(125deg, #000000 0%, #1a0f2e 35%, #4a157c 100%),
             linear-gradient(rgba(255, 0, 255, 0.05) 1px, transparent 1px),
@@ -39,15 +39,15 @@ const themes = [
     },
     {
         name: 'synthwave',
-        colors: ['#FF1493', '#00FFFF', '#FF69B4', '#FF00FF', '#9400D3', '#8A2BE2'],
+        colors: ['#00FFFF', '#FF69B4', '#FF00FF', '#9400D3', '#8A2BE2'],
         background: `
-            linear-gradient(45deg, #200122 0%, #6f0000 50%, #4a0063 100%),
+            linear-gradient(45deg, #20024a 0%, #090979 50%, #2b126e 100%),
             linear-gradient(rgba(255, 20, 147, 0.05) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 20, 147, 0.05) 1px, transparent 1px)
         `,
         backgroundSize: '100% 100%, 64px 64px, 64px 64px',
-        particleColor: '#FF1493',
-        gridColor: 'rgba(255, 20, 147, 0.1)'
+        particleColor: '#FF69B4',
+        gridColor: 'rgba(255, 105, 180, 0.1)'
     }
 ];
 

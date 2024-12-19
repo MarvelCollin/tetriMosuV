@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 interface TutorialModalProps {
   onClose: () => void;
@@ -13,13 +13,12 @@ interface Particle {
   color: string;
 }
 
-// Update key mapping constant
 const KEY_MAPPING: { [key: string]: string } = {
   'W': 'W',
   'A': 'A',
   'S': 'S',
   'D': 'D',
-  ' ': 'SPACE',  // Map spacebar
+  ' ': 'SPACE',  
   'R': 'R',
   'MOUSE1': 'MOUSE1'
 };
@@ -27,7 +26,6 @@ const KEY_MAPPING: { [key: string]: string } = {
 const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
-  const [particles, setParticles] = useState<Particle[]>([]);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
@@ -36,7 +34,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [backgroundEffect, setBackgroundEffect] = useState<string>('');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Add background color state
   const [bgColor, setBgColor] = useState<string>('');
 
   const handleNext = () => {
@@ -138,7 +135,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <h3 className="text-2xl text-white font-semibold mb-4 drop-shadow-glow">Ready to Play?</h3>
             <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm text-center">
               <p className="text-white text-lg mb-4 text-shadow-bright">
-                Clear lines, score points, and enjoy the immersive 3D Tetris experience!
+                Dont Forget to join NAR 25-2 !!
               </p>
             </div>
           </div>
@@ -148,33 +145,51 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     }
   };
 
-  // Update trigger effect function
-  const triggerBackgroundEffect = (type: string, position?: { x: number, y: number }, key?: string) => {
-    setBackgroundEffect(type);
-    if (position) {
-      setMousePosition(position);
+  const particles = useMemo(() => {
+    const particlesArray: Particle[] = [];
+    for (let i = 0; i < 60; i++) {
+      particlesArray.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        speedX: (Math.random() - 0.5) * 0.5, 
+        speedY: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 3 + 1,
+        color: `hsla(${180 + Math.random() * 60}, 100%, 70%, ${0.3 + Math.random() * 0.2})`
+      });
     }
+    return particlesArray;
+  }, []);
 
-    // Set different background colors based on key
-    let color = '';
-    if (key) {
-      switch(key) {
-        case 'W': color = 'from-cyan-500/30'; break;
-        case 'A': color = 'from-blue-500/30'; break;
-        case 'S': color = 'from-purple-500/30'; break;
-        case 'D': color = 'from-green-500/30'; break;
-        case 'SPACE': color = 'from-yellow-500/30'; break;
-        case 'R': color = 'from-red-500/30'; break;
-        default: color = 'from-cyan-500/30';
+  const triggerBackgroundEffect = useCallback((type: string, position?: { x: number, y: number }, key?: string) => {
+    requestAnimationFrame(() => {
+      setBackgroundEffect(type);
+      if (position) {
+        setMousePosition(position);
       }
-    }
-    setBgColor(color);
 
-    setTimeout(() => {
-      setBackgroundEffect('');
-      setBgColor('');
+      let color = '';
+      if (key) {
+        color = {
+          'W': 'from-cyan-500/30',
+          'A': 'from-blue-500/30',
+          'S': 'from-purple-500/30',
+          'D': 'from-green-500/30',
+          'SPACE': 'from-yellow-500/30',
+          'R': 'from-red-500/30'
+        }[key] || 'from-cyan-500/30';
+      }
+      setBgColor(color);
+    });
+
+    const timeoutId = setTimeout(() => {
+      requestAnimationFrame(() => {
+        setBackgroundEffect('');
+        setBgColor('');
+      });
     }, 300);
-  };
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -221,47 +236,36 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
   }, [currentStep, onClose]);
 
-  useEffect(() => {
-    const particlesArray: Particle[] = [];
-    for (let i = 0; i < 120; i++) {
-      particlesArray.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        speedX: (Math.random() - 0.5) * 0.8,
-        speedY: (Math.random() - 0.5) * 0.8,
-        size: Math.random() * 4 + 1,
-        color: `hsla(${180 + Math.random() * 60}, 100%, 70%, ${0.4 + Math.random() * 0.3})`
-      });
-    }
-    setParticles(particlesArray);
-  }, []);
-
   const animateParticles = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     
-    const gradient = ctx.createRadialGradient(
-      window.innerWidth / 2, window.innerHeight / 2, 0,
-      window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 2
-    );
-    gradient.addColorStop(0, 'rgba(0, 40, 80, 0.8)');
-    gradient.addColorStop(0.5, 'rgba(0, 20, 40, 0.9)');
-    gradient.addColorStop(1, 'rgba(0, 10, 20, 0.95)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    if (!backgroundEffect) {
+      const gradient = ctx.createRadialGradient(
+        width / 2, height / 2, 0,
+        width / 2, height / 2, width / 2
+      );
+      gradient.addColorStop(0, 'rgba(0, 40, 80, 0.8)');
+      gradient.addColorStop(0.5, 'rgba(0, 20, 40, 0.9)');
+      gradient.addColorStop(1, 'rgba(0, 10, 20, 0.95)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+    }
 
-    particles.forEach((particle, index) => {
-      particle.x += particle.speedX;
-      particle.y += particle.speedY;
+    const particleUpdates = particles.map((particle, index) => {
+      particle.x = (particle.x + particle.speedX + width) % width;
+      particle.y = (particle.y + particle.speedY + height) % height;
+      return particle;
+    });
 
-      if (particle.x > window.innerWidth) particle.x = 0;
-      if (particle.x < 0) particle.x = window.innerWidth;
-      if (particle.y > window.innerHeight) particle.y = 0;
-      if (particle.y < 0) particle.y = window.innerHeight;
-
-      const shimmer = Math.sin(Date.now() * 0.003 + index * 0.1) * 0.2 + 0.8;
+    ctx.save();
+    particleUpdates.forEach((particle, index) => {
+      const shimmer = Math.sin(Date.now() * 0.002 + index * 0.1) * 0.2 + 0.8;
       const particleGradient = ctx.createRadialGradient(
         particle.x, particle.y, 0,
-        particle.x, particle.y, particle.size * 3
+        particle.x, particle.y, particle.size * 2
       );
 
       const baseColor = particle.color.match(/hsla\(([^)]+)\)/)?.[1].split(',') || [];
@@ -273,47 +277,71 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
       ctx.fill();
+    });
+    ctx.restore();
 
-      particles.forEach((particle2, j) => {
-        if (index !== j) {
+    if (!backgroundEffect) {
+      ctx.save();
+      for (let i = 0; i < particles.length; i += 2) {
+        const particle = particles[i];
+        for (let j = i + 1; j < particles.length; j += 2) {
+          const particle2 = particles[j];
           const dx = particle.x - particle2.x;
           const dy = particle.y - particle2.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 120) {
-            ctx.beginPath();
-            const opacity = (1 - distance/120) * 0.2 * shimmer;
+          if (distance < 100) { 
+            const opacity = (1 - distance/100) * 0.15;
             ctx.strokeStyle = `rgba(0, 255, 255, ${opacity})`;
-            ctx.lineWidth = (1 - distance/120) * 2;
+            ctx.lineWidth = (1 - distance/100);
+            ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(particle2.x, particle2.y);
             ctx.stroke();
           }
         }
-      });
-    });
-  }, [particles]);
+      }
+      ctx.restore();
+    }
+  }, [particles, backgroundEffect]);
 
+  // Optimize animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let animationFrameId: number;
+    let frameId: number;
+    let lastTime = 0;
+    const fps = 30; // Limit FPS
+    const interval = 1000 / fps;
 
-    const animate = () => {
+    const animate = (currentTime: number) => {
+      frameId = requestAnimationFrame(animate);
+      
+      const delta = currentTime - lastTime;
+      if (delta < interval) return;
+
+      lastTime = currentTime - (delta % interval);
       animateParticles(ctx);
-      animationFrameId = requestAnimationFrame(animate);
     };
-    animate();
 
+    frameId = requestAnimationFrame(animate);
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', handleResize);
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', handleResize);
     };
   }, [animateParticles]);
 
@@ -696,6 +724,21 @@ const styles = `
     50% { transform: translateY(-5px) rotate(1deg); }
   }
 
+  .animate-float-title {
+    animation: float-title 3s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  .animate-float-title-delayed {
+    animation: float-title-delayed 3s ease-in-out infinite 0.2s;
+    display: inline-block;
+  }
+
+  .animate-float-title-more-delayed {
+    animation: float-title-more-delayed 3s ease-in-out infinite 0.4s;
+    display: inline-block;
+  }
+
   @keyframes gradient-x {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -731,7 +774,6 @@ const styles = `
     animation: pulse-fast 1s ease-in-out infinite;
   }
 
-  /* Add hover effects for interactive elements */
   .hover-lift {
     transition: transform 0.2s ease;
   }

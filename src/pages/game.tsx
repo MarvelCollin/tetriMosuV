@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import TetrisGame from '../games/tetris-game';
 import TutorialModal from '../games/tutorial-modal';
 import { currentTheme } from '../games/colors';
+import GameOverModal from '../games/game-over-modal';
 
 const Game = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -13,6 +14,22 @@ const Game = () => {
   const isRotatingRef = useRef(false);
   const rotationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const cameraPivotRef = useRef<THREE.Object3D | null>(null); 
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+
+  const handleGameOver = (score: number) => {
+    setFinalScore(score);
+    setShowGameOver(true);
+  };
+
+  const handleTryAgain = () => {
+    setShowGameOver(false);
+    // Reset game
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current = null;
+    }
+    initializeGame();
+  };
 
   const initializeGame = () => {
     const scene = new THREE.Scene();
@@ -55,6 +72,7 @@ const Game = () => {
 
     const tetrisGame = new TetrisGame(scene, camera, setTetrominoState);
     gameInstanceRef.current = tetrisGame;
+    tetrisGame.onGameOver = handleGameOver;
     tetrisGame.spawnNewTetromino();
     const gridBorders = tetrisGame.renderGridBorders(10, 20);
     scene.add(gridBorders);
@@ -219,9 +237,16 @@ const Game = () => {
       {showTutorial && (
         <TutorialModal onClose={() => setShowTutorial(false)} />
       )}
+      {showGameOver && (
+        <GameOverModal 
+          score={finalScore}
+          onClose={handleTryAgain}
+        />
+      )}
       <div ref={mountRef} style={{ width: '100%', height: '100vh' }}></div>
     </>
   );
 };
 
 export default Game;
+

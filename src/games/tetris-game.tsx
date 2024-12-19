@@ -49,6 +49,9 @@ class TetrisGame {
         originalY: number;
     }[] = [];
 
+    // Add callback property for game over
+    onGameOver: ((score: number) => void) | null = null;
+
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
         this.setTetrominoState = setTetrominoState;
@@ -190,6 +193,10 @@ class TetrisGame {
             this.gameOver = true;
             clearInterval(this.dropIntervalId!);
             console.log('Game Over!');
+            // Trigger game over callback
+            if (this.onGameOver) {
+                this.onGameOver(this.score);
+            }
         } else {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             this.renderer.updateActivePiece(this.currentTetromino, this.currentX, this.currentY);

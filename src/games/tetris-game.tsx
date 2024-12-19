@@ -713,25 +713,58 @@ class TetrisGame {
             particle.mesh.position.add(particle.velocity);
             
             const time = Date.now() * 0.001;
+            
+            // More complex movement patterns
             particle.mesh.position.y += Math.sin(time + particle.originalY) * 0.01;
             particle.mesh.position.x += Math.cos(time * 0.5 + particle.originalY) * 0.005;
             
-            if (particle.mesh.position.x > 20) particle.mesh.position.x = -10;
-            if (particle.mesh.position.x < -10) particle.mesh.position.x = 20;
-            if (particle.mesh.position.y > 5) particle.mesh.position.y = -25;
-            if (particle.mesh.position.y < -25) particle.mesh.position.y = 5;
+            // Gentle rotation
+            particle.mesh.rotation.x += 0.001;
+            particle.mesh.rotation.y += 0.002;
             
+            // Screen wrapping with smooth transition
+            if (particle.mesh.position.x > 20) {
+                particle.mesh.position.x = -20;
+                particle.mesh.material.opacity = 0;
+            }
+            if (particle.mesh.position.x < -20) {
+                particle.mesh.position.x = 20;
+                particle.mesh.material.opacity = 0;
+            }
+            if (particle.mesh.position.y > 5) {
+                particle.mesh.position.y = -25;
+                particle.mesh.material.opacity = 0;
+            }
+            if (particle.mesh.position.y < -25) {
+                particle.mesh.position.y = 5;
+                particle.mesh.material.opacity = 0;
+            }
+            
+            // Dynamic opacity based on position and time
             const distanceFromCenter = new THREE.Vector2(
                 particle.mesh.position.x - 5,
                 particle.mesh.position.y + 10
             ).length();
             
             particle.life = (Math.sin(time + particle.originalY) + 1) * 0.5;
-            const baseOpacity = particle.life * 0.3;
-            particle.mesh.material.opacity = baseOpacity * (1 - distanceFromCenter / 30);
+            const baseOpacity = particle.life * 0.4;  // Increased base opacity
+            const targetOpacity = baseOpacity * (1 - distanceFromCenter / 35);
+            
+            // Smooth opacity transition
+            particle.mesh.material.opacity += (targetOpacity - particle.mesh.material.opacity) * 0.1;
 
-            const hue = (time * 0.1 + particle.originalY) % 1;
-            (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.5, 0.5);
+            // Color cycling with different patterns for different particle types
+            if (particle.mesh.geometry.type === 'SphereGeometry') {
+                const hue = (time * 0.1 + particle.originalY) % 1;
+                (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.8, 0.5);
+            } else if (particle.mesh.geometry.type === 'OctahedronGeometry') {
+                const hue = (time * 0.05 + particle.originalY) % 1;
+                (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.5, 0.6);
+            }
+            
+            // Scale pulsing
+            const scale = 1 + Math.sin(time * 2 + particle.originalY) * 0.1;
+            particle.mesh.scale.setScalar(scale);
         });
     }
 
@@ -753,22 +786,55 @@ class TetrisGame {
     }
 
     private initializeAmbientParticles() {
-        const particleCount = 100; 
+        // Increase particle count for more visual impact
+        const particleCount = 200; 
+        
+        // Create different types of particles
         for (let i = 0; i < particleCount; i++) {
-            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
-            const material = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                transparent: true,
-                opacity: Math.random() * 0.3 + 0.1,
-                blending: THREE.AdditiveBlending
-            });
+            const type = Math.random();
+            let geometry, material;
+            
+            if (type < 0.4) { // Spherical particles
+                geometry = new THREE.SphereGeometry(0.05 + Math.random() * 0.05, 8, 8);
+                material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    transparent: true,
+                    opacity: Math.random() * 0.3 + 0.1,
+                    blending: THREE.AdditiveBlending
+                });
+            } else if (type < 0.7) { // Star-like particles
+                geometry = new THREE.OctahedronGeometry(0.08 + Math.random() * 0.05);
+                material = new THREE.MeshBasicMaterial({
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: Math.random() * 0.4 + 0.1,
+                    blending: THREE.AdditiveBlending
+                });
+            } else { // Energy streaks
+                geometry = new THREE.PlaneGeometry(0.05, 0.3 + Math.random() * 0.4);
+                material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5),
+                    transparent: true,
+                    opacity: Math.random() * 0.3 + 0.1,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.DoubleSide
+                });
+            }
 
             const mesh = new THREE.Mesh(geometry, material);
             
+            // Wider distribution of particles
             mesh.position.set(
-                Math.random() * 30 - 10,  // X: -10 to 20 (covers UI elements)
-                Math.random() * 30 - 25,   // Y: -25 to 5 (covers score area)
-                Math.random() * 4 - 2      // Z: -2 to 2 (more depth)
+                Math.random() * 40 - 20,    // X: -20 to 20
+                Math.random() * 40 - 30,     // Y: -30 to 10
+                Math.random() * 8 - 4        // Z: -4 to 4
+            );
+
+            // Random rotation for variety
+            mesh.rotation.set(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI
             );
 
             this.scene.add(mesh);
@@ -776,9 +842,9 @@ class TetrisGame {
             this.ambientParticles.push({
                 mesh,
                 velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.02,
-                    Math.random() * 0.02 - 0.01, 
-                    (Math.random() - 0.5) * 0.02
+                    (Math.random() - 0.5) * 0.03,  // Slightly faster horizontal movement
+                    Math.random() * 0.02 - 0.01,   // Vertical drift
+                    (Math.random() - 0.5) * 0.02   // Depth movement
                 ),
                 life: Math.random(),
                 originalY: mesh.position.y

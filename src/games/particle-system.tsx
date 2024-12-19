@@ -7,14 +7,23 @@ class ParticleSystem {
     private lastUpdate: number = 0;
     private isAnimating: boolean = false;
     private backgroundEffects: { mesh: THREE.Mesh; velocity: THREE.Vector3; life: number }[] = [];
+    private energyFields: THREE.Mesh[] = [];
+    private glowRings: THREE.Mesh[] = [];
 
     constructor(scene: THREE.Scene) {
         this.scene = scene;
         this.initializeBackgroundEffects();
+        this.createEnergyFields();
+        this.createGlowRings();
     }
 
     private initializeBackgroundEffects() {
-        for (let i = 0; i < 20; i++) {
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+        const centerX = viewWidth / 2;
+        const centerY = viewHeight / 2;
+
+        for (let i = 0; i < 40; i++) {  
             const geometry = new THREE.PlaneGeometry(0.1, 2 + Math.random() * 3);
             const material = new THREE.MeshBasicMaterial({
                 color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5),
@@ -26,8 +35,8 @@ class ParticleSystem {
 
             const streak = new THREE.Mesh(geometry, material);
             streak.position.set(
-                Math.random() * 30 - 10,
-                Math.random() * 30 - 25,
+                Math.random() * viewWidth - centerX,  
+                Math.random() * viewHeight - centerY,
                 -2 + Math.random()
             );
             streak.rotation.z = Math.random() * Math.PI;
@@ -36,12 +45,78 @@ class ParticleSystem {
             this.backgroundEffects.push({
                 mesh: streak,
                 velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.02,
-                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.05,  
+                    (Math.random() - 0.5) * 0.05,  
                     0
                 ),
                 life: 1
             });
+        }
+
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            const newCenterX = newWidth / 2;
+            const newCenterY = newHeight / 2;
+
+            this.backgroundEffects.forEach(effect => {
+                effect.mesh.position.set(
+                    Math.random() * newWidth - newCenterX,
+                    Math.random() * newHeight - newCenterY,
+                    effect.mesh.position.z
+                );
+            });
+        });
+    }
+
+    private createEnergyFields() {
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+
+        for (let i = 0; i < 5; i++) {
+            const geometry = new THREE.PlaneGeometry(20, 20);
+            const material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(Math.random(), 0.7, 0.5),
+                transparent: true,
+                opacity: 0.1,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide
+            });
+
+            const field = new THREE.Mesh(geometry, material);
+            field.position.set(
+                (Math.random() - 0.5) * viewWidth,
+                (Math.random() - 0.5) * viewHeight,
+                -6
+            );
+            field.rotation.z = Math.random() * Math.PI;
+            this.scene.add(field);
+            this.energyFields.push(field);
+        }
+    }
+
+    private createGlowRings() {
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+
+        for (let i = 0; i < 8; i++) {
+            const geometry = new THREE.RingGeometry(5, 6, 32);
+            const material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide
+            });
+
+            const ring = new THREE.Mesh(geometry, material);
+            ring.position.set(
+                (Math.random() - 0.5) * viewWidth,
+                (Math.random() - 0.5) * viewHeight,
+                -4
+            );
+            this.scene.add(ring);
+            this.glowRings.push(ring);
         }
     }
 
@@ -314,6 +389,97 @@ class ParticleSystem {
         }
     }
 
+    addLineEffect(startX: number, startY: number, endX: number, endY: number, color: number) {
+        const points = [];
+        points.push(new THREE.Vector3(startX + 0.5, -startY + 0.5, 0.1));
+        points.push(new THREE.Vector3(endX + 0.5, -endY + 0.5, 0.1));
+
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const line = new THREE.Line(geometry, material);
+        this.scene.add(line);
+
+        const glowMaterial = new THREE.LineBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            linewidth: 3
+        });
+
+        const glowLine = new THREE.Line(geometry, glowMaterial);
+        glowLine.scale.multiplyScalar(1.2);
+        this.scene.add(glowLine);
+
+        this.particles.push(
+            {
+                mesh: line,
+                velocity: new THREE.Vector3(0, 0, 0),
+                life: 0.5
+            },
+            {
+                mesh: glowLine,
+                velocity: new THREE.Vector3(0, 0, 0),
+                life: 0.5
+            }
+        );
+
+        // Add sparkle particles along the line
+        const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+        const steps = Math.ceil(distance * 5); // Number of particles based on line length
+
+        for (let i = 0; i < steps; i++) {
+            const t = i / steps;
+            const x = startX + (endX - startX) * t;
+            const y = startY + (endY - startY) * t;
+
+            const sparkleGeometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let j = 0; j < 6; j++) {
+                const angle = (j / 6) * Math.PI * 2;
+                vertices.push(
+                    Math.cos(angle) * 0.05, Math.sin(angle) * 0.05, 0,
+                    0, 0, 0
+                );
+            }
+            sparkleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const sparkleMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            const sparkle = new THREE.LineSegments(sparkleGeometry, sparkleMaterial);
+            sparkle.position.set(
+                x + 0.5 + (Math.random() - 0.5) * 0.2,
+                -y + 0.5 + (Math.random() - 0.5) * 0.2,
+                0.1
+            );
+            this.scene.add(sparkle);
+
+            this.particles.push({
+                mesh: sparkle,
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.05,
+                    (Math.random() - 0.5) * 0.05,
+                    0
+                ),
+                life: 0.3 + Math.random() * 0.2
+            });
+        }
+
+        if (!this.isAnimating) {
+            this.startAnimation();
+        }
+    }
+
     private startAnimation() {
         this.isAnimating = true;
         const animate = () => {
@@ -333,18 +499,37 @@ class ParticleSystem {
     }
 
     private updateParticles() {
+        const viewWidth = window.innerWidth;
+        const viewHeight = window.innerHeight;
+        const centerX = viewWidth / 2;
+        const centerY = viewHeight / 2;
+
         this.backgroundEffects.forEach(effect => {
             effect.mesh.position.add(effect.velocity);
             effect.mesh.rotation.z += 0.001;
             
-            if (effect.mesh.position.x > 20) effect.mesh.position.x = -10;
-            if (effect.mesh.position.x < -10) effect.mesh.position.x = 20;
-            if (effect.mesh.position.y > 5) effect.mesh.position.y = -25;
-            if (effect.mesh.position.y < -25) effect.mesh.position.y = 5;
+            if (effect.mesh.position.x > centerX) effect.mesh.position.x = -centerX;
+            if (effect.mesh.position.x < -centerX) effect.mesh.position.x = centerX;
+            if (effect.mesh.position.y > centerY) effect.mesh.position.y = -centerY;
+            if (effect.mesh.position.y < -centerY) effect.mesh.position.y = centerY;
 
-            // Pulse effect
             const pulse = Math.sin(Date.now() * 0.001) * 0.3 + 0.7;
             effect.mesh.material.opacity = 0.2 * pulse;
+        });
+
+        this.energyFields.forEach((field, index) => {
+            const time = Date.now() * 0.0005;
+            field.rotation.z += 0.002;
+            field.scale.x = 1 + Math.sin(time + index) * 0.2;
+            field.scale.y = 1 + Math.cos(time + index) * 0.2;
+            field.material.opacity = 0.1 + Math.sin(time * 2 + index) * 0.05;
+        });
+
+        this.glowRings.forEach((ring, index) => {
+            const time = Date.now() * 0.001;
+            ring.scale.setScalar(1 + Math.sin(time + index * 0.5) * 0.2);
+            ring.rotation.z += 0.01;
+            ring.material.opacity = 0.15 + Math.sin(time * 1.5 + index) * 0.05;
         });
 
         for (let i = this.particles.length - 1; i >= 0; i--) {
@@ -383,6 +568,10 @@ class ParticleSystem {
             } else if (particle.mesh.geometry.type === 'PlaneGeometry') {
                 particle.mesh.material.opacity *= 0.9;
                 particle.mesh.scale.x *= 1.05;
+            } else if (particle.mesh instanceof THREE.Line && !(particle.mesh instanceof THREE.LineSegments)) {
+                particle.mesh.material.opacity *= 0.95;
+                const pulse = Math.sin(Date.now() * 0.01) * 0.2 + 0.8;
+                particle.mesh.scale.y = pulse;
             } else {
                 particle.mesh.rotation.x += 0.1;
                 particle.mesh.rotation.y += 0.1;
@@ -401,6 +590,16 @@ class ParticleSystem {
                 this.particles.splice(i, 1);
             }
         }
+    }
+
+    cleanup() {
+        [...this.energyFields, ...this.glowRings].forEach(object => {
+            this.scene.remove(object);
+            object.geometry.dispose();
+            object.material.dispose();
+        });
+        this.energyFields = [];
+        this.glowRings = [];
     }
 }
 

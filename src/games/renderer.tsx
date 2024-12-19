@@ -87,12 +87,12 @@ class Renderer {
         const previewY = 2;
 
         const loader = new FontLoader();
-        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+        loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
             const titleGeometry = new TextGeometry('NEXT PIECE', {
                 font: font,
-                size: 0.4,
-                height: 0.1,
-                curveSegments: 12,
+                size: 0.3, // Adjusted size
+                height: 0.05,
+                curveSegments: 1,
                 bevelEnabled: false
             });
             
@@ -172,12 +172,12 @@ class Renderer {
         }
 
         const loader = new FontLoader();
-        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+        loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
             const textGeometry = new TextGeometry(`SCORE: ${score}`, {
                 font: font,
-                size: 0.5,
+                size: 0.6,
                 height: 0.1,
-                curveSegments: 12,
+                curveSegments: 1,
                 bevelEnabled: false
             });
             
@@ -186,37 +186,98 @@ class Renderer {
                 emissive: 0x00ffff,
                 emissiveIntensity: 0.4,
                 transparent: true,
-                opacity: 0.9
+                opacity: 0.9,
+                flatShading: true
             });
             
             this.scoreText = new THREE.Mesh(textGeometry, material);
-            this.scoreText.position.set(-5, 1, 0); 
+            this.scoreText.position.set(-8, 0, 0); 
             this.scene.add(this.scoreText);
 
-            if (!this.keybindText) {
-                const keybindsGeometry = new TextGeometry(
-                    "CONTROLS:\n\n" +
-                    "W - Rotate\n" +
-                    "A - Move Left\n" +
-                    "S - Move Down\n" +
-                    "D - Move Right\n" +
-                    "R - Swap Piece\n" +
-                    "SPACE - Hard Drop", {
+            const controlsTitleGeometry = new TextGeometry("BASIC CONTROLS", {
+                font: font,
+                size: 0.5,
+                height: 0.1,
+                curveSegments: 1,
+                bevelEnabled: false
+            });
+
+            const controlsTitleMesh = new THREE.Mesh(controlsTitleGeometry, material.clone());
+            controlsTitleMesh.position.set(-12, -3, 0);
+            this.scene.add(controlsTitleMesh);
+
+            const controls = [
+                { key: "W", action: "ROTATE PIECE" },
+                { key: "A", action: "MOVE LEFT" },
+                { key: "S", action: "MOVE DOWN" },
+                { key: "D", action: "MOVE RIGHT" },
+                { key: "R", action: "SWAP PIECE" },
+                { key: "SPACE", action: "HARD DROP" },
+                { key: "MOUSE", action: "CLICK TARGETS" }
+            ];
+
+            controls.forEach((control, index) => {
+                const yOffset = -1.9 * (index + 1) - 3; 
+                
+                const keyGeometry = new TextGeometry(control.key, {
                     font: font,
-                    size: 0.3,
-                    height: 0.05,
-                    curveSegments: 12,
+                    size: 0.45,
+                    height: 0.08,
+                    curveSegments: 1,
                     bevelEnabled: false
                 });
 
-                const keybindsMaterial = material.clone();
-                keybindsMaterial.opacity = 0.7;
-                this.keybindText = new THREE.Mesh(keybindsGeometry, keybindsMaterial);
-                this.keybindText.position.set(12, -8, 0); 
-                this.scene.add(this.keybindText);
+                const keyMaterial = material.clone();
+                keyMaterial.color.setHex(0x00ffff);
+                const keyMesh = new THREE.Mesh(keyGeometry, keyMaterial);
+                keyMesh.position.set(-12.5, yOffset, 0); 
+
+                const arrowGeometry = new TextGeometry("|", {
+                    font: font,
+                    size: 0.4,
+                    height: 0.08,
+                    curveSegments: 1,
+                    bevelEnabled: false
+                });
+
+                const arrowMaterial = material.clone();
+                arrowMaterial.color.setHex(0x4444ff);
+                const arrowMesh = new THREE.Mesh(arrowGeometry, arrowMaterial);
+                arrowMesh.position.set(-10, yOffset, 0);
+
+                const actionGeometry = new TextGeometry(control.action, {
+                    font: font,
+                    size: 0.35,
+                    height: 0.08,
+                    curveSegments: 1,
+                    bevelEnabled: false
+                });
+
+                const actionMaterial = material.clone();
+                actionMaterial.opacity = 0.7;
+                const actionMesh = new THREE.Mesh(actionGeometry, actionMaterial);
+                actionMesh.position.set(-9, yOffset, 0);
+                this.scene.add(keyMesh, arrowMesh, actionMesh);
+            });
+
+            const noteGeometry = new TextGeometry("HIT CIRCLE TARGETS TO CLEAR LINES!", {
+                font: font,
+                size: 0.3,
+                height: 0.05,
+                curveSegments: 1,
+                bevelEnabled: false
+            });
+
+            const noteMaterial = material.clone();
+            noteMaterial.color.setHex(0xff3366);
+            noteMaterial.emissive.setHex(0xff3366);
+            const noteMesh = new THREE.Mesh(noteGeometry, noteMaterial);
+            noteMesh.position.set(-12, -18, 0); 
+            this.scene.add(noteMesh);
+
+            if (this.keybindText) {
+                this.scene.remove(this.keybindText);
+                this.keybindText = null;
             }
         });
-    }
-}
-
-export default Renderer;
+    }}export default Renderer;

@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import TetrisGame from '../games/tetris-game';
+import TutorialModal from '../games/tutorial-modal';
 import { currentTheme } from '../games/colors';
-import { log } from 'three/tsl';
 
 const Game = () => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const [showTutorial, setShowTutorial] = useState(true);
   const [tetrominoState, setTetrominoState] = useState({ tetromino: 0, startX: 3, startY: 0 });
   const gameInstanceRef = useRef<TetrisGame | null>(null);
   const cameraAngleRef = useRef(0);
@@ -195,23 +196,32 @@ const Game = () => {
   };
 
   useEffect(() => {
-    const cleanup = initializeGame();
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (gameInstanceRef.current) {
-        gameInstanceRef.current.handleKeyPress(event);
-      }
-    };
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      cleanup();
-      window.removeEventListener('keydown', handleKeyPress);
-      if (gameInstanceRef.current?.dropIntervalId) {
-        clearInterval(gameInstanceRef.current.dropIntervalId);
-      }
-    };
-  }, []);
+    if (!showTutorial) {
+      const cleanup = initializeGame();
+      const handleKeyPress = (event: KeyboardEvent) => {
+        if (gameInstanceRef.current) {
+          gameInstanceRef.current.handleKeyPress(event);
+        }
+      };
+      window.addEventListener('keydown', handleKeyPress);
+      return () => {
+        cleanup();
+        window.removeEventListener('keydown', handleKeyPress);
+        if (gameInstanceRef.current?.dropIntervalId) {
+          clearInterval(gameInstanceRef.current.dropIntervalId);
+        }
+      };
+    }
+  }, [showTutorial]);
 
-  return <div ref={mountRef} style={{ width: '100%', height: '100vh' }}></div>;
+  return (
+    <>
+      {showTutorial && (
+        <TutorialModal onClose={() => setShowTutorial(false)} />
+      )}
+      <div ref={mountRef} style={{ width: '100%', height: '100vh' }}></div>
+    </>
+  );
 };
 
 export default Game;

@@ -343,6 +343,30 @@ function Home() {
                       ))}
                     </div>
                   </div>
+
+                  <div className="col-span-2 mt-8 bg-black/30 p-8 rounded-lg backdrop-blur-sm border border-white/10">
+                    <h2 className="text-4xl mb-6" id="hero-text-static">Others</h2>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      {[
+                        "Salary",
+                        "Health Benefit",
+                        "Free Parking",
+                        "Job Opportunities",
+                        "Career Path",
+                        "Second Family",
+                        "And Many More"
+                      ].map((benefit, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 bg-purple-500/20 rounded-full text-white/70 hover:text-white 
+                                   hover:bg-purple-500/30 transition-all duration-300 text-lg animate-float"
+                          style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                          {benefit}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
               <ScrollIndicator text="Back to Top" />

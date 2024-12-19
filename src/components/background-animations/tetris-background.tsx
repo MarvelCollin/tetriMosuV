@@ -3,27 +3,51 @@ import React, { useEffect, useRef, useState } from 'react';
 const themes = [
     {
         name: 'cyberpunk',
-        colors: ['#FF00FF', '#00FFFF', '#FF0000', '#FFFF00', '#7FFF00', '#FF1493', '#00FF7F'],
-        background: 'radial-gradient(circle at center, #000428 0%, #004e92 100%)',
-        particleColor: '#00FFFF'
+        colors: ['#FF00FF', '#00FFFF', '#7FFF00', '#FF1493', '#00FF7F'],
+        background: `
+            linear-gradient(135deg, #000428 0%, #004e92 50%, #2c3e50 100%),
+            linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 64px 64px, 64px 64px',
+        particleColor: '#00FFFF',
+        gridColor: 'rgba(0, 255, 255, 0.1)'
     },
     {
         name: 'midnight',
-        colors: ['#191970', '#000080', '#00008B', '#0000CD', '#483D8B', '#4169E1', '#6495ED'],
-        background: 'linear-gradient(to bottom, #0f2027, #203a43, #2c5364)',
-        particleColor: '#4169E1'
+        colors: ['#4169E1', '#483D8B', '#6495ED', '#1E90FF', '#00BFFF', '#87CEEB'],
+        background: `
+            linear-gradient(to bottom, #0f2027 0%, #203a43 50%, #2c5364 100%),
+            linear-gradient(rgba(65, 105, 225, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(65, 105, 225, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 64px 64px, 64px 64px',
+        particleColor: '#4169E1',
+        gridColor: 'rgba(65, 105, 225, 0.1)'
     },
     {
         name: 'neon',
-        colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FF0000', '#0000FF', '#FFFF00', '#FF8000'],
-        background: 'linear-gradient(to right, #000000, #1a0f2e)',
-        particleColor: '#FF00FF'
+        colors: ['#FF00FF', '#00FF00', '#00FFFF', '#FF0000', '#FFFF00', '#FF8000'],
+        background: `
+            linear-gradient(125deg, #000000 0%, #1a0f2e 35%, #4a157c 100%),
+            linear-gradient(rgba(255, 0, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 0, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 64px 64px, 64px 64px',
+        particleColor: '#FF00FF',
+        gridColor: 'rgba(255, 0, 255, 0.1)'
     },
     {
         name: 'synthwave',
-        colors: ['#FF1493', '#00FFFF', '#FF69B4', '#4B0082', '#9400D3', '#FF00FF'],
-        background: 'linear-gradient(45deg, #200122, #6f0000)',
-        particleColor: '#FF1493'
+        colors: ['#FF1493', '#00FFFF', '#FF69B4', '#FF00FF', '#9400D3', '#8A2BE2'],
+        background: `
+            linear-gradient(45deg, #200122 0%, #6f0000 50%, #4a0063 100%),
+            linear-gradient(rgba(255, 20, 147, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 20, 147, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 64px 64px, 64px 64px',
+        particleColor: '#FF1493',
+        gridColor: 'rgba(255, 20, 147, 0.1)'
     }
 ];
 
@@ -60,23 +84,28 @@ class ParticleSystem {
 
 // Add grid overlay class
 class GridOverlay {
-    draw(context: CanvasRenderingContext2D, width: number, height: number) {
-        context.strokeStyle = 'rgba(0, 255, 255, 0.1)';
-        context.lineWidth = 1;
+    draw(context: CanvasRenderingContext2D, width: number, height: number, gridColor: string) {
+        context.strokeStyle = gridColor;
+        context.lineWidth = 0.5;
+        context.globalAlpha = 0.2;
 
-        for (let x = 0; x < width; x += 50) {
+        const gridSize = 64; // Match the grid size from the original CSS
+
+        for (let x = 0; x < width; x += gridSize) {
             context.beginPath();
             context.moveTo(x, 0);
             context.lineTo(x, height);
             context.stroke();
         }
 
-        for (let y = 0; y < height; y += 50) {
+        for (let y = 0; y < height; y += gridSize) {
             context.beginPath();
             context.moveTo(0, y);
             context.lineTo(width, y);
             context.stroke();
         }
+
+        context.globalAlpha = 1;
     }
 }
 
@@ -292,7 +321,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // Draw grid overlay
-        gridRef.current.draw(context, canvas.width, canvas.height);
+        gridRef.current.draw(context, canvas.width, canvas.height, themeConfig.gridColor);
 
         // Draw enhanced particles with glow
         context.shadowBlur = 10;
@@ -333,27 +362,20 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
   }, [themeConfig]);
 
   return (
-    <>
-        <div 
-            className="fixed top-0 left-0 w-full h-full"
-            style={{
-                background: themeConfig.background,
-                opacity: 0.8,
-                zIndex: -1,
-                transition: 'background 0.5s ease-in-out'
-            }}
+    <>        <div             className="fixed top-0 left-0 w-full h-full"            style={{                background: themeConfig.background,                backgroundSize: themeConfig.backgroundSize,                opacity: 0.95,                zIndex: -1,                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'            }}
         />
         <div 
             className="fixed top-0 left-0 w-full h-full pointer-events-none"
             style={{
-                background: `radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.3) 100%)`,
-                zIndex: 1
+                background: `radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%)`,
+                zIndex: 0,
+                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
         />
         <canvas
             ref={canvasRef}
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 0 }}
+            style={{ zIndex: 1, mixBlendMode: 'lighten' }}
         />
     </>
   );

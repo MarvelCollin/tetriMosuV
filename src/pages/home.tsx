@@ -32,6 +32,7 @@ function Home() {
     const themes = ['cyberpunk', 'midnight', 'neon', 'synthwave'];
     return themes[Math.floor(Math.random() * themes.length)];
   });
+  const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
   
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -43,6 +44,7 @@ function Home() {
     setIsTransitioning(true);
     setTimeout(() => {
       setShowWelcome(true);
+      setShowThemeSwitcher(true);
       setIsTransitioning(false);
     }, 1000);
   };
@@ -60,10 +62,12 @@ function Home() {
 
   return (
     <div
-      className="bg-black w-full h-screen flex flex-col items-center justify-center font-game"
+      className=" w-full h-screen flex flex-col items-center justify-center font-game"
       onClick={!showWelcome ? handleClick : undefined}
     >
-      <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
+      {showThemeSwitcher && (
+        <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
+      )}
       <TetrisBackground selectedTheme={currentTheme} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
@@ -73,11 +77,7 @@ function Home() {
               className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section1InView ? 'slide-from-left' : ''}`}
             >
-              <div className="relativ h-full
-                           bg-[linear-gradient(to_right,#80808020_1px,transparent_1px),linear-gradient(to_bottom,#80808020_1px,transparent_1px)] 
-                           bg-[size:64px_64px]
-                           before:absolute before:inset-0 before:z-0
-                           flex items-center justify-center p-8">
+              <div className="relative h-full flex items-center justify-center p-8">
                 <div className="w-full max-w-7xl relative z-10">
                   <div className="w-full flex flex-row items-center justify-center text-center">
                     <div className="relative flex flex-1 items-center justify-center">

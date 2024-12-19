@@ -4,9 +4,10 @@ import TetrisBackground from "../components/background-animations/tetris-backgro
 import "../index.css";
 import HeroComponent from "../components/main-page/HeroComponent";
 import { useInView } from '../hooks/useInView';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 
-const ScrollIndicator = ({ text = "Scroll Down" }) => (
-  <div className="absolute bottom-8 right-8 flex flex-col items-center text-white/70 animate-bounce">
+const ScrollIndicator = ({ text = "Scroll Down", onClick }) => (
+  <div className="absolute bottom-8 right-8 flex flex-col items-center text-white/70 animate-bounce" onClick={onClick}>
     <p className="mb-2 text-sm">{text}</p>
     <svg
       className="w-6 h-6"
@@ -27,6 +28,10 @@ const ScrollIndicator = ({ text = "Scroll Down" }) => (
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    const themes = ['cyberpunk', 'midnight', 'neon', 'synthwave'];
+    return themes[Math.floor(Math.random() * themes.length)];
+  });
   
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -42,12 +47,24 @@ function Home() {
     }, 1000);
   };
 
+  const scrollToTop = () => {
+    const container = document.querySelector('.snap-y');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleThemeChange = (newTheme: string) => {
+    setCurrentTheme(newTheme);
+  };
+
   return (
     <div
       className="bg-black w-full h-screen flex flex-col items-center justify-center font-game"
       onClick={!showWelcome ? handleClick : undefined}
     >
-      <TetrisBackground />
+      <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
+      <TetrisBackground selectedTheme={currentTheme} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
@@ -80,20 +97,38 @@ function Home() {
                         <br />
                         25-2
                       </p>
-                      <Link
-                        to="/game"
-                        className="bg-black/30 px-12 py-6 rounded-lg backdrop-blur-sm 
-                                 hover:scale-110 transition-all duration-300 
-                                 border-2 border-white/20 group
-                                 relative overflow-hidden"
-                      >
-                        <span className="text-4xl glitch-text relative z-10">
-                          Play Game
-                        </span>
-                        <div className="absolute inset-0 group-hover:opacity-100 opacity-0 
-                                    transition-opacity duration-300 pointer-events-none
-                                    bg-white/10 blur-sm" />
-                      </Link>
+                      <div className="flex gap-8">
+                        {[
+                          { 
+                            to: '/game',
+                            text: 'Play Game',
+                            border: 'border-white/20',
+                            glow: 'bg-white/10'
+                          },
+                          { 
+                            to: 'https://bluejack.binus.ac.id/nar/home/registration',
+                            text: 'Register Now',
+                            border: 'border-white/20',
+                            glow: 'bg-white/10'
+                          }
+                        ].map((button, index) => (
+                          <Link
+                            key={index}
+                            to={button.to}
+                            className="bg-black/30 px-12 py-6 rounded-lg backdrop-blur-sm 
+                                     hover:scale-110 transition-all duration-300 
+                                     border-2 group relative overflow-hidden"
+                            style={{ borderColor: `rgb(255 255 255 / 0.2)` }}
+                          >
+                            <span className="text-4xl glitch-text relative z-10">
+                              {button.text}
+                            </span>
+                            <div className="absolute inset-0 group-hover:opacity-100 opacity-0 
+                                         transition-opacity duration-300 pointer-events-none
+                                         bg-white/10 blur-sm" />
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -335,15 +370,20 @@ function Home() {
               ref={section5Ref}
               className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section5InView ? 'slide-from-left' : ''}`}
+              onWheel={(e) => {
+                if (e.deltaY > 0) { 
+                  scrollToTop();
+                }
+              }}
             >
-              <div className="w-full max-w-7xl px-8">
+              <div className="w-full max-w-7xl px-8 flex flex-col items-center justify-center">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">CONTACT</span>
                   <span className="inline-block animate-float-title-delayed mx-2">US</span>
                   <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
                 </h1>
 
-                <div className="flex flex-col items-center gap-16">
+                <div className="flex flex-col items-center gap-16 w-full">
                   <div className="grid grid-cols-3 w-full gap-8">
                     {[
                       {
@@ -382,19 +422,35 @@ function Home() {
                     <h3 className="text-2xl mb-8 text-center" id="hero-text-static">Connect With Us</h3>
                     <div className="flex justify-center gap-12">
                       {[
-                        { name: 'Instagram', icon: '📸', url: '#' },
-                        { name: 'Line', icon: '💬', url: '#' },
-                        { name: 'YouTube', icon: '📺', url: '#' }
+                        { 
+                          name: 'Instagram', 
+                          icon: './assets/images/instagram.png', 
+                          url: 'https://www.instagram.com/slcbinusuniv/' 
+                        },
+                        { 
+                          name: 'Line', 
+                          icon: './assets/images/line.png',
+                          url: 'https://lin.ee/T8Zr5qu' 
+                        },
+                        { 
+                          name: 'YouTube', 
+                          icon: './assets/images/youtube.png',
+                          url: 'https://www.youtube.com/@SoftwareLabCenter' 
+                        }
                       ].map((social, index) => (
                         <a
                           key={index}
                           href={social.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="group flex flex-col items-center gap-3 p-4 rounded-lg
                                    hover:bg-cyan-500/10 transition-all duration-300"
                         >
-                          <span className="text-3xl group-hover:scale-125 transition-transform duration-300">
-                            {social.icon}
-                          </span>
+                          <img 
+                            src={social.icon}
+                            alt={social.name}
+                            className="w-8 h-8 group-hover:scale-125 transition-transform duration-300 object-contain"
+                          />
                           <span className="text-white/70 text-xl group-hover:text-white transition-colors">
                             {social.name}
                           </span>
@@ -404,6 +460,7 @@ function Home() {
                   </div>
                 </div>
               </div>
+              <ScrollIndicator text="Back to Top" onClick={scrollToTop} />
             </section>
 
           </div>

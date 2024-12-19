@@ -80,254 +80,267 @@ class GridOverlay {
     }
 }
 
-const TetrisBackground = () => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [selectedTheme] = useState(themes[Math.floor(Math.random() * themes.length)]);
-    const particleSystemRef = useRef<ParticleSystem | null>(null);
-    const gridRef = useRef<GridOverlay>(new GridOverlay());
-    const animationFrameRef = useRef<number>();
+interface TetrisBackgroundProps {
+  selectedTheme: string;
+}
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const context = canvas?.getContext('2d');
-        if (!canvas || !context) return;
-        const size = 25;
+const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) => {
+  const [themeConfig, setThemeConfig] = useState(() => 
+    themes.find(t => t.name === selectedTheme) || themes[0]
+  );
 
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth * window.devicePixelRatio;
-            canvas.height = window.innerHeight * window.devicePixelRatio;
-            context.scale(window.devicePixelRatio, window.devicePixelRatio);
-        };
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+  useEffect(() => {
+    const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
+    setThemeConfig(newTheme);
+  }, [selectedTheme]);
 
-        const tetrisShapes = [
-            [[1, 1, 1, 1]], // I
-            [[1, 1], [1, 1]], // O
-            [[0, 1, 0], [1, 1, 1]], // T
-            [[1, 1, 0], [0, 1, 1]], // S
-            [[0, 1, 1], [1, 1, 0]], // Z
-            [[1, 1, 1], [1, 0, 0]], // L
-            [[1, 1, 1], [0, 0, 1]], // J
-        ];
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particleSystemRef = useRef<ParticleSystem | null>(null);
+  const gridRef = useRef<GridOverlay>(new GridOverlay());
+  const animationFrameRef = useRef<number>();
 
-        const themeSpecificAnimations = {
-            classic: ['straight', 'zigzag'],
-            pastel: ['straight', 'spiral', 'rotate'],
-            neon: ['zigzag', 'bounce', 'spiral'],
-            monochrome: ['straight', 'rotate'],
-            earth: ['straight', 'bounce'],
-            sunset: ['spiral', 'rotate'],
-            ocean: ['zigzag', 'wave'],
-            forest: ['straight', 'sway'],
-            candy: ['bounce', 'spiral', 'rotate'],
-            retro: ['straight', 'bounce'],
-            cyberpunk: ['glitch', 'zigzag', 'bounce'],
-            grayscale: ['straight', 'fade'],
-            midnight: ['float', 'spiral']
-        };
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+    const size = 25;
 
-        const defaultAnimations = ['straight', 'zigzag', 'bounce'];
+    const resizeCanvas = () => {
+        canvas.width = window.innerWidth * window.devicePixelRatio;
+        canvas.height = window.innerHeight * window.devicePixelRatio;
+        context.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const tetrisShapes = [
+        [[1, 1, 1, 1]], // I
+        [[1, 1], [1, 1]], // O
+        [[0, 1, 0], [1, 1, 1]], // T
+        [[1, 1, 0], [0, 1, 1]], // S
+        [[0, 1, 1], [1, 1, 0]], // Z
+        [[1, 1, 1], [1, 0, 0]], // L
+        [[1, 1, 1], [0, 0, 1]], // J
+    ];
+
+    const themeSpecificAnimations = {
+        classic: ['straight', 'zigzag'],
+        pastel: ['straight', 'spiral', 'rotate'],
+        neon: ['zigzag', 'bounce', 'spiral'],
+        monochrome: ['straight', 'rotate'],
+        earth: ['straight', 'bounce'],
+        sunset: ['spiral', 'rotate'],
+        ocean: ['zigzag', 'wave'],
+        forest: ['straight', 'sway'],
+        candy: ['bounce', 'spiral', 'rotate'],
+        retro: ['straight', 'bounce'],
+        cyberpunk: ['glitch', 'zigzag', 'bounce'],
+        grayscale: ['straight', 'fade'],
+        midnight: ['float', 'spiral']
+    };
+
+    const defaultAnimations = ['straight', 'zigzag', 'bounce'];
+    
+    const shapes = [];
+    const themeAnimations = themeSpecificAnimations[themeConfig.name as keyof typeof themeSpecificAnimations] || defaultAnimations;
+
+    if (!themeAnimations || themeAnimations.length === 0) {
+        console.warn('No animations available for theme:', themeConfig.name);
+        return;
+    }
+
+    const animationPatterns = {
+        straight: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        zigzag: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            shapeObj.x += Math.sin(shapeObj.y / 50) * 2;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        spiral: (shapeObj: any) => {
+            shapeObj.angle = (shapeObj.angle || 0) + shapeObj.speed * 0.02;
+            shapeObj.y += shapeObj.speed;
+            shapeObj.x += Math.cos(shapeObj.angle) * 2;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+                shapeObj.angle = 0;
+            }
+        },
+        bounce: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            if (!shapeObj.bounceX) shapeObj.bounceX = 1;
+            shapeObj.x += shapeObj.bounceX;
+            if (shapeObj.x > canvas.width || shapeObj.x < 0) {
+                shapeObj.bounceX *= -1;
+            }
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        rotate: (shapeObj: any) => {
+            shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
+            shapeObj.y += shapeObj.speed;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+                shapeObj.rotation = 0;
+            }
+        },
+        wave: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            shapeObj.x += Math.sin(shapeObj.y / 100) * 3;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        sway: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            shapeObj.x += Math.sin(Date.now() / 1000) * 1;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        glitch: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            if (Math.random() > 0.95) {
+                shapeObj.x += (Math.random() - 0.5) * 20;
+            }
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        },
+        fade: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed;
+            shapeObj.opacity = (shapeObj.opacity || 1) - 0.003;
+            if (shapeObj.opacity < 0.3) shapeObj.opacity = 1;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+                shapeObj.opacity = 1;
+            }
+        },
+        float: (shapeObj: any) => {
+            shapeObj.y += shapeObj.speed * 0.5;
+            shapeObj.x += Math.sin(Date.now() / 2000 + shapeObj.y / 100) * 1;
+            if (shapeObj.y > canvas.height) {
+                shapeObj.y = -shapeObj.shape.length * size;
+                shapeObj.x = Math.random() * canvas.width;
+            }
+        }
+    };
+
+    for (let i = 0; i < 20; i++) {
+        const shape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
+        const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        // Safely get a random animation pattern
+        const pattern = themeAnimations[Math.floor(Math.random() * themeAnimations.length)];
+        shapes.push({ 
+            shape, 
+            color, 
+            x, 
+            y, 
+            speed: Math.random() * 2 + 1,
+            pattern,
+            opacity: 1
+        });
+    }
+
+    const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1) => {
+        context.save();
+        context.translate(x + (shape[0].length * size) / 2, y + (shape.length * size) / 2);
+        context.rotate(rotation);
+        context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
+        context.globalAlpha = opacity;
         
-        const shapes = [];
-        const themeAnimations = themeSpecificAnimations[selectedTheme.name as keyof typeof themeSpecificAnimations] || defaultAnimations;
-
-        if (!themeAnimations || themeAnimations.length === 0) {
-            console.warn('No animations available for theme:', selectedTheme.name);
-            return;
-        }
-
-        const animationPatterns = {
-            straight: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
+        context.fillStyle = color;
+        shape.forEach((row, rowIndex) => {
+            row.forEach((cell, cellIndex) => {
+                if (cell) {
+                    context.fillRect(cellIndex * size, rowIndex * size, size, size);
                 }
-            },
-            zigzag: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                shapeObj.x += Math.sin(shapeObj.y / 50) * 2;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            },
-            spiral: (shapeObj: any) => {
-                shapeObj.angle = (shapeObj.angle || 0) + shapeObj.speed * 0.02;
-                shapeObj.y += shapeObj.speed;
-                shapeObj.x += Math.cos(shapeObj.angle) * 2;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                    shapeObj.angle = 0;
-                }
-            },
-            bounce: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                if (!shapeObj.bounceX) shapeObj.bounceX = 1;
-                shapeObj.x += shapeObj.bounceX;
-                if (shapeObj.x > canvas.width || shapeObj.x < 0) {
-                    shapeObj.bounceX *= -1;
-                }
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            },
-            rotate: (shapeObj: any) => {
-                shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
-                shapeObj.y += shapeObj.speed;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                    shapeObj.rotation = 0;
-                }
-            },
-            wave: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                shapeObj.x += Math.sin(shapeObj.y / 100) * 3;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            },
-            sway: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                shapeObj.x += Math.sin(Date.now() / 1000) * 1;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            },
-            glitch: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                if (Math.random() > 0.95) {
-                    shapeObj.x += (Math.random() - 0.5) * 20;
-                }
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            },
-            fade: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed;
-                shapeObj.opacity = (shapeObj.opacity || 1) - 0.003;
-                if (shapeObj.opacity < 0.3) shapeObj.opacity = 1;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                    shapeObj.opacity = 1;
-                }
-            },
-            float: (shapeObj: any) => {
-                shapeObj.y += shapeObj.speed * 0.5;
-                shapeObj.x += Math.sin(Date.now() / 2000 + shapeObj.y / 100) * 1;
-                if (shapeObj.y > canvas.height) {
-                    shapeObj.y = -shapeObj.shape.length * size;
-                    shapeObj.x = Math.random() * canvas.width;
-                }
-            }
-        };
-
-        for (let i = 0; i < 20; i++) {
-            const shape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
-            const color = selectedTheme.colors[Math.floor(Math.random() * selectedTheme.colors.length)];
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            // Safely get a random animation pattern
-            const pattern = themeAnimations[Math.floor(Math.random() * themeAnimations.length)];
-            shapes.push({ 
-                shape, 
-                color, 
-                x, 
-                y, 
-                speed: Math.random() * 2 + 1,
-                pattern,
-                opacity: 1
             });
-        }
+        });
+        context.restore();
+    };
 
-        const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1) => {
-            context.save();
-            context.translate(x + (shape[0].length * size) / 2, y + (shape.length * size) / 2);
-            context.rotate(rotation);
-            context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
-            context.globalAlpha = opacity;
+    // Initialize particle system
+    particleSystemRef.current = new ParticleSystem(50);
+
+    // Apply theme background to container
+    document.body.style.background = themeConfig.background;
+
+    // Add glow effect to shapes
+    context.shadowBlur = 15;
+    context.shadowColor = themeConfig.colors[0];
+
+    const animate = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw grid overlay
+        gridRef.current.draw(context, canvas.width, canvas.height);
+
+        // Draw enhanced particles with glow
+        context.shadowBlur = 10;
+        context.shadowColor = themeConfig.particleColor;
+        particleSystemRef.current?.update(context, themeConfig.particleColor);
+        context.shadowBlur = 0;
+
+        // Draw shapes with enhanced glow
+        shapes.forEach(shapeObj => {
+            context.shadowBlur = 20;
+            context.shadowColor = shapeObj.color;
+            // Add pulse effect
+            const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
+            context.shadowBlur *= pulse;
             
-            context.fillStyle = color;
-            shape.forEach((row, rowIndex) => {
-                row.forEach((cell, cellIndex) => {
-                    if (cell) {
-                        context.fillRect(cellIndex * size, rowIndex * size, size, size);
-                    }
-                });
-            });
-            context.restore();
-        };
+            animationPatterns[shapeObj.pattern as keyof typeof animationPatterns](shapeObj);
+            drawShape(
+                shapeObj.shape,
+                shapeObj.x,
+                shapeObj.y,
+                shapeObj.color,
+                shapeObj.pattern === 'rotate' ? shapeObj.rotation : 0,
+                shapeObj.opacity * pulse
+            );
+        });
 
-        // Initialize particle system
-        particleSystemRef.current = new ParticleSystem(50);
+        animationFrameRef.current = requestAnimationFrame(animate);
+    };
 
-        // Apply theme background to container
-        document.body.style.background = selectedTheme.background;
+    animate();
 
-        // Add glow effect to shapes
-        context.shadowBlur = 15;
-        context.shadowColor = selectedTheme.colors[0];
-
-        const animate = () => {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw grid overlay
-            gridRef.current.draw(context, canvas.width, canvas.height);
-
-            // Draw enhanced particles with glow
-            context.shadowBlur = 10;
-            context.shadowColor = selectedTheme.particleColor;
-            particleSystemRef.current?.update(context, selectedTheme.particleColor);
-            context.shadowBlur = 0;
-
-            // Draw shapes with enhanced glow
-            shapes.forEach(shapeObj => {
-                context.shadowBlur = 20;
-                context.shadowColor = shapeObj.color;
-                // Add pulse effect
-                const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
-                context.shadowBlur *= pulse;
-                
-                animationPatterns[shapeObj.pattern as keyof typeof animationPatterns](shapeObj);
-                drawShape(
-                    shapeObj.shape,
-                    shapeObj.x,
-                    shapeObj.y,
-                    shapeObj.color,
-                    shapeObj.pattern === 'rotate' ? shapeObj.rotation : 0,
-                    shapeObj.opacity * pulse
-                );
-            });
-
-            animationFrameRef.current = requestAnimationFrame(animate);
-        };
-
-        animate();
-
-        return () => {
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-            window.removeEventListener('resize', resizeCanvas);
-        };
-    }, [selectedTheme]);
+    return () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+        window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [themeConfig]);
 
   return (
     <>
         <div 
             className="fixed top-0 left-0 w-full h-full"
             style={{
-                background: selectedTheme.background,
+                background: themeConfig.background,
                 opacity: 0.8,
-                zIndex: -1
+                zIndex: -1,
+                transition: 'background 0.5s ease-in-out'
             }}
         />
         <div 

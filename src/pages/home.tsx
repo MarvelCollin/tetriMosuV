@@ -274,15 +274,13 @@ function Home() {
                     <h2 className="text-4xl mb-8" id="hero-text-static">Requirements</h2>
                     <div className="space-y-4">
                       {[
-                        "Active BINUS Student (2023/2024)",
-                        "Minimum GPA 2.75",
-                        "Strong commitment to teach",
-                        "Excellent communication skills",
-                        "Team player mindset",
-                        "Willing to learn new technologies"
+                        "Must be an active student of Binus University",
+                        "Must be willing to sign a contract for 2 years",
+                        "Minimum grade B in Algorithm and Programming / Introduction to Programming *Except for first semester student",
+                        "Majors: SoCS (Computer Science), SoIS (Information System), DP (Double Program), MTP (Master Track Program)",
                       ].map((req, index) => (
                         <div key={index} className="flex items-start gap-4 group/item">
-                          <span className="text-cyan-400 text-xl">→</span>
+                          <span className="text-white/70 group-hover:text-white text-xl transition-colors">→</span>
                           <p className="text-xl text-white/70 group-hover/item:text-white transition-colors duration-300">
                             {req}
                           </p>

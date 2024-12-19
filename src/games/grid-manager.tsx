@@ -5,7 +5,7 @@ class GridManager {
     grid: Array<Array<{ color: number | null; filled: boolean }>>;
     width: number;
     height: number;
-    game: any; // Add this property
+    game: any; 
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -78,26 +78,22 @@ class GridManager {
     checkAndClearLines(particleSystem: ParticleSystem): number {
         let completedLines = [];
         
-        // Find all completed lines from bottom to top
         for (let y = this.height - 1; y >= 0; y--) {
             if (this.grid[y].every(cell => cell.filled)) {
                 completedLines.push(y);
             }
         }
 
-        // If no completed lines or already in target mode, return
         if (completedLines.length === 0 || this.game.isInTargetMode) {
             return 0;
         }
 
-        // Start target mode for the bottom-most line
         const bottomLine = completedLines[0];
         this.game.startTargetMode(bottomLine);
         return 1;
     }
 
     clearLine(y: number) {
-        // Shift all lines above down
         for (let moveY = y; moveY > 0; moveY--) {
             this.grid[moveY] = [...this.grid[moveY - 1]].map(cell => ({
                 color: cell.color,
@@ -105,7 +101,6 @@ class GridManager {
             }));
         }
         
-        // Create empty line at top
         this.grid[0] = Array(this.width).fill(null).map(() => ({
             color: null,
             filled: false

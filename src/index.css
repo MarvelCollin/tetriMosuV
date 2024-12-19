@@ -127,49 +127,58 @@
   animation: shine 3s ease-in-out infinite;
 }
 
-/* .animate-glitch {
-  animation: glitch 0.8s steps(2) infinite;
-  animation-play-state: running;
-} */
-
 .glitch-text {
   position: relative;
   color: white;
-  animation: glitch-interval 4s infinite;
+  animation: glitch-interval 2s infinite;
 }
 
 @keyframes glitch-interval {
-  0%, 40%, 100% {
-    text-shadow: none;
-    transform: none;
-  }
-  41%, 45% {
+  0% {
     text-shadow: 0.05em 0 0 #ff00ff, -0.05em -0.025em 0 #00ffff;
     transform: translate(-2px, 2px);
   }
-  46%, 49% {
+  25% {
     text-shadow: -0.05em -0.025em 0 #ff00ff, 0.025em 0.025em 0 #00ffff;
     transform: translate(2px, -2px);
+  }
+  50% {
+    text-shadow: 0.05em 0 0 #ff00ff, -0.05em -0.025em 0 #00ffff;
+    transform: translate(-1px, 1px);
+  }
+  75% {
+    text-shadow: -0.05em -0.025em 0 #ff00ff, 0.025em 0.025em 0 #00ffff;
+    transform: translate(1px, -1px);
+  }
+  100% {
+    text-shadow: 0.05em 0 0 #ff00ff, -0.05em -0.025em 0 #00ffff;
+    transform: translate(-2px, 2px);
   }
 }
 
 .glitch-clip {
   position: relative;
-  animation: glitch-clip-interval 2s infinite;
+  animation: glitch-clip-interval 1s infinite;
 }
 
 @keyframes glitch-clip-interval {
-  0%, 40%, 100% {
-    clip-path: none;
-  }
-  41%, 43% {
+  0% {
     clip-path: inset(40% 0 60% 0);
   }
-  44%, 46% {
+  20% {
     clip-path: inset(20% 0 80% 0);
   }
-  47%, 49% {
+  40% {
     clip-path: inset(60% 0 20% 0);
+  }
+  60% {
+    clip-path: inset(30% 0 70% 0);
+  }
+  80% {
+    clip-path: inset(70% 0 30% 0);
+  }
+  100% {
+    clip-path: inset(40% 0 60% 0);
   }
 }
 
@@ -188,14 +197,14 @@
   left: 2px;
   text-shadow: -2px 0 #ff00ff;
   clip: rect(24px, 550px, 90px, 0);
-  animation: glitch-anim 1.5s infinite linear alternate-reverse;
+  animation: glitch-anim 4s infinite linear alternate-reverse;
 }
 
 .glitch-text::after {
   left: -2px;
   text-shadow: -2px 0 #00ffff;
   clip: rect(85px, 550px, 140px, 0);
-  animation: glitch-anim 1s infinite linear alternate-reverse;
+  animation: glitch-anim 2s infinite linear alternate-reverse;
 }
 
 @keyframes glitch-anim {

@@ -189,15 +189,14 @@ class TetrisGame {
         this.currentX = Math.floor((this.gridManager.width - TETROMINOES[this.currentTetromino][0].length) / 2);
         this.currentY = -2;
 
-        // Check if the piece can be placed at starting position
         if (this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
             this.gameOver = true;
             clearInterval(this.dropIntervalId!);
-            console.log('Game Over - Collision at spawn!');
+            console.log('Game Over - ad di collision spawn');
             if (this.onGameOver) {
                 this.onGameOver(this.score);
             }
-            return; // Return early to prevent placing the piece
+            return; 
         }
 
         this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
@@ -206,7 +205,7 @@ class TetrisGame {
     }
 
     moveDown() {
-        if (this.gameOver) return; // Don't move if game is over
+        if (this.gameOver) return; 
 
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
@@ -214,11 +213,10 @@ class TetrisGame {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             this.gridManager.checkAndClearLines(this.particleSystem);
         } else {
-            // If we can't move down, check if we're too high
             if (this.currentY < 0) {
                 this.gameOver = true;
                 clearInterval(this.dropIntervalId!);
-                console.log('Game Over - Stack too high!');
+                console.log('Game Over bang cukup bang');
                 if (this.onGameOver) {
                     this.onGameOver(this.score);
                 }

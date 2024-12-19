@@ -275,7 +275,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     }
   }, [particles, backgroundEffect]);
 
-  // Optimize animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;

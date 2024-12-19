@@ -430,9 +430,8 @@ class ParticleSystem {
             }
         );
 
-        // Add sparkle particles along the line
         const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-        const steps = Math.ceil(distance * 5); // Number of particles based on line length
+        const steps = Math.ceil(distance * 5); 
 
         for (let i = 0; i < steps; i++) {
             const t = i / steps;

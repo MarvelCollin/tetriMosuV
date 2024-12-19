@@ -195,7 +195,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const mappedKey = KEY_MAPPING[e.key] || e.key.toUpperCase();
       setActiveKeys(prev => new Set(prev).add(mappedKey));
-      triggerBackgroundEffect('keypress', undefined, mappedKey);
       
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight' && currentStep < totalSteps) setCurrentStep(currentStep + 1);
@@ -318,7 +317,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
 
     let frameId: number;
     let lastTime = 0;
-    const fps = 30; // Limit FPS
+    const fps = 60; 
     const interval = 1000 / fps;
 
     const animate = (currentTime: number) => {
@@ -345,7 +344,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
   }, [animateParticles]);
 
-  // Update the return JSX with dynamic background colors
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
       <div className="fixed inset-0">

@@ -160,37 +160,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     return particlesArray;
   }, []);
 
-  const triggerBackgroundEffect = useCallback((type: string, position?: { x: number, y: number }, key?: string) => {
-    requestAnimationFrame(() => {
-      setBackgroundEffect(type);
-      if (position) {
-        setMousePosition(position);
-      }
-
-      let color = '';
-      if (key) {
-        color = {
-          'W': 'from-cyan-500/30',
-          'A': 'from-blue-500/30',
-          'S': 'from-purple-500/30',
-          'D': 'from-green-500/30',
-          'SPACE': 'from-yellow-500/30',
-          'R': 'from-red-500/30'
-        }[key] || 'from-cyan-500/30';
-      }
-      setBgColor(color);
-    });
-
-    const timeoutId = setTimeout(() => {
-      requestAnimationFrame(() => {
-        setBackgroundEffect('');
-        setBgColor('');
-      });
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const mappedKey = KEY_MAPPING[e.key] || e.key.toUpperCase();
@@ -212,7 +181,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
 
     const handleMouseDown = (e: MouseEvent) => {
       setActiveKeys(prev => new Set(prev).add('MOUSE1'));
-      triggerBackgroundEffect('click', { x: e.clientX, y: e.clientY });
     };
 
     const handleMouseUp = () => {
@@ -425,9 +393,9 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             </div>
 
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
-              <span className="inline-block animate-float-title transition-all duration-300">3D</span>
-              <span className="inline-block animate-float-title-delayed mx-2">Tetris</span>
-              <span className="inline-block animate-float-title-more-delayed">Tutorial</span>
+              <span className="inline-block animate-float-title transition-all duration-300">HOW</span>
+              <span className="inline-block animate-float-title-delayed mx-2">TO</span>
+              <span className="inline-block animate-float-title-more-delayed">PLAY</span>
               <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
             </h2>
 

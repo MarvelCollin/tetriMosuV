@@ -43,6 +43,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 #hero-text {
   background: linear-gradient(
     75deg,
@@ -140,6 +144,15 @@
 
 .animate-fade-out {
   animation: fadeOut 2s ease-in-out infinite;
+}
+
+.snap-y {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.snap-y::-webkit-scrollbar {
+  display: none;
 }
 
 * {

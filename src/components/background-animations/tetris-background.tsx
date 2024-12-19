@@ -82,10 +82,10 @@ class GridOverlay {
 
 const TetrisBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isPaused, setIsPaused] = useState(false);
     const [selectedTheme] = useState(themes[Math.floor(Math.random() * themes.length)]);
     const particleSystemRef = useRef<ParticleSystem | null>(null);
     const gridRef = useRef<GridOverlay>(new GridOverlay());
+    const animationFrameRef = useRef<number>();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -277,7 +277,6 @@ const TetrisBackground = () => {
         context.shadowColor = selectedTheme.colors[0];
 
         const animate = () => {
-            if (isPaused) return;
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw grid overlay
@@ -308,29 +307,18 @@ const TetrisBackground = () => {
                 );
             });
 
-            requestAnimationFrame(animate);
+            animationFrameRef.current = requestAnimationFrame(animate);
         };
-
-        const handleMouseEnter = () => {
-            setIsPaused(true);
-        };
-
-        const handleMouseLeave = () => {
-            setIsPaused(false);
-            requestAnimationFrame(animate);
-        };
-
-        canvas.addEventListener('mouseenter', handleMouseEnter);
-        canvas.addEventListener('mouseleave', handleMouseLeave);
 
         animate();
 
         return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
             window.removeEventListener('resize', resizeCanvas);
-            canvas.removeEventListener('mouseenter', handleMouseEnter);
-            canvas.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isPaused, selectedTheme]);
+    }, [selectedTheme]);
 
   return (
     <>
@@ -351,7 +339,7 @@ const TetrisBackground = () => {
         />
         <canvas
             ref={canvasRef}
-            className="absolute top-0 left-0 w-full h-full"
+            className="absolute top-0 left-0 w-full h-full pointer-events-none"
             style={{ zIndex: 0 }}
         />
     </>

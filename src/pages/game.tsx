@@ -165,8 +165,7 @@ const Game = () => {
       };
 
       const randomInterval = () => {
-        // const interval = 30000 + Math.random() * 10000; 
-        const interval = 2000; 
+        const interval = 30000 + Math.random() * 10000; 
         rotationIntervalRef.current = setTimeout(() => {
           rotateAndReturn();
           randomInterval();

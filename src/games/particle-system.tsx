@@ -22,7 +22,6 @@ class ParticleSystem {
             blending: THREE.AdditiveBlending
         });
 
-        // Add flash effect
         const flash = new THREE.Mesh(flashGeometry, flashMaterial);
         flash.position.set(5, -lineY + 0.5, 0.1);
         this.scene.add(flash);
@@ -32,12 +31,10 @@ class ParticleSystem {
             life: 0.5
         });
 
-        // Create energetic particles
         for (let x = 0; x < grid[0].length; x++) {
             if (grid[lineY][x].filled && grid[lineY][x].color !== null) {
                 const colorIndex = COLORS.indexOf(grid[lineY][x].color!);
                 if (colorIndex !== -1) {
-                    // Explosion particles
                     for (let i = 0; i < 8; i++) {
                         const size = 0.2 + Math.random() * 0.3;
                         const geometry = new THREE.BoxGeometry(size, size, size);

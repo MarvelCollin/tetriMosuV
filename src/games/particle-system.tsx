@@ -6,9 +6,45 @@ class ParticleSystem {
     private scene: THREE.Scene;
     private lastUpdate: number = 0;
     private isAnimating: boolean = false;
+    // Add new property for background effects
+    private backgroundEffects: { mesh: THREE.Mesh; velocity: THREE.Vector3; life: number }[] = [];
 
     constructor(scene: THREE.Scene) {
         this.scene = scene;
+        this.initializeBackgroundEffects();
+    }
+
+    private initializeBackgroundEffects() {
+        // Add floating light streaks
+        for (let i = 0; i < 20; i++) {
+            const geometry = new THREE.PlaneGeometry(0.1, 2 + Math.random() * 3);
+            const material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5),
+                transparent: true,
+                opacity: 0.2,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide
+            });
+
+            const streak = new THREE.Mesh(geometry, material);
+            streak.position.set(
+                Math.random() * 30 - 10,
+                Math.random() * 30 - 25,
+                -2 + Math.random()
+            );
+            streak.rotation.z = Math.random() * Math.PI;
+            this.scene.add(streak);
+
+            this.backgroundEffects.push({
+                mesh: streak,
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02,
+                    0
+                ),
+                life: 1
+            });
+        }
     }
 
     addParticlesForLine(lineY: number, grid: Array<Array<{ color: number | null; filled: boolean }>>) {
@@ -179,6 +215,113 @@ class ParticleSystem {
             velocity: new THREE.Vector3(0, 2.5, 0),
             life: 1.5
         });
+
+        // Add spiral particles around the beam
+        const spiralCount = 8;
+        for (let i = 0; i < spiralCount; i++) {
+            const spiralGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const spiralMaterial = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending
+            });
+
+            const spiral = new THREE.Mesh(spiralGeometry, spiralMaterial);
+            const angle = (i / spiralCount) * Math.PI * 2;
+            spiral.position.set(
+                x + 0.5 + Math.cos(angle) * 0.3,
+                -y + 0.5,
+                Math.sin(angle) * 0.3
+            );
+
+            this.scene.add(spiral);
+            
+            this.particles.push({
+                mesh: spiral,
+                velocity: new THREE.Vector3(
+                    Math.cos(angle) * 0.05,
+                    0.2,
+                    Math.sin(angle) * 0.05
+                ),
+                life: 1.0
+            });
+        }
+
+        // Add enhanced spiral particles with trails
+        const trailCount = 12;
+        for (let i = 0; i < trailCount; i++) {
+            const trailGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const trailMaterial = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.3,
+                blending: THREE.AdditiveBlending
+            });
+
+            // Create trail effect with multiple segments
+            const segments = 5;
+            for (let j = 0; j < segments; j++) {
+                const trail = new THREE.Mesh(trailGeometry, trailMaterial.clone());
+                const angle = (i / trailCount) * Math.PI * 2;
+                const radius = 0.3 + j * 0.1;
+                trail.position.set(
+                    x + 0.5 + Math.cos(angle) * radius,
+                    -y + 0.5 + j * 0.2,
+                    Math.sin(angle) * radius
+                );
+                trail.scale.set(1 - j * 0.15, 1 - j * 0.15, 1 - j * 0.15);
+                this.scene.add(trail);
+
+                this.particles.push({
+                    mesh: trail,
+                    velocity: new THREE.Vector3(
+                        Math.cos(angle) * (0.05 + j * 0.02),
+                        0.2 + j * 0.1,
+                        Math.sin(angle) * (0.05 + j * 0.02)
+                    ),
+                    life: 1.0 - j * 0.15
+                });
+            }
+        }
+
+        // Add sparkle effects
+        const sparkleCount = 6;
+        for (let i = 0; i < sparkleCount; i++) {
+            const sparkleGeometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let j = 0; j < 6; j++) {
+                const angle = (j / 6) * Math.PI * 2;
+                vertices.push(
+                    Math.cos(angle) * 0.1, Math.sin(angle) * 0.1, 0,
+                    0, 0, 0
+                );
+            }
+            sparkleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const sparkleMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const sparkle = new THREE.LineSegments(sparkleGeometry, sparkleMaterial);
+            sparkle.position.set(
+                x + 0.5 + (Math.random() - 0.5) * 0.5,
+                -y + 0.5 + Math.random() * 0.5,
+                (Math.random() - 0.5) * 0.5
+            );
+            this.scene.add(sparkle);
+
+            this.particles.push({
+                mesh: sparkle,
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.1,
+                    0.3 + Math.random() * 0.2,
+                    (Math.random() - 0.5) * 0.1
+                ),
+                life: 0.8 + Math.random() * 0.4
+            });
+        }
     }
 
     private startAnimation() {
@@ -200,17 +343,61 @@ class ParticleSystem {
     }
 
     private updateParticles() {
+        // Update background effects
+        this.backgroundEffects.forEach(effect => {
+            effect.mesh.position.add(effect.velocity);
+            effect.mesh.rotation.z += 0.001;
+            
+            // Wrap around screen
+            if (effect.mesh.position.x > 20) effect.mesh.position.x = -10;
+            if (effect.mesh.position.x < -10) effect.mesh.position.x = 20;
+            if (effect.mesh.position.y > 5) effect.mesh.position.y = -25;
+            if (effect.mesh.position.y < -25) effect.mesh.position.y = 5;
+
+            // Pulse effect
+            const pulse = Math.sin(Date.now() * 0.001) * 0.3 + 0.7;
+            effect.mesh.material.opacity = 0.2 * pulse;
+        });
+
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const particle = this.particles[i];
             
             if (particle.mesh.geometry.type === 'CylinderGeometry') {
-                // Light beam behavior
+                // Enhanced light beam behavior
                 particle.mesh.scale.y *= 0.97;
                 particle.mesh.scale.x *= 0.99;
                 particle.mesh.scale.z *= 0.99;
                 particle.mesh.position.y += 0.3;
                 particle.mesh.rotation.y += 0.02;
                 particle.mesh.material.opacity *= 0.97;
+                
+                // Add pulsing effect
+                const pulse = Math.sin(Date.now() * 0.005) * 0.1 + 0.9;
+                particle.mesh.scale.multiplyScalar(pulse);
+
+            } else if (particle.mesh.geometry.type === 'SphereGeometry') {
+                // Enhanced spiral/trail particle behavior
+                particle.mesh.position.add(particle.velocity);
+                particle.velocity.y *= 0.98;
+                particle.mesh.rotation.x += 0.1;
+                particle.mesh.rotation.z += 0.1;
+                
+                // Add oscillating scale
+                const oscillation = Math.sin(Date.now() * 0.01 + particle.mesh.position.x) * 0.1 + 0.9;
+                particle.mesh.scale.set(oscillation, oscillation, oscillation);
+                
+                // Add slight color variation
+                if (particle.mesh.material.color) {
+                    const hue = (Date.now() * 0.001) % 1;
+                    particle.mesh.material.color.offsetHSL(0.001, 0, 0);
+                }
+
+            } else if (particle.mesh.type === 'LineSegments') {
+                // Sparkle behavior
+                particle.mesh.position.add(particle.velocity);
+                particle.mesh.rotation.z += 0.1;
+                particle.mesh.scale.multiplyScalar(0.98);
+                particle.mesh.material.opacity = particle.life * Math.sin(Date.now() * 0.01);
             } else if (particle.mesh.geometry.type === 'PlaneGeometry') {
                 // Flash effect behavior
                 particle.mesh.material.opacity *= 0.9;

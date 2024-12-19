@@ -41,6 +41,13 @@ class TetrisGame {
     private tetrominoBag: number[] = [];  
     private isRotating: boolean = false;
     private pivotPoint: THREE.Vector3;
+    // Add new property for ambient particles
+    private ambientParticles: {
+        mesh: THREE.Mesh;
+        velocity: THREE.Vector3;
+        life: number;
+        originalY: number;
+    }[] = [];
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
@@ -81,6 +88,9 @@ class TetrisGame {
 
         window.addEventListener('click', this.handleClick.bind(this));
         this.pivotPoint = new THREE.Vector3(5, -10, 0);
+
+        // Add ambient particles initialization
+        this.initializeAmbientParticles();
     }
 
     private setupLighting() {
@@ -699,6 +709,36 @@ class TetrisGame {
 
         this.updateCameraShake();
         this.circleTargets.forEach(target => target.update());
+
+        // Update ambient particles with expanded boundaries
+        this.ambientParticles.forEach(particle => {
+            particle.mesh.position.add(particle.velocity);
+            
+            // Enhanced floating effect with varied speeds
+            const time = Date.now() * 0.001;
+            particle.mesh.position.y += Math.sin(time + particle.originalY) * 0.01;
+            particle.mesh.position.x += Math.cos(time * 0.5 + particle.originalY) * 0.005;
+            
+            // Wrap around with expanded boundaries
+            if (particle.mesh.position.x > 20) particle.mesh.position.x = -10;
+            if (particle.mesh.position.x < -10) particle.mesh.position.x = 20;
+            if (particle.mesh.position.y > 5) particle.mesh.position.y = -25;
+            if (particle.mesh.position.y < -25) particle.mesh.position.y = 5;
+            
+            // Dynamic opacity based on position
+            const distanceFromCenter = new THREE.Vector2(
+                particle.mesh.position.x - 5,
+                particle.mesh.position.y + 10
+            ).length();
+            
+            particle.life = (Math.sin(time + particle.originalY) + 1) * 0.5;
+            const baseOpacity = particle.life * 0.3;
+            particle.mesh.material.opacity = baseOpacity * (1 - distanceFromCenter / 30);
+
+            // Subtle color variation
+            const hue = (time * 0.1 + particle.originalY) % 1;
+            (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.5, 0.5);
+        });
     }
 
     async onRotationStart() {
@@ -716,6 +756,42 @@ class TetrisGame {
         this.circleTargets.forEach(target => {
             target.updatePositionWithCamera(this.camera.rotation.y);
         });
+    }
+
+    // Add new method for ambient particles
+    private initializeAmbientParticles() {
+        const particleCount = 100; // Increased count
+        for (let i = 0; i < particleCount; i++) {
+            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: Math.random() * 0.3 + 0.1,
+                blending: THREE.AdditiveBlending
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            
+            // Extended position range to cover the entire game area
+            mesh.position.set(
+                Math.random() * 30 - 10,  // X: -10 to 20 (covers UI elements)
+                Math.random() * 30 - 25,   // Y: -25 to 5 (covers score area)
+                Math.random() * 4 - 2      // Z: -2 to 2 (more depth)
+            );
+
+            this.scene.add(mesh);
+            
+            this.ambientParticles.push({
+                mesh,
+                velocity: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    Math.random() * 0.02 - 0.01, // Varied vertical movement
+                    (Math.random() - 0.5) * 0.02
+                ),
+                life: Math.random(),
+                originalY: mesh.position.y
+            });
+        }
     }
 }
 

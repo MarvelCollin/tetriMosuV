@@ -207,10 +207,10 @@ class Renderer {
             this.scene.add(controlsTitleMesh);
 
             const controls = [
-                { key: "W", action: "ROTATE PIECE" },
-                { key: "A", action: "MOVE LEFT" },
-                { key: "S", action: "MOVE DOWN" },
-                { key: "D", action: "MOVE RIGHT" },
+                { key: "W / Top", action: "ROTATE PIECE" },
+                { key: "A / Left", action: "MOVE LEFT" },
+                { key: "S / Down", action: "MOVE DOWN" },
+                { key: "D / Right", action: "MOVE RIGHT" },
                 { key: "R", action: "SWAP PIECE" },
                 { key: "SPACE", action: "HARD DROP" },
                 { key: "MOUSE", action: "CLICK TARGETS" }
@@ -230,7 +230,7 @@ class Renderer {
                 const keyMaterial = material.clone();
                 keyMaterial.color.setHex(0x00ffff);
                 const keyMesh = new THREE.Mesh(keyGeometry, keyMaterial);
-                keyMesh.position.set(-12.5, yOffset, 0); 
+                keyMesh.position.set(-14, yOffset, 0); 
 
                 const arrowGeometry = new TextGeometry("|", {
                     font: font,

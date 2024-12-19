@@ -152,7 +152,7 @@ function Home() {
                     {
                       phase: "1",
                       title: "Initial Test",
-                      desc: "Written test to assess your basic knowledge"
+                      desc: "Aptitude test to assess your basic knowledge"
                     },
                     {
                       phase: "2",
@@ -208,17 +208,76 @@ function Home() {
                     </div>
                   ))}
 
-                  {/* Connecting Line */}
                   <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/30 to-cyan-500/0" />
                 </div>
               </div>
-              <ScrollIndicator text="Assistant Benefits" />
+              <ScrollIndicator text="Initial Test" />
             </section>
 
             <section
               ref={section3Ref}
               className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section3InView ? 'slide-from-left' : ''}`}
+            >
+              <div className="w-full max-w-7xl px-8">
+                <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
+                  <span className="inline-block animate-float-title transition-all duration-300">INITIAL</span>
+                  <span className="inline-block animate-float-title-delayed mx-2">TEST</span>
+                  <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
+                </h1>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
+                               hover:border-cyan-500/40 transition-all duration-300">
+                    <h2 className="text-4xl mb-8" id="hero-text-static">Test Components</h2>
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="text-2xl text-white/90">Aptitude Test</h3>
+                      </div>
+                      <div className="space-y-4">
+                        <h3 className="text-2xl text-white/90">Programming Test</h3>
+                        <p className="text-white/70 text-lg pl-4">
+                          You can use:<br/>
+                          • C/C++<br/>
+                          • Java<br/>
+                          • Python
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Important Information */}
+                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
+                               hover:border-cyan-500/40 transition-all duration-300">
+                    <h2 className="text-4xl mb-8" id="hero-text-static">Important Information</h2>
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="text-2xl text-white/90">Schedule</h3>
+                        <p className="text-white/70 text-lg pl-4">
+                          Date: 27 March 2024<br/>
+                          Time: 08:00 - 11:00 (Batch 1)
+                          Time: 13:00 - 16:00 (Batch 2)
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <h3 className="text-2xl text-white/90">Requirements</h3>
+                        <p className="text-white/70 text-lg pl-4">
+                          • Dress Politely<br/>
+                          • Bring Binusian Card<br/>
+                          • Arrive On Time
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ScrollIndicator text="Assistant Benefits" />
+            </section>
+            
+            <section
+              ref={section4Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section4InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">

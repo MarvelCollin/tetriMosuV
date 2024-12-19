@@ -60,7 +60,35 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shine 10s infinite linear;
+}
+
+#hero-text-static {
+  background: linear-gradient(
+    75deg,
+    hsl(196, 85%, 70%) 0%,
+    hsl(198, 88%, 68%) 12.5%,
+    hsl(202, 92%, 66%) 25%,
+    hsl(205, 100%, 65%) 37.5%,
+    hsl(0, 0%, 85%) 50%,
+    hsl(205, 100%, 65%) 62.5%,
+    hsl(202, 92%, 66%) 75%,
+    hsl(198, 88%, 68%) 87.5%,
+    hsl(196, 85%, 70%) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradient 3s linear infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 #hero-logo {

@@ -4,7 +4,6 @@ import LayeredTransition from "../components/page-animations/layered";
 import TetrisBackground from "../components/background-animations/tetris-background";
 import "../index.css";
 import HeroComponent from "../components/main-page/HeroComponent";
-import SlidingText from "../components/main-page/SlidingText";
 
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -52,7 +51,7 @@ function Home() {
                 />
               </div>
               <div className="flex-1 flex flex-col items-center justify-center">
-                <p className="mt-4 text-7xl" id="hero-text">
+                <p className="mt-4 text-7xl text-white" id="hero-text-static">
                   New Assistant Recruitment
                   <br />
                   25-2
@@ -60,8 +59,6 @@ function Home() {
               </div>
             </div>
           </div>
-          {/* Benefits */}
-          <SlidingText text="NAR25-2" />
         </div>
       )}
       {!showTransition && !showWelcome && <HeroComponent />}

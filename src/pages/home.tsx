@@ -4,6 +4,26 @@ import TetrisBackground from "../components/background-animations/tetris-backgro
 import "../index.css";
 import HeroComponent from "../components/main-page/HeroComponent";
 
+// Add ScrollIndicator component
+const ScrollIndicator = ({ text = "Scroll Down" }) => (
+  <div className="absolute bottom-8 right-8 flex flex-col items-center text-white/70 animate-bounce">
+    <p className="mb-2 text-sm">{text}</p>
+    <svg 
+      className="w-6 h-6" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2} 
+        d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+      />
+    </svg>
+  </div>
+);
+
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -26,7 +46,7 @@ function Home() {
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
             {/* Hero Section - Updated with grid background */}
-            <section className="w-full h-screen snap-start">
+            <section className="w-full h-screen snap-start relative">
               <div className="relativ h-full
                            bg-[linear-gradient(to_right,#80808020_1px,transparent_1px),linear-gradient(to_bottom,#80808020_1px,transparent_1px)] 
                            bg-[size:64px_64px]
@@ -52,9 +72,11 @@ function Home() {
                   </div>
                 </div>
               </div>
+              {/* Scroll Down Indicator */}
+              <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section className="w-full h-screen snap-start flex items-center justify-center p-8">
+            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
               <div className="w-full max-w-7xl">
                 <h1 className="text-6xl text-center mb-16" id="hero-text-static">
                   Recruitment Phases
@@ -98,6 +120,19 @@ function Home() {
                   ))}
                 </div>
               </div>
+              <ScrollIndicator text="Contact Us" />
+            </section>
+
+            {/* Add a Contact Section */}
+            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
+              <div className="w-full max-w-7xl text-center">
+                <h1 className="text-6xl mb-8" id="hero-text-static">Contact Us</h1>
+                <p className="text-white/70 text-xl">
+                  Have questions? Reach out to us
+                </p>
+                {/* Add your contact information or form here */}
+              </div>
+              <ScrollIndicator text="Back to Top" />
             </section>
           </div>
         ) : (

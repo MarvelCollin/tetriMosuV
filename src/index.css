@@ -81,6 +81,28 @@
   }
 }
 
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(-100vw);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .animate-float {
   animation: float 2s ease-in-out infinite;
 }
@@ -203,6 +225,28 @@
   }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -319,6 +363,39 @@ html {
   transition: opacity 1000ms, transform 1000ms;
 }
 
+.slide-in-right {
+  animation: slideInRight 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.slide-in-left {
+  animation: slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.slide-from-left {
+  animation: slideFromLeft 0.8s ease-out forwards;
+}
+
+.slide-from-right {
+  animation: slideFromRight 0.8s ease-out forwards;
+}
+
+.section-hidden {
+  opacity: 0;
+}
+
 * {
   font-family: "Joystix Monospace", sans-serif;
+}
+
+@layer utilities {
+  .delay-100 {
+    transition-delay: 100ms;
+  }
+}
+
+.section-transition {
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }

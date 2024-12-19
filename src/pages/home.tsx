@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import TetrisBackground from "../components/background-animations/tetris-background";
 import "../index.css";
 import HeroComponent from "../components/main-page/HeroComponent";
+import { useInView } from '../hooks/useInView';
 
 const ScrollIndicator = ({ text = "Scroll Down" }) => (
   <div className="absolute bottom-8 right-8 flex flex-col items-center text-white/70 animate-bounce">
@@ -26,6 +27,12 @@ const ScrollIndicator = ({ text = "Scroll Down" }) => (
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  const [section1Ref, section1InView] = useInView();
+  const [section2Ref, section2InView] = useInView();
+  const [section3Ref, section3InView] = useInView();
+  const [section4Ref, section4InView] = useInView();
+  const [section5Ref, section5InView] = useInView();
 
   const handleClick = () => {
     setIsTransitioning(true);
@@ -44,7 +51,11 @@ function Home() {
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
-            <section className="w-full h-screen snap-start relative">
+            <section
+              ref={section1Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section1InView ? 'slide-from-left' : ''}`}
+            >
               <div className="relativ h-full
                            bg-[linear-gradient(to_right,#80808020_1px,transparent_1px),linear-gradient(to_bottom,#80808020_1px,transparent_1px)] 
                            bg-[size:64px_64px]
@@ -90,8 +101,12 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
-              <div className="w-full max-w-7xl">
+            <section
+              ref={section2Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section2InView ? 'slide-from-right' : ''}`}
+            >
+              <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">RECRUITMENT</span>
                   <span className="inline-block animate-float-title-delayed mx-2">PHASES</span>
@@ -165,8 +180,12 @@ function Home() {
               <ScrollIndicator text="Assistant Benefits" />
             </section>
 
-            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
-              <div className="w-full max-w-7xl text-center">
+            <section
+              ref={section3Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section3InView ? 'slide-from-left' : ''}`}
+            >
+              <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">ASSISTANT</span>
                   <span className="inline-block animate-float-title-delayed mx-2">BENEFITS</span>
@@ -235,9 +254,12 @@ function Home() {
               <ScrollIndicator text="Back to Top" />
             </section>
 
-            {/* Add this section before the contact us section */}
-            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
-              <div className="w-full max-w-7xl relative z-10">
+            <section
+              ref={section4Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section4InView ? 'slide-from-right' : ''}`}
+            >
+              <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">REGISTRATION</span>
                   <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
@@ -309,8 +331,12 @@ function Home() {
               <ScrollIndicator text="Contact Us" />
             </section>
 
-            <section className="w-full h-screen snap-start relative flex items-center justify-center p-8">
-              <div className="w-full max-w-7xl relative z-10">
+            <section
+              ref={section5Ref}
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section5InView ? 'slide-from-left' : ''}`}
+            >
+              <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">CONTACT</span>
                   <span className="inline-block animate-float-title-delayed mx-2">US</span>

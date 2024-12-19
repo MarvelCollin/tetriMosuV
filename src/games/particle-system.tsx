@@ -6,7 +6,6 @@ class ParticleSystem {
     private scene: THREE.Scene;
     private lastUpdate: number = 0;
     private isAnimating: boolean = false;
-    // Add new property for background effects
     private backgroundEffects: { mesh: THREE.Mesh; velocity: THREE.Vector3; life: number }[] = [];
 
     constructor(scene: THREE.Scene) {
@@ -15,7 +14,6 @@ class ParticleSystem {
     }
 
     private initializeBackgroundEffects() {
-        // Add floating light streaks
         for (let i = 0; i < 20; i++) {
             const geometry = new THREE.PlaneGeometry(0.1, 2 + Math.random() * 3);
             const material = new THREE.MeshBasicMaterial({
@@ -101,7 +99,6 @@ class ParticleSystem {
                         });
                     }
 
-                    // Energy beam particles
                     const beamCount = 2;
                     for (let i = 0; i < beamCount; i++) {
                         const beamGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 4);

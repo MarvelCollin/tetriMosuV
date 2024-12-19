@@ -89,7 +89,6 @@ class TetrisGame {
         window.addEventListener('click', this.handleClick.bind(this));
         this.pivotPoint = new THREE.Vector3(5, -10, 0);
 
-        // Add ambient particles initialization
         this.initializeAmbientParticles();
     }
 
@@ -560,7 +559,7 @@ class TetrisGame {
             const circlePosition = new THREE.Vector3(
                 x + 0.5,                      
                 -targetLineY + 0.5,           
-                CircleTarget.getCurrentZ() // Use static Z value
+                CircleTarget.getCurrentZ() 
             );
 
             const target = new CircleTarget(
@@ -710,22 +709,18 @@ class TetrisGame {
         this.updateCameraShake();
         this.circleTargets.forEach(target => target.update());
 
-        // Update ambient particles with expanded boundaries
         this.ambientParticles.forEach(particle => {
             particle.mesh.position.add(particle.velocity);
             
-            // Enhanced floating effect with varied speeds
             const time = Date.now() * 0.001;
             particle.mesh.position.y += Math.sin(time + particle.originalY) * 0.01;
             particle.mesh.position.x += Math.cos(time * 0.5 + particle.originalY) * 0.005;
             
-            // Wrap around with expanded boundaries
             if (particle.mesh.position.x > 20) particle.mesh.position.x = -10;
             if (particle.mesh.position.x < -10) particle.mesh.position.x = 20;
             if (particle.mesh.position.y > 5) particle.mesh.position.y = -25;
             if (particle.mesh.position.y < -25) particle.mesh.position.y = 5;
             
-            // Dynamic opacity based on position
             const distanceFromCenter = new THREE.Vector2(
                 particle.mesh.position.x - 5,
                 particle.mesh.position.y + 10
@@ -735,7 +730,6 @@ class TetrisGame {
             const baseOpacity = particle.life * 0.3;
             particle.mesh.material.opacity = baseOpacity * (1 - distanceFromCenter / 30);
 
-            // Subtle color variation
             const hue = (time * 0.1 + particle.originalY) % 1;
             (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.5, 0.5);
         });
@@ -758,9 +752,8 @@ class TetrisGame {
         });
     }
 
-    // Add new method for ambient particles
     private initializeAmbientParticles() {
-        const particleCount = 100; // Increased count
+        const particleCount = 100; 
         for (let i = 0; i < particleCount; i++) {
             const geometry = new THREE.SphereGeometry(0.05, 8, 8);
             const material = new THREE.MeshBasicMaterial({
@@ -772,7 +765,6 @@ class TetrisGame {
 
             const mesh = new THREE.Mesh(geometry, material);
             
-            // Extended position range to cover the entire game area
             mesh.position.set(
                 Math.random() * 30 - 10,  // X: -10 to 20 (covers UI elements)
                 Math.random() * 30 - 25,   // Y: -25 to 5 (covers score area)
@@ -785,7 +777,7 @@ class TetrisGame {
                 mesh,
                 velocity: new THREE.Vector3(
                     (Math.random() - 0.5) * 0.02,
-                    Math.random() * 0.02 - 0.01, // Varied vertical movement
+                    Math.random() * 0.02 - 0.01, 
                     (Math.random() - 0.5) * 0.02
                 ),
                 life: Math.random(),

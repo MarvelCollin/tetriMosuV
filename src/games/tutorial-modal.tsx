@@ -13,16 +13,32 @@ interface Particle {
   color: string;
 }
 
+// Update key mapping constant
+const KEY_MAPPING: { [key: string]: string } = {
+  'W': 'W',
+  'A': 'A',
+  'S': 'S',
+  'D': 'D',
+  ' ': 'SPACE',  // Map spacebar
+  'R': 'R',
+  'MOUSE1': 'MOUSE1'
+};
+
 const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
   const [particles, setParticles] = useState<Particle[]>([]);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  // Add animation direction state
   const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
 
-  // Modified navigation handlers
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
+  const [backgroundEffect, setBackgroundEffect] = useState<string>('');
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Add background color state
+  const [bgColor, setBgColor] = useState<string>('');
+
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setSlideDirection('right');
@@ -51,14 +67,38 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                 { key: 'A', action: 'Move left' },
                 { key: 'S', action: 'Move down' },
                 { key: 'D', action: 'Move right' },
-                { key: 'Space', action: 'Hard drop' },
+                { key: 'SPACE', action: 'Hard drop' },
                 { key: 'R', action: 'Swap piece' },
+                { key: 'MOUSE1', action: 'Click targets', icon: '🎯' },
               ].map((control) => (
-                <div key={control.key} className="flex items-center space-x-3 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
-                  <kbd className="px-3 py-1.5 bg-cyan-500/30 text-white border border-cyan-400 rounded-lg font-mono shadow-glow">
-                    {control.key}
+                <div 
+                  key={control.key} 
+                  className={`flex items-center space-x-3 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm transition-all duration-300 ${
+                    activeKeys.has(control.key) ? 'bg-cyan-900/50 scale-105' : ''
+                  }`}
+                >
+                  <kbd 
+                    className={`px-3 py-1.5 ${
+                      activeKeys.has(control.key)
+                        ? 'bg-cyan-500/50 border-cyan-300 shadow-glow-intense animate-pulse-fast'
+                        : 'bg-cyan-500/30 border-cyan-400'
+                    } text-white border rounded-lg font-mono shadow-glow transition-all duration-300`}
+                  >
+                    {control.key === 'MOUSE1' ? (
+                      <div className="flex items-center space-x-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 0C4.477 0 0 4.477 0 10c0 5.522 4.477 10 10 10 5.522 0 10-4.478 10-10 0-5.523-4.478-10-10-10zm0 2c4.411 0 8 3.589 8 8s-3.589 8-8 8-8-3.589-8-8 3.589-8 8-8z"/>
+                        </svg>
+                        <span>Click</span>
+                      </div>
+                    ) : control.key}
                   </kbd>
-                  <span className="text-white text-shadow-bright">{control.action}</span>
+                  <span className={`text-white text-shadow-bright flex items-center space-x-2 ${
+                    activeKeys.has(control.key) ? 'text-cyan-300' : ''
+                  }`}>
+                    <span>{control.action}</span>
+                    {control.icon && <span className="text-xl">{control.icon}</span>}
+                  </span>
                 </div>
               ))}
             </div>
@@ -80,11 +120,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                   description: 'Hit the circular targets to clear lines and score points',
                   icon: '🎯'
                 },
-                {
-                  title: 'Visual Effects',
-                  description: 'Enjoy stunning particle effects and visual feedback',
-                  icon: '✨'
-                }
               ].map((feature) => (
                 <div key={feature.title} className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
                   <span className="text-2xl">{feature.icon}</span>
@@ -105,12 +140,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
               <p className="text-white text-lg mb-4 text-shadow-bright">
                 Clear lines, score points, and enjoy the immersive 3D Tetris experience!
               </p>
-              <button
-                onClick={onClose}
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 active:scale-95"
-              >
-                Start Game
-              </button>
             </div>
           </div>
         );
@@ -119,15 +148,77 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     }
   };
 
+  // Update trigger effect function
+  const triggerBackgroundEffect = (type: string, position?: { x: number, y: number }, key?: string) => {
+    setBackgroundEffect(type);
+    if (position) {
+      setMousePosition(position);
+    }
+
+    // Set different background colors based on key
+    let color = '';
+    if (key) {
+      switch(key) {
+        case 'W': color = 'from-cyan-500/30'; break;
+        case 'A': color = 'from-blue-500/30'; break;
+        case 'S': color = 'from-purple-500/30'; break;
+        case 'D': color = 'from-green-500/30'; break;
+        case 'SPACE': color = 'from-yellow-500/30'; break;
+        case 'R': color = 'from-red-500/30'; break;
+        default: color = 'from-cyan-500/30';
+      }
+    }
+    setBgColor(color);
+
+    setTimeout(() => {
+      setBackgroundEffect('');
+      setBgColor('');
+    }, 300);
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const mappedKey = KEY_MAPPING[e.key] || e.key.toUpperCase();
+      setActiveKeys(prev => new Set(prev).add(mappedKey));
+      triggerBackgroundEffect('keypress', undefined, mappedKey);
+      
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight' && currentStep < totalSteps) setCurrentStep(currentStep + 1);
       if (e.key === 'ArrowLeft' && currentStep > 1) setCurrentStep(currentStep - 1);
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const mappedKey = KEY_MAPPING[e.key] || e.key.toUpperCase();
+      setActiveKeys(prev => {
+        const newKeys = new Set(prev);
+        newKeys.delete(mappedKey);
+        return newKeys;
+      });
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      setActiveKeys(prev => new Set(prev).add('MOUSE1'));
+      triggerBackgroundEffect('click', { x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseUp = () => {
+      setActiveKeys(prev => {
+        const newKeys = new Set(prev);
+        newKeys.delete('MOUSE1');
+        return newKeys;
+      });
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
   }, [currentStep, onClose]);
 
   useEffect(() => {
@@ -226,6 +317,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
   }, [animateParticles]);
 
+  // Update the return JSX with dynamic background colors
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
       <div className="fixed inset-0">
@@ -267,6 +359,29 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
           <div className="absolute bottom-1/4 right-1/4 w-56 h-56 bg-blue-400/20 rounded-full blur-3xl animate-float-slow" />
           <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl animate-spin-slow" />
         </div>
+
+        {backgroundEffect === 'keypress' && (
+          <div className="absolute inset-0 animate-ripple-fast">
+            <div className={`absolute inset-0 ${bgColor || 'from-cyan-500/10'} via-transparent to-transparent bg-gradient-radial animate-pulse-fast`} />
+            <div className={`absolute inset-0 bg-gradient-to-br ${bgColor || 'from-cyan-500/5'} via-transparent to-transparent opacity-80`} />
+          </div>
+        )}
+
+        {backgroundEffect === 'click' && (
+          <div 
+            className="absolute pointer-events-none"
+            style={{
+              left: mousePosition.x,
+              top: mousePosition.y,
+              transform: 'translate(-50%, -50%)'
+            }}
+          >
+            <div className="absolute w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ripple-out" />
+              <div className="absolute inset-0 bg-cyan-500/10 rounded-full animate-ripple-out-delayed" />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="relative">
@@ -283,8 +398,11 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
               </button>
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown">
-              3D Tetris Tutorial
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
+              <span className="inline-block animate-float-title transition-all duration-300">3D</span>
+              <span className="inline-block animate-float-title-delayed mx-2">Tetris</span>
+              <span className="inline-block animate-float-title-more-delayed">Tutorial</span>
+              <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
             </h2>
 
             <div className="text-white text-shadow-sm">
@@ -302,31 +420,49 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
               <button
                 onClick={handlePrevious}
                 disabled={currentStep === 1}
-                className={`px-6 py-2 rounded-lg text-white font-medium transform transition-all duration-300 ${
+                className={`px-6 py-2 rounded-lg text-white font-medium relative overflow-hidden group ${
                   currentStep === 1
                     ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 active:scale-95'
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95'
                 }`}
               >
-                Previous
+                <span className="relative z-10">Previous</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)]"></div>
               </button>
 
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 {Array.from({ length: totalSteps }).map((_, i) => (
                   <div
                     key={i}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 transform hover:scale-150 ${
-                      i + 1 === currentStep ? 'bg-cyan-400 animate-ping-slow' : 'bg-gray-600'
-                    }`}
-                  />
+                    className={`relative ${
+                      i + 1 === currentStep ? 'scale-125' : ''
+                    } transition-all duration-300`}
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                        i + 1 === currentStep 
+                          ? 'bg-cyan-400 animate-ping-slow' 
+                          : 'bg-gray-600 hover:bg-gray-400'
+                      }`}
+                    />
+                    {i + 1 === currentStep && (
+                      <div className="absolute inset-0 bg-cyan-400/30 rounded-full animate-ripple"></div>
+                    )}
+                  </div>
                 ))}
               </div>
 
               <button
                 onClick={handleNext}
-                className="px-6 py-2 text-white rounded-lg font-medium bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 active:scale-95"
+                className="px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95"
               >
-                {currentStep === totalSteps ? 'Start' : 'Next'}
+                <span className="relative z-10 group-hover:animate-pulse-fast">
+                  {currentStep === totalSteps ? 'Start' : 'Next'}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)]"></div>
+                <div className="absolute -inset-px bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-all duration-500 animate-gradient-x"></div>
               </button>
             </div>
           </div>
@@ -483,6 +619,201 @@ const styles = `
 
   .animate-bounce-slow {
     animation: bounce-slow 2s ease-in-out infinite;
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  .animate-ripple {
+    animation: ripple 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 15px rgba(99, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes shine {
+    from {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    to {
+      transform: translateX(100%) rotate(45deg);
+    }
+  }
+
+  .shine-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    animation: shine 3s infinite;
+  }
+
+  @keyframes float-title {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(2deg); }
+  }
+
+  @keyframes float-title-delayed {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(-2deg); }
+  }
+
+  @keyframes float-title-more-delayed {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(1deg); }
+  }
+
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes pulse-fast {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .animate-float-title {
+    animation: float-title 3s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  .animate-float-title-delayed {
+    animation: float-title-delayed 3s ease-in-out infinite 0.2s;
+    display: inline-block;
+  }
+
+  .animate-float-title-more-delayed {
+    animation: float-title-more-delayed 3s ease-in-out infinite 0.4s;
+    display: inline-block;
+  }
+
+  .animate-gradient-x {
+    animation: gradient-x 3s linear infinite;
+    background-size: 200% 200%;
+  }
+
+  .animate-pulse-fast {
+    animation: pulse-fast 1s ease-in-out infinite;
+  }
+
+  /* Add hover effects for interactive elements */
+  .hover-lift {
+    transition: transform 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 15px rgba(99, 255, 255, 0.5);
+    text-shadow: 0 0 8px rgba(99, 255, 255, 0.8);
+  }
+
+  .shadow-glow-intense {
+    box-shadow: 0 0 15px rgba(99, 255, 255, 0.8),
+                0 0 30px rgba(99, 255, 255, 0.6);
+  }
+
+  @keyframes key-press {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .animate-key-press {
+    animation: key-press 0.2s ease-in-out;
+  }
+
+  @keyframes ripple-out {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  @keyframes ripple-out-delayed {
+    0% { transform: scale(0); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  @keyframes ripple-fast {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .animate-ripple-out {
+    animation: ripple-out 0.8s ease-out forwards;
+  }
+
+  .animate-ripple-out-delayed {
+    animation: ripple-out-delayed 1s ease-out forwards;
+  }
+
+  .animate-ripple-fast {
+    animation: ripple-fast 0.3s ease-out forwards;
+  }
+
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle at center, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 70%);
+  }
+
+  @keyframes ripple-glow {
+    0% { opacity: 0.8; transform: scale(0.8); filter: brightness(1); }
+    50% { opacity: 0.4; transform: scale(1.2); filter: brightness(1.5); }
+    100% { opacity: 0; transform: scale(1.5); filter: brightness(1); }
+  }
+
+  .animate-ripple-glow {
+    animation: ripple-glow 0.8s ease-out forwards;
+  }
+
+  .bg-gradient-animated {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 `;
 

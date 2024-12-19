@@ -38,7 +38,7 @@ const GameOverModal: React.FC<GameOverModalProps> = ({ score, onClose }) => {
                                      hover:shadow-xl hover:shadow-cyan-500/25 
                                      active:scale-95"
                         >
-                            Continue to Registration
+                            Continue
                         </button>
                     </div>
                 </div>

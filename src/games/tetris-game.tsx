@@ -189,28 +189,42 @@ class TetrisGame {
         this.currentX = Math.floor((this.gridManager.width - TETROMINOES[this.currentTetromino][0].length) / 2);
         this.currentY = -2;
 
+        // Check if the piece can be placed at starting position
         if (this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
             this.gameOver = true;
             clearInterval(this.dropIntervalId!);
-            console.log('Game Over!');
-            // Trigger game over callback
+            console.log('Game Over - Collision at spawn!');
             if (this.onGameOver) {
                 this.onGameOver(this.score);
             }
-        } else {
-            this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
-            this.renderer.updateActivePiece(this.currentTetromino, this.currentX, this.currentY);
+            return; // Return early to prevent placing the piece
         }
+
+        this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+        this.renderer.updateActivePiece(this.currentTetromino, this.currentX, this.currentY);
         this.renderer.updateNextPiecePreview(this.nextTetromino);
     }
 
     moveDown() {
+        if (this.gameOver) return; // Don't move if game is over
+
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
             this.currentY++;
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             this.gridManager.checkAndClearLines(this.particleSystem);
         } else {
+            // If we can't move down, check if we're too high
+            if (this.currentY < 0) {
+                this.gameOver = true;
+                clearInterval(this.dropIntervalId!);
+                console.log('Game Over - Stack too high!');
+                if (this.onGameOver) {
+                    this.onGameOver(this.score);
+                }
+                return;
+            }
+
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             const linesCleared = this.gridManager.checkAndClearLines(this.particleSystem);
             if (linesCleared > 0) {
@@ -352,6 +366,7 @@ class TetrisGame {
     }
 
     handleKeyPress(event: KeyboardEvent) {
+        if (this.gameOver) return; // Don't process inputs if game is over
         this.inputHandler.handleKeyPress(event);
     }
 

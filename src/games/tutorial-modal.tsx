@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 
 interface TutorialModalProps {
   onClose: () => void;
@@ -46,9 +47,11 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
+    if (currentStep === 1) {
+      window.location.href = '/'; 
+    } else {
       setSlideDirection('left');
-      setCurrentStep(Math.max(1, currentStep - 1));
+      setCurrentStep(prev => prev - 1);
     }
   };
 
@@ -66,7 +69,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                 { key: 'D', action: 'Move right' },
                 { key: 'SPACE', action: 'Hard drop' },
                 { key: 'R', action: 'Swap piece' },
-                { key: 'MOUSE1', action: 'Click targets', icon: '🎯' },
+                { key: 'MOUSE1', action: 'Click targets'},
               ].map((control) => (
                 <div 
                   key={control.key} 
@@ -184,7 +187,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
 
     const handleMouseUp = () => {
-      setActiveKeys(prevw => {
+      setActiveKeys(prev => {  
         const newKeys = new Set(prev);
         newKeys.delete('MOUSE1');
         return newKeys;
@@ -413,14 +416,14 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div className="mt-8 flex items-center justify-between animate-fadeIn">
               <button
                 onClick={handlePrevious}
-                disabled={currentStep === 1}
-                className={`px-6 py-2 rounded-lg text-white font-medium relative overflow-hidden group ${
-                  currentStep === 1
-                    ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95'
-                }`}
+                className={`px-6 py-2 rounded-lg text-white font-medium relative overflow-hidden group 
+                  bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 
+                  transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 
+                  active:scale-95`}
               >
-                <span className="relative z-10">Previous</span>
+                <span className="relative z-10">
+                  {currentStep === 1 ? 'Back to Home' : 'Previous'}
+                </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"></div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)]"></div>
               </button>
@@ -805,8 +808,6 @@ const styles = `
 
   @keyframes ripple-glow {
     0% { opacity: 0.8; transform: scale(0.8); filter: brightness(1); }
-    50% { opacity: 0.4; transform: scale(1.2); filter: brightness(1.5); }
-    100% { opacity: 0; transform: scale(1.5); filter: brightness(1); }
   }
 
   .animate-ripple-glow {

@@ -244,163 +244,140 @@ function Home() {
   <ScrollIndicator text="Initial Test" />
 </section>
 
-            <section
-              ref={section3Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
-                         ${section3InView ? 'slide-from-left' : ''}`}
-            >
-              <div className="w-full max-w-7xl px-8">
-                <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
-                  <span className="inline-block animate-float-title transition-all duration-300">INITIAL</span>
-                  <span className="inline-block animate-float-title-delayed mx-2">TEST</span>
-                  <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
-                </h1>
+<section
+  ref={section3Ref}
+  className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              ${section3InView ? 'slide-from-left' : ''}`}
+>
+  <div className="w-full max-w-6xl px-8"> {/* Reduced from max-w-7xl */}
+    <h1 className="text-5xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown"> {/* Reduced from text-6xl and mb-12 */}
+      <span className="inline-block animate-float-title">INITIAL</span>
+      <span className="inline-block animate-float-title-delayed mx-2">TEST</span>
+    </h1>
 
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
-                               hover:border-cyan-500/40 transition-all duration-300">
-                    <h2 className="text-4xl mb-8" id="hero-text-static">Test Components</h2>
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <h3 className="text-2xl text-white/90">Aptitude Test</h3>
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-2xl text-white/90">Programming Test</h3>
-                        <p className="text-white/70 text-lg pl-4">
-                          You can use:<br/>
-                          • C/C++<br/>
-                          • Java<br/>
-                          • Python
-                        </p>
+    <div className="relative flex flex-col items-center">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-purple-500/5 to-blue-500/5 rounded-3xl blur-xl"></div>
+      
+      {/* Main content */}
+      <div className="relative w-full">
+        <div className="flex justify-between items-start gap-6"> {/* Reduced gap from 8 */}
+          {/* Aptitude Test Panel */}
+          <div className="flex-1 group perspective">
+            <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
+              <div className="bg-gradient-to-br from-cyan-500/10 to-transparent p-6 rounded-xl border border-cyan-500/20
+                            backdrop-blur-sm hover:border-cyan-500/40 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4"> {/* Reduced gap and margin */}
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center"> {/* Reduced size */}
+                    <span className="text-xl">🧠</span>
+                  </div>
+                  <h2 className="text-2xl" id="hero-text-static">Aptitude Test</h2> {/* Reduced from text-3xl */}
+                </div>
+                
+                <div className="space-y-3"> {/* Reduced spacing */}
+                  {[
+                    { name: "Mathematical Reasoning", desc: "Solve complex mathematical problems" },
+                    { name: "Pattern Recognition", desc: "Identify sequences and patterns" },
+                    { name: "Analytical Thinking", desc: "Analyze and solve logical problems" }
+                  ].map((item, idx) => (
+                    <div key={idx} 
+                         className="p-3 bg-black/20 rounded-lg transform hover:translate-x-2 
+                                  transition-all duration-300 border border-cyan-500/10
+                                  hover:border-cyan-500/30">
+                      <h3 className="text-lg text-white/90 mb-1">{item.name}</h3>
+                      <p className="text-sm text-white/60">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Programming Test Panel */}
+          <div className="flex-1 group perspective">
+            <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
+              <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-6 rounded-xl border border-purple-500/20
+                            backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                    <span className="text-xl">💻</span>
+                  </div>
+                  <h2 className="text-2xl" id="hero-text-static">Programming Test</h2>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    { lang: "C/C++", icon: "⚡", desc: "Low-level programming" },
+                    { lang: "Java", icon: "☕", desc: "Object-oriented programming" },
+                    { lang: "Python", icon: "🐍", desc: "High-level programming" }
+                  ].map((lang, idx) => (
+                    <div key={idx} className="relative group/item">
+                      <div className="p-3 bg-black/20 rounded-lg transform hover:translate-x-2
+                                    transition-all duration-300 border border-purple-500/10
+                                    hover:border-purple-500/30">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{lang.icon}</span>
+                          <div>
+                            <h3 className="text-lg text-white/90">{lang.lang}</h3>
+                            <p className="text-sm text-white/60">{lang.desc}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                  {/* Important Information */}
-                  <div className="bg-black/30 p-8 rounded-xl backdrop-blur-sm border border-cyan-500/20 group
-                               hover:border-cyan-500/40 transition-all duration-300">
-                    <h2 className="text-4xl mb-8" id="hero-text-static">Important Information</h2>
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <h3 className="text-2xl text-white/90">Schedule</h3>
-                        <p className="text-white/70 text-lg pl-4">
-                          Date: 27 March 2024<br/>
-                          Time: 08:00 - 11:00 (Batch 1)
-                          Time: 13:00 - 16:00 (Batch 2)
-                        </p>
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-2xl text-white/90">Requirements</h3>
-                        <p className="text-white/70 text-lg pl-4">
-                          • Dress Politely<br/>
-                          • Bring Binusian Card<br/>
-                          • Arrive On Time
-                        </p>
-                      </div>
+        {/* Schedule Panel */}
+        <div className="mt-6 group perspective"> {/* Reduced margin */}
+          <div className="relative transform transition-all duration-500 group-hover:rotate-x-12">
+            <div className="bg-gradient-to-br from-blue-500/10 to-transparent p-6 rounded-xl border border-blue-500/20
+                          backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                  <span className="text-xl">📅</span>
+                </div>
+                <h2 className="text-2xl" id="hero-text-static">Test Schedule</h2>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6"> {/* Reduced gap */}
+                <div className="space-y-3">
+                  <div className="p-3 bg-black/20 rounded-lg border border-blue-500/10
+                                hover:border-blue-500/30 transition-all duration-300">
+                    <h3 className="text-lg text-white/90 mb-1">27 March 2024</h3>
+                    <div className="space-y-1">
+                      <p className="text-sm text-white/60">Batch 1: 08:00 - 11:00</p>
+                      <p className="text-sm text-white/60">Batch 2: 13:00 - 16:00</p>
                     </div>
                   </div>
                 </div>
-              </div>
-              <ScrollIndicator text="Assistant Benefits" />
-            </section>
-            
-            <section
-              ref={section6Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
-                         ${section6InView ? 'slide-from-right' : ''}`}
-            >
-              <div className="w-full max-w-7xl px-8">
-                <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
-                  <span className="inline-block animate-float-title transition-all duration-300">ASSISTANT</span>
-                  <span className="inline-block animate-float-title-delayed mx-2">BENEFITS</span>
-                  <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
-                </h1>
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="bg-black/30 p-8 rounded-lg backdrop-blur-sm border border-white/10">
-                    <h2 className="text-4xl mb-6" id="hero-text-static">Soft Skills</h2>
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {[
-                        "Public Speaking",
-                        "Time Management",
-                        "Discipline",
-                        "Networking",
-                        "Leadership",
-                        "Communication",
-                        "Teamwork",
-                        "Problem Solving",
-                        "And Many More"
-                      ].map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-4 py-2 bg-cyan-500/20 rounded-full text-white/70 hover:text-white 
-                                   hover:bg-cyan-500/30 transition-all duration-300 text-lg animate-float"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
 
-                  <div className="bg-black/30 p-8 rounded-lg backdrop-blur-sm border border-white/10">
-                    <h2 className="text-4xl mb-6" id="hero-text-static">Hard Skills</h2>
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {[
-                        "C/C++",
-                        "Java",
-                        "Golang",
-                        "Rust",
-                        "Flutter",
-                        "Unity",
-                        "Database",
-                        "React",
-                        "Laravel",
-                        "Docker",
-                        "Kubenetes",
-                        "Cisco",
-                        "Javascript",
-                        "Typescript",
-                        "And Many More"
-                      ].map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-4 py-2 bg-blue-500/20 rounded-full text-white/70 hover:text-white 
-                                   hover:bg-blue-500/30 transition-all duration-300 text-lg animate-float"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                          {skill}
-                        </span>
-                      ))}
+                <div className="space-y-3">
+                  {[
+                    { text: "Dress Politely", icon: "👔" },
+                    { text: "Bring Binusian Card", icon: "🪪" },
+                    { text: "Arrive On Time", icon: "⏰" }
+                  ].map((item, idx) => (
+                    <div key={idx}
+                         className="flex items-center gap-2 p-3 bg-black/20 rounded-lg
+                                  border border-blue-500/10 hover:border-blue-500/30
+                                  transition-all duration-300">
+                      <span className="text-xl">{item.icon}</span>
+                      <span className="text-sm text-white/90">{item.text}</span>
                     </div>
-                  </div>
-
-                  <div className="col-span-2 mt-8 bg-black/30 p-8 rounded-lg backdrop-blur-sm border border-white/10">
-                    <h2 className="text-4xl mb-6" id="hero-text-static">Others</h2>
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {[
-                        "Salary",
-                        "Health Benefit",
-                        "Free Parking",
-                        "Job Opportunities",
-                        "Career Path",
-                        "Second Family",
-                        "And Many More"
-                      ].map((benefit, index) => (
-                        <span
-                          key={index}
-                          className="px-4 py-2 bg-purple-500/20 rounded-full text-white/70 hover:text-white 
-                                   hover:bg-purple-500/30 transition-all duration-300 text-lg animate-float"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                          {benefit}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
-              <ScrollIndicator text="Registration" />
-            </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ScrollIndicator text="Assistant Benefits" />
+</section>
 
             <section
               ref={section4Ref}
@@ -572,6 +549,117 @@ function Home() {
               </div>
               <ScrollIndicator text="Back to Top" onClick={scrollToTop} />
             </section>
+
+            <section
+  ref={section6Ref}
+  className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              ${section6InView ? 'slide-from-right' : ''}`}
+>
+  <div className="w-full max-w-7xl px-8">
+    <h1 className="text-6xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown relative group">
+      <span className="inline-block animate-float-title transition-all duration-300">ASSISTANT</span>
+      <span className="inline-block animate-float-title-delayed mx-2">BENEFITS</span>
+    </h1>
+
+    <div className="relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-purple-500/5 to-blue-500/5 rounded-3xl blur-xl"></div>
+      
+      <div className="relative grid grid-cols-3 gap-8 p-8">
+        {[
+          {
+            title: "Skill Development",
+            color: "cyan",
+            skills: [
+              { name: "Public Speaking", icon: "🎤" },
+              { name: "Leadership", icon: "👑" },
+              { name: "Problem Solving", icon: "🧩" },
+              { name: "Time Management", icon: "⏰" },
+              { name: "Communication", icon: "💬" }
+            ]
+          },
+          {
+            title: "Technical Growth",
+            color: "purple",
+            skills: [
+              { name: "Programming", icon: "💻" },
+              { name: "Web Development", icon: "🌐" },
+              { name: "Mobile Apps", icon: "📱" },
+              { name: "Database", icon: "🗄️" },
+              { name: "Cloud Computing", icon: "☁️" }
+            ]
+          },
+          {
+            title: "Perks",
+            color: "blue",
+            skills: [
+              { name: "Salary", icon: "💰" },
+              { name: "Health Benefits", icon: "🏥" },
+              { name: "Free Parking", icon: "🅿️" },
+              { name: "Career Path", icon: "📈" },
+              { name: "Second Family", icon: "❤️" }
+            ]
+          }
+        ].map((category, index) => (
+          <div 
+            key={index}
+            className="group relative bg-black/30 backdrop-blur-md rounded-xl p-6 overflow-hidden
+                     hover:bg-black/40 transition-all duration-500"
+          >
+            {/* Animated border gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br from-${category.color}-500/30 to-transparent
+                           opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+            
+            <h2 className="text-3xl mb-6 relative z-10" id="hero-text-static">
+              {category.title}
+            </h2>
+
+            <div className="space-y-4 relative z-10">
+              {category.skills.map((skill, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-center gap-3 p-2 rounded-lg
+                           bg-${category.color}-500/10 hover:bg-${category.color}-500/20
+                           transform hover:translate-x-2
+                           transition-all duration-300`}
+                  style={{ animationDelay: `${idx * 0.1}s` }}
+                >
+                  <span className="text-2xl">{skill.icon}</span>
+                  <span className="text-lg text-white/80 group-hover:text-white">
+                    {skill.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom gradient line */}
+            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r 
+                           from-transparent via-${category.color}-500/50 to-transparent
+                           transform scale-x-0 group-hover:scale-x-100
+                           transition-transform duration-500`}></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Additional floating elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-white/30
+                     animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          ></div>
+        ))}
+      </div>
+    </div>
+  </div>
+  <ScrollIndicator text="Registration" />
+</section>
 
           </div>
         ) : (

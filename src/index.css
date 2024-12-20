@@ -109,6 +109,18 @@
   }
 }
 
+@keyframes rotate-y-12 {
+  to {
+    transform: rotateY(12deg);
+  }
+}
+
+@keyframes rotate-x-12 {
+  to {
+    transform: rotateX(12deg);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -416,4 +428,16 @@ html {
 .section-transition {
   transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+}
+
+.perspective {
+  perspective: 2000px;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+.rotate-x-12 {
+  transform: rotateX(12deg);
 }

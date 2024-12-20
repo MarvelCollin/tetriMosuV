@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -6,6 +7,8 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onRestart }) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -23,7 +26,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onRestart }) => 
         <h2 className="text-3xl font-bold text-white mb-8 text-center drop-shadow-glow">Settings</h2>
         
         <div className="space-y-4">
-          
           <button
             onClick={onRestart}
             className="w-full py-4 px-6 rounded-lg bg-gradient-to-r from-white/80 to-pink-400/80 text-gray-800 font-bold 
@@ -31,6 +33,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onRestart }) => 
                      hover:shadow-lg active:scale-95 backdrop-blur-sm"
           >
             Restart Game
+          </button>
+
+          <button
+            onClick={() => navigate('/')}
+            className="w-full py-4 px-6 rounded-lg bg-gradient-to-r from-white/80 to-purple-400/80 text-gray-800 font-bold 
+                     hover:from-white hover:to-purple-400 transition-all duration-300 transform hover:scale-105 
+                     hover:shadow-lg active:scale-95 backdrop-blur-sm"
+          >
+            Back to Home
           </button>
         </div>
       </div>

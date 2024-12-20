@@ -365,6 +365,29 @@ html {
 .snap-y {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;  /* For smoother scrolling on iOS */
+}
+
+/* Add new smooth scroll utilities */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-snap {
+  scroll-snap-type: y mandatory;
+  scroll-snap-stop: always;
+}
+
+.snap-point {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Add transition for smoother scroll stop */
+.scroll-transition {
+  transition: scroll-behavior 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .snap-y::-webkit-scrollbar {

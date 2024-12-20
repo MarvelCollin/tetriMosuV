@@ -16,7 +16,7 @@ const ScrollIndicator = ({ text = "Scroll Down", onClick }) => (
       viewBox="0 0 24 24"
     >
       <path
-        strokeLinecap="round"
+      
         strokeLinejoin="round"
         strokeWidth={2}
         d="M19 14l-7 7m0 0l-7-7m7 7V3"
@@ -72,10 +72,10 @@ function Home() {
       <TetrisBackground selectedTheme={currentTheme} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
-          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
+          <div className="w-full h-screen overflow-y-scroll snap-y scroll-smooth scroll-snap scroll-transition">
             <section
               ref={section1Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
                          ${section1InView ? 'slide-from-left' : ''}`}
             >
               <div className="relative h-full flex items-center justify-center p-8">
@@ -137,7 +137,7 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+            <section ref={section2Ref} className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
                          ${section2InView ? 'slide-from-right' : ''}`}>
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
@@ -243,7 +243,7 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
               ${section3InView ? 'slide-from-left' : ''}`}
             >
               <div className="w-full max-w-6xl px-8"> {/* Reduced from max-w-7xl */}
@@ -375,13 +375,12 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
               ${section4InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-6xl px-8">
                 <h1 className="text-5xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown">
                   <span className="inline-block animate-float-title">REGISTRATION</span>
-                  <span className="inline-block animate-float-title-delayed mx-2">INFO</span>
                 </h1>
 
                 <div className="relative">
@@ -421,7 +420,7 @@ function Home() {
                         {[
                           { text: "Active BINUS Student", icon: "🎓", desc: "Currently enrolled in BINUS University" },
                           { text: "2 Year Commitment", icon: "📝", desc: "Willing to sign a contract" },
-                          { text: "Grade B in AlPro", icon: "💯", desc: "*Except for first semester students" },
+                          { text: "Grade B in Algorithm and Programming / Introduction to Programming", icon: "💯", desc: "*Except for first semester students" },
                           { text: "SoCS/SoIS/DP/MTP", icon: "🏫", desc: "Students from eligible majors" }
                         ].map((req, idx) => (
                           <div key={idx} className="flex items-start gap-4 group">
@@ -474,7 +473,7 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
               ${section6InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-7xl px-8">
@@ -489,36 +488,39 @@ function Home() {
                   <div className="relative grid grid-cols-3 gap-8 p-8">
                     {[
                       {
-                        title: "Skill Development",
+                        title: "SOFT SKILLS",
                         color: "cyan",
                         skills: [
                           { name: "Public Speaking", icon: "🎤" },
                           { name: "Leadership", icon: "👑" },
                           { name: "Problem Solving", icon: "🧩" },
                           { name: "Time Management", icon: "⏰" },
-                          { name: "Communication", icon: "💬" }
+                          { name: "Communication", icon: "💬" },
+                          { name: "And Many More" }
                         ]
                       },
                       {
-                        title: "Technical Growth",
+                        title: "HARD SKILLS",
                         color: "purple",
                         skills: [
                           { name: "Programming", icon: "💻" },
                           { name: "Web Development", icon: "🌐" },
                           { name: "Mobile Apps", icon: "📱" },
                           { name: "Database", icon: "🗄️" },
-                          { name: "Cloud Computing", icon: "☁️" }
+                          { name: "Cloud Computing", icon: "☁️" },
+                          { name: "And Many More" }
                         ]
                       },
                       {
-                        title: "Perks",
+                        title: "OTHER",
                         color: "blue",
                         skills: [
                           { name: "Salary", icon: "💰" },
                           { name: "Health Benefits", icon: "🏥" },
                           { name: "Free Parking", icon: "🅿️" },
                           { name: "Career Path", icon: "📈" },
-                          { name: "Second Family", icon: "❤️" }
+                          { name: "Second Family", icon: "❤️" },
+                          { name: "And Many More"}
                         ]
                       }
                     ].map((category, index) => (
@@ -585,7 +587,7 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
                          ${section5InView ? 'slide-from-left' : ''}`}
               onWheel={(e) => {
                 if (e.deltaY > 0) {

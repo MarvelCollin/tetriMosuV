@@ -208,7 +208,6 @@ class TetrisGame {
     }
 
     moveDown() {
-        if (this.isPaused) return;
         if (this.gameOver) return; 
 
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
@@ -368,7 +367,7 @@ class TetrisGame {
     }
 
     handleKeyPress(event: KeyboardEvent) {
-        if (this.gameOver || this.isPaused) return; // Don't process inputs if game is over or paused
+        if (this.gameOver) return; 
         this.inputHandler.handleKeyPress(event);
     }
 
@@ -691,7 +690,6 @@ class TetrisGame {
     }
 
     updateScene() {
-        if (this.isPaused) return;
         const now = performance.now();
         if (now - this.lastRenderTime < 16) {
             return;
@@ -739,15 +737,12 @@ class TetrisGame {
             
             const time = Date.now() * 0.001;
             
-            // More complex movement patterns
             particle.mesh.position.y += Math.sin(time + particle.originalY) * 0.01;
             particle.mesh.position.x += Math.cos(time * 0.5 + particle.originalY) * 0.005;
             
-            // Gentle rotation
             particle.mesh.rotation.x += 0.001;
             particle.mesh.rotation.y += 0.002;
             
-            // Screen wrapping with smooth transition
             if (particle.mesh.position.x > 20) {
                 particle.mesh.position.x = -20;
                 particle.mesh.material.opacity = 0;
@@ -765,20 +760,17 @@ class TetrisGame {
                 particle.mesh.material.opacity = 0;
             }
             
-            // Dynamic opacity based on position and time
             const distanceFromCenter = new THREE.Vector2(
                 particle.mesh.position.x - 5,
                 particle.mesh.position.y + 10
             ).length();
             
             particle.life = (Math.sin(time + particle.originalY) + 1) * 0.5;
-            const baseOpacity = particle.life * 0.4;  // Increased base opacity
+            const baseOpacity = particle.life * 0.4;  
             const targetOpacity = baseOpacity * (1 - distanceFromCenter / 35);
             
-            // Smooth opacity transition
             particle.mesh.material.opacity += (targetOpacity - particle.mesh.material.opacity) * 0.1;
 
-            // Color cycling with different patterns for different particle types
             if (particle.mesh.geometry.type === 'SphereGeometry') {
                 const hue = (time * 0.1 + particle.originalY) % 1;
                 (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.8, 0.5);
@@ -787,7 +779,6 @@ class TetrisGame {
                 (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.5, 0.6);
             }
             
-            // Scale pulsing
             const scale = 1 + Math.sin(time * 2 + particle.originalY) * 0.1;
             particle.mesh.scale.setScalar(scale);
         });
@@ -811,15 +802,13 @@ class TetrisGame {
     }
 
     private initializeAmbientParticles() {
-        // Increase particle count for more visual impact
         const particleCount = 200; 
         
-        // Create different types of particles
         for (let i = 0; i < particleCount; i++) {
             const type = Math.random();
             let geometry, material;
             
-            if (type < 0.4) { // Spherical particles
+            if (type < 0.4) { 
                 geometry = new THREE.SphereGeometry(0.05 + Math.random() * 0.05, 8, 8);
                 material = new THREE.MeshBasicMaterial({
                     color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
@@ -827,7 +816,7 @@ class TetrisGame {
                     opacity: Math.random() * 0.3 + 0.1,
                     blending: THREE.AdditiveBlending
                 });
-            } else if (type < 0.7) { // Star-like particles
+            } else if (type < 0.7) {
                 geometry = new THREE.OctahedronGeometry(0.08 + Math.random() * 0.05);
                 material = new THREE.MeshBasicMaterial({
                     color: 0x00ffff,
@@ -835,7 +824,7 @@ class TetrisGame {
                     opacity: Math.random() * 0.4 + 0.1,
                     blending: THREE.AdditiveBlending
                 });
-            } else { // Energy streaks
+            } else { 
                 geometry = new THREE.PlaneGeometry(0.05, 0.3 + Math.random() * 0.4);
                 material = new THREE.MeshBasicMaterial({
                     color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5),
@@ -848,14 +837,12 @@ class TetrisGame {
 
             const mesh = new THREE.Mesh(geometry, material);
             
-            // Wider distribution of particles
             mesh.position.set(
-                Math.random() * 40 - 20,    // X: -20 to 20
-                Math.random() * 40 - 30,     // Y: -30 to 10
-                Math.random() * 8 - 4        // Z: -4 to 4
+                Math.random() * 40 - 20,   
+                Math.random() * 40 - 30,    
+                Math.random() * 8 - 4      
             );
 
-            // Random rotation for variety
             mesh.rotation.set(
                 Math.random() * Math.PI,
                 Math.random() * Math.PI,
@@ -867,9 +854,9 @@ class TetrisGame {
             this.ambientParticles.push({
                 mesh,
                 velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.03,  // Slightly faster horizontal movement
-                    Math.random() * 0.02 - 0.01,   // Vertical drift
-                    (Math.random() - 0.5) * 0.02   // Depth movement
+                    (Math.random() - 0.5) * 0.03,  
+                    Math.random() * 0.02 - 0.01,   
+                    (Math.random() - 0.5) * 0.02   
                 ),
                 life: Math.random(),
                 originalY: mesh.position.y
@@ -878,15 +865,6 @@ class TetrisGame {
     }
 
     togglePause() {
-        this.isPaused = !this.isPaused;
-        if (this.isPaused) {
-            if (this.dropIntervalId) {
-                clearInterval(this.dropIntervalId);
-                this.dropIntervalId = null;
-            }
-        } else {
-            this.startAutoDrop();
-        }
     }
 }
 

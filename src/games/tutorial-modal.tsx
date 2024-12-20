@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { THEMES, setCurrentTheme } from './colors';
 
 interface TutorialModalProps {
   onClose: () => void;
@@ -36,6 +37,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const [bgColor, setBgColor] = useState<string>('');
+  const [selectedTheme, setSelectedTheme] = useState<string>('');
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -136,10 +138,66 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         return (
           <div className="space-y-6">
             <h3 className="text-2xl text-white font-semibold mb-4 drop-shadow-glow">Ready to Play?</h3>
-            <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm text-center">
-              <p className="text-white text-lg mb-4 text-shadow-bright">
-                Dont Forget to join NAR 25-2 !!
-              </p>
+            
+            <div className="space-y-6">
+              <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm">
+                <h4 className="text-xl text-white mb-4">Select Theme</h4>
+                <div className="relative flex flex-col gap-4">
+                  <select
+                    value={selectedTheme}
+                    onChange={(e) => {
+                      setSelectedTheme(e.target.value);
+                      setCurrentTheme(e.target.value as keyof typeof THEMES);
+                    }}
+                    className="w-full p-4 rounded-lg bg-gray-900/90 border-2 border-cyan-500/30 text-white 
+                             focus:border-cyan-400/50 focus:outline-none transition-all duration-300
+                             appearance-none cursor-pointer hover:bg-gray-800/90"
+                    style={{
+                      backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1) 0 0)'
+                    }}
+                  >
+                    <option value="" disabled className="bg-gray-900">Choose a theme</option>
+                    {Object.entries(THEMES).map(([themeName, theme]) => (
+                      <option 
+                        key={themeName} 
+                        value={themeName} 
+                        className="bg-gray-900 py-2"
+                        style={{ backgroundColor: 'rgb(17, 24, 39)' }}
+                      >
+                        {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {selectedTheme && (
+                  <div className="mt-4 flex flex-wrap gap-2 justify-center p-2 bg-gray-900/50 rounded-lg">
+                    <span className="text-white/70 mr-2">Theme Colors:</span>
+                    {THEMES[selectedTheme as keyof typeof THEMES].colors.map((color, i) => (
+                      <div
+                        key={i}
+                        className="w-6 h-6 rounded-full border border-white/20 transition-transform hover:scale-110"
+                        style={{ 
+                          backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
+                          boxShadow: `0 0 10px #${color.toString(16).padStart(6, '0')}`
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm text-center">
+                <p className="text-white text-lg mb-4 text-shadow-bright">
+                  Dont Forget to join NAR 25-2 !!
+                </p>
+              </div>
             </div>
           </div>
         );
@@ -275,6 +333,26 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     }
   }, [particles, backgroundEffect]);
 
+  // Add function to get theme-based background color
+  const getThemeBackgroundColor = (themeName: string) => {
+    if (!themeName) return 'rgba(2, 6, 23, 0.95)';
+    const theme = THEMES[themeName as keyof typeof THEMES];
+    const bgColor = theme.background;
+    // Convert hex to rgba with opacity
+    const r = (bgColor >> 16) & 255;
+    const g = (bgColor >> 8) & 255;
+    const b = bgColor & 255;
+    return `rgba(${r}, ${g}, ${b}, 0.95)`;
+  };
+
+  // Update the canvas background when theme changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.style.backgroundColor = getThemeBackgroundColor(selectedTheme);
+    }
+  }, [selectedTheme]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -320,7 +398,10 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full"
-          style={{ backgroundColor: 'rgba(2, 6, 23, 0.95)' }}
+          style={{ 
+            backgroundColor: getThemeBackgroundColor(selectedTheme),
+            transition: 'background-color 0.5s ease-in-out'
+          }}
         />
         
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-cyan-500/20 to-purple-600/30" />

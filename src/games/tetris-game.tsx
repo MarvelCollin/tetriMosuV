@@ -52,6 +52,9 @@ class TetrisGame {
     // Add callback property for game over
     onGameOver: ((score: number) => void) | null = null;
 
+    // Add new property for pause
+    isPaused: boolean = false;
+
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
         this.scene = scene;
         this.setTetrominoState = setTetrominoState;
@@ -205,6 +208,7 @@ class TetrisGame {
     }
 
     moveDown() {
+        if (this.isPaused) return;
         if (this.gameOver) return; 
 
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
@@ -364,7 +368,7 @@ class TetrisGame {
     }
 
     handleKeyPress(event: KeyboardEvent) {
-        if (this.gameOver) return; // Don't process inputs if game is over
+        if (this.gameOver || this.isPaused) return; // Don't process inputs if game is over or paused
         this.inputHandler.handleKeyPress(event);
     }
 
@@ -687,6 +691,7 @@ class TetrisGame {
     }
 
     updateScene() {
+        if (this.isPaused) return;
         const now = performance.now();
         if (now - this.lastRenderTime < 16) {
             return;
@@ -869,6 +874,18 @@ class TetrisGame {
                 life: Math.random(),
                 originalY: mesh.position.y
             });
+        }
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            if (this.dropIntervalId) {
+                clearInterval(this.dropIntervalId);
+                this.dropIntervalId = null;
+            }
+        } else {
+            this.startAutoDrop();
         }
     }
 }

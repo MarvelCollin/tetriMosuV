@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // Define multiple color themes
-const THEMES = {
+export const THEMES = {
     neon: {
         colors: [
             0x00ffff, // Cyan
@@ -32,13 +32,13 @@ const THEMES = {
     },
     pastel: {
         colors: [
-            0xffb3ba, // Pastel Red
-            0xbaffc9, // Pastel Green
+            0xffb3ba, // Pastel Pink
+            0xbaffc9, // Pastel Mint
             0xbae1ff, // Pastel Blue
             0xffffba, // Pastel Yellow
-            0xffdfba, // Pastel Orange
+            0xffdfba, // Pastel Peach
             0xe0bbff, // Pastel Purple
-            0xdcd0ff  // Pastel Violet
+            0xffd1dc  // Pastel Rose
         ],
         background: 0x2a2a2a,
         grid: 0x444444,
@@ -60,26 +60,24 @@ const THEMES = {
     },
     cyberpunk: {
         colors: [
-            0xff00ff, // Magenta
-            0x00ffff, // Cyan
-            0xff3366, // Hot Pink
-            0x33ff33, // Bright Green
-            0xffff00, // Yellow
-            0xff9900, // Orange
-            0x9933ff  // Purple
+            0xff2281, // Hot Pink
+            0x00feff, // Neon Cyan
+            0x8b54ff, // Electric Purple
+            0x3ef400, // Toxic Green
+            0xff1741, // Electric Red
+            0xffdf00, // Cyber Yellow
+            0x0ff0fc  // Electric Blue
         ],
-        background: 0x000033,
-        grid: 0x003366,
-        border: 0x0099ff
+        background: 0x000824, // Darker blue background
+        grid: 0x00356b,      // Deeper grid color
+        border: 0x00fff5     // Brighter border
     }
 };
 
-// Get random theme
-export const currentTheme = THEMES[Object.keys(THEMES)[Math.floor(Math.random() * Object.keys(THEMES).length)]];
+let currentTheme = THEMES[Object.keys(THEMES)[Math.floor(Math.random() * Object.keys(THEMES).length)]];
 
 export const COLORS = currentTheme.colors;
 
-// Add bevel to blocks
 export const BLOCK_GEOMETRY = new THREE.BoxGeometry(0.92, 0.92, 1.2);
 
 export const MATERIALS = COLORS.map(color => 
@@ -109,3 +107,55 @@ export const SHADOW_MATERIALS = COLORS.map(color =>
         wireframe: true
     })
 );
+
+export const setCurrentTheme = (themeName: keyof typeof THEMES) => {
+    currentTheme = THEMES[themeName];
+    
+    const transitionDuration = 500; 
+
+    COLORS.length = 0;
+    COLORS.push(...currentTheme.colors);
+    
+    MATERIALS.forEach((material, i) => {
+        const startColor = material.color.getHex();
+        const endColor = currentTheme.colors[i];        const startEmissive = material.emissive.getHex();        const endEmissive = new THREE.Color(endColor).multiplyScalar(0.3).getHex();        const startTime = performance.now();        
+        const animate = () => {
+            const elapsed = performance.now() - startTime;
+            const progress = Math.min(elapsed / transitionDuration, 1);
+
+            material.color.setHex(startColor).lerp(new THREE.Color(endColor), progress);
+            material.emissive.setHex(startEmissive).lerp(new THREE.Color(endEmissive), progress);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    });
+
+    SHADOW_MATERIALS.forEach((material, i) => {
+        const startColor = material.color.getHex();
+        const endColor = currentTheme.colors[i];
+        const startEmissive = material.emissive.getHex();
+        const endEmissive = new THREE.Color(endColor).multiplyScalar(0.15).getHex();
+
+        const startTime = performance.now();
+        
+        const animate = () => {
+            const elapsed = performance.now() - startTime;
+            const progress = Math.min(elapsed / transitionDuration, 1);
+
+            material.color.setHex(startColor).lerp(new THREE.Color(endColor), progress);
+            material.emissive.setHex(startEmissive).lerp(new THREE.Color(endEmissive), progress);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    });
+};
+
+export { currentTheme };

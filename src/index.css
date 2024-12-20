@@ -103,6 +103,16 @@
   }
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.animate-dash {
+  animation: dash 1s linear infinite;
+}
+
 .animate-float {
   animation: float 2s ease-in-out infinite;
 }
@@ -313,7 +323,6 @@ html {
 }
 
 #marquee-text-hollow {
-  /* font-family: "SportsWorld"; */
   -webkit-text-fill-color: transparent;
   -webkit-text-stroke: 4px #a0d8f4;
 }

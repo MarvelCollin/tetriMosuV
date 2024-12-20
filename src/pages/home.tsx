@@ -4,7 +4,7 @@ import TetrisBackground from "../components/background-animations/tetris-backgro
 import "../index.css";
 import HeroComponent from "../components/main-page/HeroComponent";
 import { useInView } from '../hooks/useInView';
-import ThemeSwitcher from '../components/ThemeSwitcher';
+import ThemeSwitcher from '../components/main-page/ThemeSwitcher';
 
 const ScrollIndicator = ({ text = "Scroll Down", onClick }) => (
   <div className="absolute bottom-8 right-8 flex flex-col items-center text-white/70 animate-bounce" onClick={onClick}>
@@ -137,83 +137,112 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section
-              ref={section2Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
-                         ${section2InView ? 'slide-from-right' : ''}`}
-            >
-              <div className="w-full max-w-7xl px-8">
-                <h1 className="text-6xl font-bold text-white mb-16 text-center text-shadow-glow animate-slideDown relative group">
-                  <span className="inline-block animate-float-title transition-all duration-300">RECRUITMENT</span>
-                  <span className="inline-block animate-float-title-delayed mx-2">PHASES</span>
-                  <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
-                </h1>
-                <div className="relative flex flex-col gap-6 items-center">
-                  {[
-                    {
-                      phase: "1",
-                      title: "Initial Test",
-                      desc: "Aptitude test to assess your basic knowledge"
-                    },
-                    {
-                      phase: "2",
-                      title: "Pre Training",
-                      desc: "Prepare yourself for the role"
-                    },
-                    {
-                      phase: "3",
-                      title: "Interview",
-                      desc: "One-on-one discussion with our team"
-                    },
-                    {
-                      phase: "4",
-                      title: "Core Training",
-                      desc: "Final phase to become an assistant"
-                    }
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className={`w-full max-w-4xl bg-black/30 backdrop-blur-sm 
-                             border border-cyan-500/20 rounded-xl overflow-hidden
-                             group hover:border-cyan-500/40 transition-all duration-500
-                             transform hover:scale-[1.02] ${index % 2 === 0 ? 'ml-0' : 'mr-0'}`}
-                    >
-                      <div className={`relative flex ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                        {/* Phase Number */}
-                        <div className="w-32 h-32 relative flex items-center justify-center">
-                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 blur-xl group-hover:from-cyan-500/30 group-hover:to-blue-500/30" />
-                          <span className="text-6xl font-bold relative z-10" id="hero-text-static">
-                            {item.phase}
-                          </span>
-                        </div>
+            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+                         ${section2InView ? 'slide-from-right' : ''}`}>
+  <div className="w-full max-w-7xl px-8">
+    <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
+      <span className="inline-block animate-float-title transition-all duration-300">RECRUITMENT</span>
+      <span className="inline-block animate-float-title-delayed mx-2">PHASE</span>
+    </h1>
 
-                        {/* Content */}
-                        <div className="flex-1 p-8 relative overflow-hidden">
-                          {/* Background Glow */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative h-[600px] px-4">
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 600">
+        <path
+          d="M100,300 C250,300 300,100 500,100 C700,100 750,500 900,500"
+          fill="none"
+          stroke="url(#roadGradient)"
+          strokeWidth="40"
+          className="drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+        />
+        
+        <path
+          d="M100,300 C250,300 300,100 500,100 C700,100 750,500 900,500"
+          fill="none"
+          stroke="rgba(6,182,212,0.5)"
+          strokeWidth="2"
+          strokeDasharray="10,10"
+          className="animate-dash"
+        />
 
-                          {/* Content */}
-                          <h2 className={`text-4xl mb-3 animate-float-title-${index % 4}`} id="hero-text-static">
-                            {item.title}
-                          </h2>
-                          <p className="text-white/70 text-xl group-hover:text-white transition-colors">
-                            {item.desc}
-                          </p>
+        <defs>
+          <linearGradient id="roadGradient" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="rgba(17,24,39,0.8)" />
+            <stop offset="50%" stopColor="rgba(6,182,212,0.2)" />
+            <stop offset="100%" stopColor="rgba(17,24,39,0.8)" />
+          </linearGradient>
+        </defs>
+      </svg>
 
-                          {/* Decorative Line */}
-                          <div className={`absolute ${index % 2 === 0 ? '-left-1' : '-right-1'} top-0 w-1 h-full
-                                      bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0
-                                      group-hover:via-cyan-500/70 transition-all duration-500`} />
-                        </div>
-                      </div>
+      <div className="absolute inset-0">
+        {[
+          {
+            phase: "01",
+            title: "Initial Test",
+            isCurrent: true,
+            position: "left-[10%] top-[45%]",
+            steps: ["Aptitude Test", "Programming Test"]
+          },
+          {
+            phase: "02",
+            title: "Pre Training",
+            position: "left-[40%] top-[15%]",
+            steps: ["DS Using C", "OOP Using Java", "Database"]
+          },
+          {
+            phase: "03",
+            title: "Interview",
+            position: "left-[60%] top-[15%]",
+            steps: ["Resume", "Presentation"]
+          },
+          {
+            phase: "04",
+            title: "Core Training",
+            position: "left-[85%] top-[80%]",
+            steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"]
+          }
+        ].map((phase, index) => (
+          <div key={index} 
+               className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2
+                          ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'}`}>
+            <div className={`group flex flex-col items-center
+                           ${phase.isCurrent ? 'animate-float' : ''}`}>
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center
+                             backdrop-blur-sm relative
+                             ${phase.isCurrent 
+                               ? 'bg-cyan-500/20 border-2 border-cyan-400 shadow-lg shadow-cyan-500/50' 
+                               : 'bg-gray-900/50 border border-white/20'}`}>
+                <span className="text-3xl" id="hero-text-static">{phase.phase}</span>
+                
+                {phase.isCurrent && (
+                  <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
+                )}
+              </div>
+
+              <div className={`mt-4 text-center backdrop-blur-sm rounded-lg p-3
+                             ${phase.isCurrent 
+                               ? 'bg-cyan-500/10 border border-cyan-500/30' 
+                               : 'bg-black/30'}`}>
+                <h3 className="text-xl mb-2" id="hero-text-static">{phase.title}</h3>
+                <div className="space-y-1">
+                  {phase.steps.map((step, i) => (
+                    <div key={i} 
+                         className={`text-sm ${phase.isCurrent ? 'text-white' : 'text-white/70'}`}>
+                      {step}
                     </div>
                   ))}
-
-                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-500/0 via-cyan-500/30 to-cyan-500/0" />
                 </div>
+                {phase.isCurrent && (
+                  <div className="text-cyan-400 text-xs mt-2 animate-pulse">Current Phase</div>
+                )}
               </div>
-              <ScrollIndicator text="Initial Test" />
-            </section>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+  <ScrollIndicator text="Initial Test" />
+</section>
 
             <section
               ref={section3Ref}

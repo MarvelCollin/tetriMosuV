@@ -121,6 +121,15 @@
   }
 }
 
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -147,6 +156,10 @@
 
 .animate-shine {
   animation: shine 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
 }
 
 .glitch-text {
@@ -278,6 +291,18 @@
   }
 }
 
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -365,29 +390,6 @@ html {
 .snap-y {
   scrollbar-width: none;
   -ms-overflow-style: none;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;  /* For smoother scrolling on iOS */
-}
-
-/* Add new smooth scroll utilities */
-.scroll-smooth {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.scroll-snap {
-  scroll-snap-type: y mandatory;
-  scroll-snap-stop: always;
-}
-
-.snap-point {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-
-/* Add transition for smoother scroll stop */
-.scroll-transition {
-  transition: scroll-behavior 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .snap-y::-webkit-scrollbar {
@@ -463,4 +465,9 @@ html {
 
 .rotate-x-12 {
   transform: rotateX(12deg);
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
 }

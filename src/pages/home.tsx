@@ -72,64 +72,76 @@ function Home() {
       <TetrisBackground selectedTheme={currentTheme} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
-          <div className="w-full h-screen overflow-y-scroll snap-y scroll-smooth scroll-snap scroll-transition">
+          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
             <section
               ref={section1Ref}
-              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section1InView ? 'slide-from-left' : ''}`}
             >
               <div className="relative h-full flex items-center justify-center p-8">
                 <div className="w-full max-w-7xl relative z-10">
-                  <div className="w-full flex flex-row items-center justify-center text-center">
-                    <div className="relative flex flex-1 items-center justify-center">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <img
-                          id="hero-logo"
-                          className="max-w-3xl hover:scale-105 transition-transform duration-500 relative z-10"
-                          src="./assets/images/logo.png"
-                          alt="logo"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shine" />
+                  <div className="w-full flex flex-col items-center justify-center text-center gap-16">
+                    <div className="relative flex flex-col items-center gap-8">
+                      <div className="relative">
+                        <h1 className="text-[120px] font-bold tracking-tight text-shadow-glow text-white">
+                          <span className="inline-block animate-float-title-0">N</span>
+                          <span className="inline-block animate-float-title-1">A</span>
+                          <span className="inline-block animate-float-title-2">R</span>
+                        </h1>
+                        <div className="absolute -top-8 -right-8 bg-gradient-to-br from-cyan-500 to-blue-500 
+                                      text-white text-4xl px-4 py-2 rounded-full animate-float">
+                          25-2
+                        </div>
+                      </div>
+                      
+                      <div className="relative flex flex-col items-center">
+                        <p className="text-6xl mb-4" id="hero-text-static">
+                          New Assistant
+                        </p>
+                        <p className="text-7xl" id="hero-text-static">
+                          Recruitment
+                        </p>
+                        <div className="absolute -right-24 top-1/2 -translate-y-1/2">
+                          <img
+                            src="./assets/images/logo.png"
+                            alt="SLC Logo"
+                            className="w-32 h-32 animate-spin-slow opacity-50"
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="flex-1 flex flex-col items-center justify-center gap-12">
-                      <p className="mt-4 text-7xl" id="hero-text-static">
-                        New Assistant Recruitment
-                        <br />
-                        25-2
-                      </p>
-                      <div className="flex gap-8">
-                        {[
-                          {
-                            to: '/game',
-                            text: 'Play Game',
-                            border: 'border-white/20',
-                            glow: 'bg-white/10'
-                          },
-                          {
-                            to: 'https://bluejack.binus.ac.id/nar/home/registration',
-                            text: 'Register Now',
-                            border: 'border-white/20',
-                            glow: 'bg-white/10'
-                          }
-                        ].map((button, index) => (
-                          <Link
-                            key={index}
-                            to={button.to}
-                            className="bg-black/30 px-12 py-6 rounded-lg backdrop-blur-sm 
-                                     hover:scale-110 transition-all duration-300 
-                                     border-2 group relative overflow-hidden"
-                            style={{ borderColor: `rgb(255 255 255 / 0.2)` }}
-                          >
-                            <span className="text-4xl glitch-text relative z-10">
+
+                    <div className="flex gap-12">
+                      {[
+                        {
+                          to: '/game',
+                          text: 'Play Game',
+                          icon: '🎮'
+                        },
+                        {
+                          to: 'https://bluejack.binus.ac.id/nar/home/registration',
+                          text: 'Register Now',
+                          icon: '📝'
+                        }
+                      ].map((button, index) => (
+                        <Link
+                          key={index}
+                          to={button.to}
+                          className="group relative overflow-hidden rounded-xl backdrop-blur-sm
+                                   hover:scale-105 transition-all duration-500"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
+                                       group-hover:opacity-70 transition-all duration-500"></div>
+                          <div className="relative px-12 py-6 flex items-center gap-4 border-2 border-white/20">
+                            <span className="text-4xl">{button.icon}</span>
+                            <span className="text-4xl glitch-text">
                               {button.text}
                             </span>
-                            <div className="absolute inset-0 group-hover:opacity-100 opacity-0 
-                                         transition-opacity duration-300 pointer-events-none
-                                         bg-white/10 blur-sm" />
-                          </Link>
-                        ))}
-                      </div>
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-white/25 to-cyan-500/0 
+                                       translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -137,7 +149,7 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section ref={section2Ref} className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section2InView ? 'slide-from-right' : ''}`}>
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
@@ -243,7 +255,7 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
               ${section3InView ? 'slide-from-left' : ''}`}
             >
               <div className="w-full max-w-6xl px-8"> {/* Reduced from max-w-7xl */}
@@ -375,7 +387,7 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
               ${section4InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-6xl px-8">
@@ -412,7 +424,6 @@ function Home() {
                     ))}
                   </div>
 
-                  {/* Requirements Section */}
                   <div className="mt-12 relative">
                     <div className="flex flex-col items-center space-y-8">
                       <h2 className="text-3xl mb-4" id="hero-text-static">Requirements</h2>
@@ -473,7 +484,7 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
               ${section6InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-7xl px-8">
@@ -587,7 +598,7 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className={`w-full h-screen snap-point relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
                          ${section5InView ? 'slide-from-left' : ''}`}
               onWheel={(e) => {
                 if (e.deltaY > 0) {

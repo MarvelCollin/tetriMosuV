@@ -462,9 +462,15 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       </div>
 
       <div className="relative">
+          <p className="text-9xl  font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
+            <span className="inline-block animate-float-title transition-all duration-300">2</span>
+            <span className="inline-block animate-float-title-delayed mx-2">5</span>
+            <span className="inline-block animate-float-title-more-delayed">-</span>
+            <span className="inline-block animate-float-title">2</span>
+            <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
+          </p>
         <div className="relative bg-gray-900/80 border-2 border-cyan-400/50 rounded-xl p-8 max-w-3xl w-full mx-auto backdrop-blur-md animate-slideUp">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 opacity-50 animate-pulse" />
-          
           <div className="relative bg-gray-900/90 p-8 rounded-lg overflow-hidden">
             <div className="absolute -top-4 -right-4 animate-bounce-slow">
               <button

@@ -236,13 +236,32 @@ const Game = () => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setShowSettings(prev => !prev);
+        setShowSettings(prev => {
+          if (gameInstanceRef.current) {
+            gameInstanceRef.current.togglePause();
+          }
+          return !prev;
+        });
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  const handleOpenSettings = () => {
+    setShowSettings(true);
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.togglePause();
+    }
+  };
+
+  const handleCloseSettings = () => {
+    setShowSettings(false);
+    if (gameInstanceRef.current) {
+      gameInstanceRef.current.togglePause();
+    }
+  };
 
   const handleRestart = () => {
     setShowSettings(false);
@@ -256,7 +275,7 @@ const Game = () => {
   return (
     <>
       <button
-        onClick={() => setShowSettings(true)}
+        onClick={handleOpenSettings}
         className="fixed top-4 left-4 z-50 p-3 rounded-full bg-white border border-cyan-500/30 hover:bg-white transition-all duration-300 group backdrop-blur-sm"
       >
         <svg 
@@ -282,7 +301,7 @@ const Game = () => {
 
       {showSettings && (
         <SettingsModal
-          onClose={() => setShowSettings(false)}
+          onClose={handleCloseSettings}
           onRestart={handleRestart}
         />
       )}

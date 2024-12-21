@@ -471,3 +471,36 @@ html {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
 }
+
+.text-container {
+  position: relative;
+  isolation: isolate;
+}
+
+.text-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
+  backdrop-filter: blur(8px);
+  z-index: -1;
+  border-radius: inherit;
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7),
+               0 0 20px rgba(99, 255, 255, 0.4),
+               0 0 30px rgba(99, 255, 255, 0.3);
+}
+
+.card-blur {
+  @apply bg-black/50 backdrop-blur-lg border border-white/10 transition-all duration-300;
+}
+
+.card-hover {
+  @apply hover:border-white/30 hover:bg-black/60;
+}
+
+.glow-hover {
+  @apply hover:shadow-[0_0_15px_rgba(255,255,255,0.1)];
+}

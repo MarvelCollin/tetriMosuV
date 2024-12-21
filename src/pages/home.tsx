@@ -63,7 +63,7 @@ function Home() {
 
   return (
     <div
-      className=" w-full h-screen flex flex-col items-center justify-center font-game"
+      className=" w-full h-screen flex flex-col items-center bg-black justify-center font-game"
       onClick={!showWelcome ? handleClick : undefined}
     >
       {showThemeSwitcher && (
@@ -72,16 +72,19 @@ function Home() {
       <TetrisBackground selectedTheme={currentTheme} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
-          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory">
+          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative">
+            <div className="fixed inset-0 z-0 pointer-events-none"></div>
+            
             <section
               ref={section1Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+                         backdrop-blur-lg bg-black/30
                          ${section1InView ? 'slide-from-left' : ''}`}
             >
               <div className="relative h-full flex items-center justify-center p-8">
-                <div className="w-full max-w-7xl relative z-10">
+                <div className="w-full max-w-7xl relative">
                   <div className="w-full flex flex-col items-center justify-center text-center gap-16">
-                    <div className="relative flex flex-col items-center gap-8">
+                    <div className="relative flex flex-col items-center gap-8 p-8 rounded-2xl backdrop-blur-lg ">
                       <div className="relative">
                         <h1 className="text-[120px] font-bold tracking-tight text-shadow-glow text-white">
                           <span className="inline-block animate-float-title-0">N</span>
@@ -127,8 +130,8 @@ function Home() {
                         <Link
                           key={index}
                           to={button.to}
-                          className="group relative overflow-hidden rounded-xl backdrop-blur-sm
-                                   hover:scale-105 transition-all duration-500"
+                          className="group relative overflow-hidden rounded-xl backdrop-blur-lg bg-black/50 
+                                   hover:scale-105 transition-all duration-500 border border-white/10"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
                                        group-hover:opacity-70 transition-all duration-500"></div>
@@ -149,7 +152,8 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+                         backdrop-blur-lg bg-black/30
                          ${section2InView ? 'slide-from-right' : ''}`}>
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
@@ -216,13 +220,9 @@ function Home() {
                       <div key={index}
                         className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2
                           ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'}`}>
-                        <div className={`group flex flex-col items-center
-                           ${phase.isCurrent ? 'animate-float' : ''}`}>
+                        <div className={`group flex flex-col items-center animate-float`}>
                           <div className={`w-20 h-20 rounded-full flex items-center justify-center
-                             backdrop-blur-sm relative
-                             ${phase.isCurrent
-                              ? 'bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50'
-                              : 'bg-gray-900/50 border border-white/20'}`}>
+                             backdrop-blur-sm relative bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50'`}>
                             <span className="text-3xl" id="hero-text-static">{phase.phase}</span>
 
                             {phase.isCurrent && (
@@ -230,15 +230,12 @@ function Home() {
                             )}
                           </div>
 
-                          <div className={`mt-4 text-center backdrop-blur-sm rounded-lg p-3
-                             ${phase.isCurrent
-                              ? 'bg-cyan-500/10 border border-white'
-                              : 'bg-black/30'}`}>
+                          <div className={`mt-4 text-center backdrop-blur-lg rounded-lg p-3 bg-black/50 border-2 border-white/50`}>
                             <h3 className="text-xl mb-2" id="hero-text-static">{phase.title}</h3>
                             <div className="space-y-1">
                               {phase.steps.map((step, i) => (
                                 <div key={i}
-                                  className={`text-sm ${phase.isCurrent ? 'text-white' : 'text-white/70'}`}>
+                                  className={`text-sm text-white`}>
                                   {step}
                                 </div>
                               ))}
@@ -255,10 +252,11 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+              backdrop-blur-lg bg-black/30
               ${section3InView ? 'slide-from-left' : ''}`}
             >
-              <div className="w-full max-w-6xl px-8"> {/* Reduced from max-w-7xl */}
+              <div className="w-full max-w-6xl px-8"> 
                 <h1 className="text-5xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown">
                   <span className="inline-block animate-float-title">INITIAL</span>
                   <span className="inline-block animate-float-title-delayed mx-2">TEST</span>
@@ -271,8 +269,8 @@ function Home() {
                     <div className="flex justify-between items-start gap-6">
                       <div className="flex-1 group perspective">
                         <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
-                          <div className="bg-gradient-to-br from-cyan-500/10 to-transparent p-6 rounded-xl border border-cyan-500/20
-                            backdrop-blur-sm hover:border-cyan-500/40 transition-all duration-300">
+                          <div className="p-6 rounded-xl 
+                            backdrop-blur-lg transition-all duration-300">
                             <div className="flex items-center gap-3 mb-4">
                               <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                                 <span className="text-xl">🧠</span>
@@ -287,9 +285,8 @@ function Home() {
                                 { name: "Analytical Thinking", desc: "Analyze and solve logical problems" }
                               ].map((item, idx) => (
                                 <div key={idx}
-                                  className="p-3 bg-black/20 rounded-lg transform hover:translate-x-2 
-                                  transition-all duration-300 border border-cyan-500/10
-                                  hover:border-cyan-500/30">
+                                  className="p-3 bg-black rounded-lg transform hover:translate-x-2 
+                                  transition-all duration-300 border border-white backdrop-blur-md">
                                   <h3 className="text-lg text-white/90 mb-1">{item.name}</h3>
                                   <p className="text-sm text-white/60">{item.desc}</p>
                                 </div>
@@ -301,14 +298,15 @@ function Home() {
 
                       <div className="flex-1 group perspective">
                         <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
-                          <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-6 rounded-xl border border-purple-500/20
-                            backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300">
+                          <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-6 rounded-xl 
+                            backdrop-blur-lg hover:border-purple-500/40 transition-all duration-300">
                             <div className="flex items-center gap-3 mb-4">
                               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                                 <span className="text-xl">💻</span>
                               </div>
                               <h2 className="text-2xl" id="hero-text-static">Programming Test</h2>
                             </div>
+                              <h3 className="text-lg text-white/90 mb-2">You can use : </h3>
 
                             <div className="space-y-3">
                               {[
@@ -317,9 +315,8 @@ function Home() {
                                 { lang: "Python" }
                               ].map((lang, idx) => (
                                 <div key={idx} className="relative group/item">
-                                  <div className="p-3 bg-black/20 rounded-lg transform hover:translate-x-2
-                                    transition-all duration-300 border border-purple-500/10
-                                    hover:border-purple-500/30">
+                                  <div className="p-3 bg-black rounded-lg transform hover:translate-x-2
+                                    transition-all duration-300 border border-white backdrop-blur-md">
                                     <div className="flex items-center gap-2">
                                       <span className="text-xl">{lang.icon}</span>
                                       <div>
@@ -336,26 +333,24 @@ function Home() {
                       </div>
                     </div>
 
-                    {/* Schedule Panel */}
-                    <div className="mt-6 group perspective"> {/* Reduced margin */}
+                    <div className="mt-6 group perspective">
                       <div className="relative transform transition-all duration-500 group-hover:rotate-x-12">
-                        <div className="bg-gradient-to-br from-blue-500/10 to-transparent p-6 rounded-xl border border-blue-500/20
-                          backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300">
-                          <div className="flex items-center gap-3 mb-4">
+                        <div className="p-6 rounded-xl 
+                          backdrop-blur-lg hover:border-blue-500/40 transition-all duration-300">
+                          <div className="flex items-center justify-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
                               <span className="text-xl">📅</span>
                             </div>
                             <h2 className="text-2xl" id="hero-text-static">Test Schedule</h2>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-6"> {/* Reduced gap */}
-                            <div className="space-y-3">
-                              <div className="p-3 bg-black/20 rounded-lg border border-blue-500/10
-                                hover:border-blue-500/30 transition-all duration-300">
-                                <h3 className="text-lg text-white/90 mb-1">27 March 2024</h3>
+                          <div className="grid grid-cols-2  gap-6">
+                            <div className="space-y-3 justify-items-end align-middle">
+                              <div className=" bg-black p-4  rounded-lg border border-white backdrop-blur-md transition-all duration-300">  
+                                <h3 className="text-4xl text-white/90 mb-1">27 March 2024</h3>
                                 <div className="space-y-1">
-                                  <p className="text-sm text-white/60">Batch 1: 08:00 - 11:00</p>
-                                  <p className="text-sm text-white/60">Batch 2: 13:00 - 16:00</p>
+                                  <p className="text-2xl text-white">Batch 1: 08:00 - 11:00</p>
+                                  <p className="text-2xl text-white">Batch 2: 13:00 - 16:00</p>
                                 </div>
                               </div>
                             </div>
@@ -367,11 +362,11 @@ function Home() {
                                 { text: "Arrive On Time", icon: "⏰" }
                               ].map((item, idx) => (
                                 <div key={idx}
-                                  className="flex items-center gap-2 p-3 bg-black/20 rounded-lg
-                                  border border-blue-500/10 hover:border-blue-500/30
+                                  className="flex items-center gap-2 p-3 bg-black rounded-lg
+                                  border border-white backdrop-blur-md
                                   transition-all duration-300">
                                   <span className="text-xl">{item.icon}</span>
-                                  <span className="text-sm text-white/90">{item.text}</span>
+                                  <span className="text-lg text-white/90">{item.text}</span>
                                 </div>
                               ))}
                             </div>
@@ -387,7 +382,8 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+              backdrop-blur-lg bg-black/30
               ${section4InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-6xl px-8">
@@ -406,9 +402,9 @@ function Home() {
                     ].map((item, index) => (
                       <div key={index} className="relative z-10 flex flex-col items-center group">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center 
-                          ${item.status === 'current' ? 'bg-cyan-500/30 border-2 border-cyan-500' :
-                           item.status === 'past' ? 'bg-purple-500/30 border-2 border-purple-500' :
-                           'bg-black/30 border border-white/30'}
+                          ${item.status === 'current' ? 'bg-black border-2 border-cyan-500' :
+                           item.status === 'past' ? 'bg-black border-2 border-purple-500' :
+                           'bg-black border border-white'}
                           backdrop-blur-sm relative`}>
                           <span className="text-2xl">{item.icon}</span>
                           {item.status === 'current' && (
@@ -417,8 +413,8 @@ function Home() {
                         </div>
                         <div className={`mt-4 text-center transform transition-all duration-300
                           ${item.status === 'current' ? 'scale-110' : 'group-hover:scale-110'}`}>
-                          <p className="text-xl font-bold text-white/90">{item.date}</p>
-                          <p className="text-sm text-white/70">{item.event}</p>
+                          <p className="text-2xl font-bold text-white/90">{item.date}</p>
+                          <p className="text-xl text-white/70">{item.event}</p>
                         </div>
                       </div>
                     ))}
@@ -484,7 +480,8 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+              backdrop-blur-lg bg-black/30
               ${section6InView ? 'slide-from-right' : ''}`}
             >
               <div className="w-full max-w-7xl px-8">
@@ -537,36 +534,31 @@ function Home() {
                     ].map((category, index) => (
                       <div
                         key={index}
-                        className="group relative bg-black/30 backdrop-blur-md rounded-xl p-6 overflow-hidden
-                     hover:bg-black/40 transition-all duration-500"
+                        className="group relative rounded-xl p-6 overflow-hidden bg-black/90 backdrop-blur-md transition-all duration-500 border border-white hover:bg-black/95"
                       >
-                        {/* Animated border gradient */}
-                        <div className={`absolute inset-0 bg-gradient-to-br from-${category.color}-500/30 to-transparent
-                           opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                        <div className={`absolute bg-black duration-500`}></div>
 
                         <h2 className="text-3xl mb-6 relative z-10" id="hero-text-static">
                           {category.title}
                         </h2>
 
-                        <div className="space-y-4 relative z-10">
+                        <div className="space-y-4 relative  z-10">
                           {category.skills.map((skill, idx) => (
                             <div
                               key={idx}
                               className={`flex items-center gap-3 p-2 rounded-lg
-                           bg-${category.color}-500/10 hover:bg-${category.color}-500/20
                            transform hover:translate-x-2
                            transition-all duration-300`}
                               style={{ animationDelay: `${idx * 0.1}s` }}
                             >
                               <span className="text-2xl">{skill.icon}</span>
-                              <span className="text-lg text-white/80 group-hover:text-white">
+                              <span className="text-lg text-white group-hover:text-white">
                                 {skill.name}
                               </span>
                             </div>
                           ))}
                         </div>
 
-                        {/* Bottom gradient line */}
                         <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r 
                            from-transparent via-${category.color}-500/50 to-transparent
                            transform scale-x-0 group-hover:scale-x-100
@@ -575,7 +567,6 @@ function Home() {
                     ))}
                   </div>
 
-                  {/* Additional floating elements */}
                   <div className="absolute inset-0 pointer-events-none">
                     {Array.from({ length: 20 }).map((_, i) => (
                       <div
@@ -598,7 +589,8 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden
+              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
+                         backdrop-blur-lg bg-black/30
                          ${section5InView ? 'slide-from-left' : ''}`}
               onWheel={(e) => {
                 if (e.deltaY > 0) {
@@ -633,8 +625,8 @@ function Home() {
                       }
                     ].map((item, index) => (
                       <div key={index}
-                        className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-sm
-                                    border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300">
+                        className="group relative p-6 rounded-xl bg-black/50 backdrop-blur-lg
+                                    border border-white/10 hover:border-white/30 transition-all duration-300">
                         <div className="relative z-10">
                           <span className="text-3xl mb-4 block">{item.icon}</span>
                           <h3 className="text-2xl mb-4" id="hero-text-static">{item.title}</h3>

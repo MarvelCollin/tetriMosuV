@@ -194,90 +194,53 @@ class Renderer {
             this.scoreText.position.set(-8, 0, 0); 
             this.scene.add(this.scoreText);
 
-            const controlsTitleGeometry = new TextGeometry("BASIC CONTROLS", {
-                font: font,
-                size: 0.5,
-                height: 0.1,
-                curveSegments: 1,
-                bevelEnabled: false
-            });
+            const tutorialDiv = document.createElement('div');
+            tutorialDiv.className = 'fixed bottom-4 right-4 z-50';
+            tutorialDiv.innerHTML = `
+                <div class="w-72 p-4 bg-black/80 backdrop-blur-md 
+                            border border-cyan-500/30 rounded-lg text-white space-y-3">
+                    <h3 class="text-lg font-bold text-cyan-400 mb-2">Quick Tutorial</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">W / ↑</span>
+                            <span class="text-gray-300">Rotate Piece</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">A / ←</span>
+                            <span class="text-gray-300">Move Left</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">S / ↓</span>
+                            <span class="text-gray-300">Move Down</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">D / →</span>
+                            <span class="text-gray-300">Move Right</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">R</span>
+                            <span class="text-gray-300">Swap Piece</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">SPACE</span>
+                            <span class="text-gray-300">Hard Drop</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300">LEFT MOUSE</span>
+                            <span class="text-gray-300">Click Circle</span>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-            const controlsTitleMesh = new THREE.Mesh(controlsTitleGeometry, material.clone());
-            controlsTitleMesh.position.set(-12, -3, 0);
-            this.scene.add(controlsTitleMesh);
-
-            const controls = [
-                { key: "W / Top", action: "ROTATE PIECE" },
-                { key: "A / Left", action: "MOVE LEFT" },
-                { key: "S / Down", action: "MOVE DOWN" },
-                { key: "D / Right", action: "MOVE RIGHT" },
-                { key: "R", action: "SWAP PIECE" },
-                { key: "SPACE", action: "HARD DROP" },
-                { key: "MOUSE", action: "CLICK TARGETS" }
-            ];
-
-            controls.forEach((control, index) => {
-                const yOffset = -1.9 * (index + 1) - 3; 
-                
-                const keyGeometry = new TextGeometry(control.key, {
-                    font: font,
-                    size: 0.45,
-                    height: 0.08,
-                    curveSegments: 1,
-                    bevelEnabled: false
-                });
-
-                const keyMaterial = material.clone();
-                keyMaterial.color.setHex(0x00ffff);
-                const keyMesh = new THREE.Mesh(keyGeometry, keyMaterial);
-                keyMesh.position.set(-14, yOffset, 0); 
-
-                const arrowGeometry = new TextGeometry("|", {
-                    font: font,
-                    size: 0.4,
-                    height: 0.08,
-                    curveSegments: 1,
-                    bevelEnabled: false
-                });
-
-                const arrowMaterial = material.clone();
-                arrowMaterial.color.setHex(0x4444ff);
-                const arrowMesh = new THREE.Mesh(arrowGeometry, arrowMaterial);
-                arrowMesh.position.set(-10, yOffset, 0);
-
-                const actionGeometry = new TextGeometry(control.action, {
-                    font: font,
-                    size: 0.35,
-                    height: 0.08,
-                    curveSegments: 1,
-                    bevelEnabled: false
-                });
-
-                const actionMaterial = material.clone();
-                actionMaterial.opacity = 0.7;
-                const actionMesh = new THREE.Mesh(actionGeometry, actionMaterial);
-                actionMesh.position.set(-9, yOffset, 0);
-                this.scene.add(keyMesh, arrowMesh, actionMesh);
-            });
-
-            const noteGeometry = new TextGeometry("HIT CIRCLE TARGETS TO CLEAR LINES!", {
-                font: font,
-                size: 0.3,
-                height: 0.05,
-                curveSegments: 1,
-                bevelEnabled: false
-            });
-
-            const noteMaterial = material.clone();
-            noteMaterial.color.setHex(0xff3366);
-            noteMaterial.emissive.setHex(0xff3366);
-            const noteMesh = new THREE.Mesh(noteGeometry, noteMaterial);
-            noteMesh.position.set(-12, -18, 0); 
-            this.scene.add(noteMesh);
-
-            if (this.keybindText) {
-                this.scene.remove(this.keybindText);
-                this.keybindText = null;
+            const existingTutorial = document.querySelector('.fixed.bottom-4.right-4');
+            if (existingTutorial) {
+                existingTutorial.remove();
             }
+
+            document.body.appendChild(tutorialDiv);
         });
-    }}export default Renderer;
+    }
+}
+
+export default Renderer;

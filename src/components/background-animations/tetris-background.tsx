@@ -307,33 +307,26 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
         context.restore();
     };
 
-    // Initialize particle system
     particleSystemRef.current = new ParticleSystem(50);
 
-    // Apply theme background to container
     document.body.style.background = themeConfig.background;
 
-    // Add glow effect to shapes
     context.shadowBlur = 15;
     context.shadowColor = themeConfig.colors[0];
 
     const animate = () => {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw grid overlay
         gridRef.current.draw(context, canvas.width, canvas.height, themeConfig.gridColor);
 
-        // Draw enhanced particles with glow
         context.shadowBlur = 10;
         context.shadowColor = themeConfig.particleColor;
         particleSystemRef.current?.update(context, themeConfig.particleColor);
         context.shadowBlur = 0;
 
-        // Draw shapes with enhanced glow
         shapes.forEach(shapeObj => {
             context.shadowBlur = 20;
             context.shadowColor = shapeObj.color;
-            // Add pulse effect
             const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
             context.shadowBlur *= pulse;
             

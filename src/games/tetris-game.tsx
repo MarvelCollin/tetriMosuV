@@ -303,23 +303,42 @@ class TetrisGame {
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
         const currentShape = TETROMINOES[this.currentTetromino];
-        
         const rotated = currentShape[0].map((_, i) => 
             currentShape.map(row => row[row.length - 1 - i])
         );
         
         const originalShape = TETROMINOES[this.currentTetromino];
-        
         TETROMINOES[this.currentTetromino] = rotated;
         
+        // Try normal rotation
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
-        } else {
-            TETROMINOES[this.currentTetromino] = originalShape;
-            this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+            return;
         }
         
-        this.renderer.renderScene();
+        // Try wall kicks - first try moving left/right
+        const kicks = [
+            { x: 1, y: 0 },   // Try right
+            { x: -1, y: 0 },  // Try left
+            { x: 2, y: 0 },   // Try 2 spaces right
+            { x: -2, y: 0 },  // Try 2 spaces left
+        ];
+        
+        for (const kick of kicks) {
+            if (!this.gridManager.checkCollision(
+                this.currentTetromino, 
+                this.currentX + kick.x, 
+                this.currentY
+            )) {
+                this.currentX += kick.x;
+                this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
+                return;
+            }
+        }
+        
+        // If all wall kicks fail, revert the rotation
+        TETROMINOES[this.currentTetromino] = originalShape;
+        this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
     }
 
     replaceTetromino() {

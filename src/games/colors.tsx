@@ -44,37 +44,49 @@ export const THEMES = {
         grid: 0x444444,
         border: 0x666666
     },
-    monochrome: {
+    synthwave: {
         colors: [
-            0xffffff, // White
-            0xe6e6e6,
-            0xcccccc,
-            0xb3b3b3,
-            0x999999,
-            0x808080,
-            0x666666
+            0xff00ff, // Hot Pink
+            0x00ffff, // Cyan
+            0xff1493, // Deep Pink
+            0x4169e1, // Royal Blue
+            0xff4500, // Orange Red
+            0x7fff00, // Chartreuse
+            0xffd700  // Gold
         ],
-        background: 0x111111,
-        grid: 0x333333,
-        border: 0x555555
-    },
-    cyberpunk: {
-        colors: [
-            0xff2281, // Hot Pink
-            0x00feff, // Neon Cyan
-            0x8b54ff, // Electric Purple
-            0x3ef400, // Toxic Green
-            0xff1741, // Electric Red
-            0xffdf00, // Cyber Yellow
-            0x0ff0fc  // Electric Blue
-        ],
-        background: 0x000824, // Darker blue background
-        grid: 0x00356b,      // Deeper grid color
-        border: 0x00fff5     // Brighter border
+        background: 0x150025, // Deep Purple background
+        grid: 0xff00ff,      // Pink grid
+        border: 0x00ffff     // Cyan border
     }
 };
 
-let currentTheme = THEMES[Object.keys(THEMES)[Math.floor(Math.random() * Object.keys(THEMES).length)]];
+// Change default theme to synthwave
+const DEFAULT_THEME = 'synthwave';
+
+// Modify theme selection logic to be more robust
+let currentTheme = (() => {
+    try {
+        const savedTheme = localStorage.getItem('selectedTheme');
+        // Always set a default theme first
+        let theme = THEMES[DEFAULT_THEME];
+        
+        // Try to use saved theme if it exists
+        if (savedTheme && THEMES[savedTheme]) {
+            theme = THEMES[savedTheme];
+        }
+        
+        // Ensure theme has all required properties
+        if (!theme.colors || theme.colors.length !== 7) {
+            console.warn('Invalid theme structure, falling back to default');
+            theme = THEMES[DEFAULT_THEME];
+        }
+
+        return theme;
+    } catch (error) {
+        console.error('Error initializing theme:', error);
+        return THEMES[DEFAULT_THEME];
+    }
+})();
 
 export const COLORS = currentTheme.colors;
 
@@ -108,54 +120,44 @@ export const SHADOW_MATERIALS = COLORS.map(color =>
     })
 );
 
+// Update setCurrentTheme to be more robust
 export const setCurrentTheme = (themeName: keyof typeof THEMES) => {
-    currentTheme = THEMES[themeName];
-    
-    const transitionDuration = 500; 
+    try {
+        // Ensure theme exists and is valid
+        if (!THEMES[themeName] || !THEMES[themeName].colors || THEMES[themeName].colors.length !== 7) {
+            console.warn(`Invalid theme ${themeName}, using default theme`);
+            themeName = DEFAULT_THEME as keyof typeof THEMES;
+        }
 
-    COLORS.length = 0;
-    COLORS.push(...currentTheme.colors);
-    
-    MATERIALS.forEach((material, i) => {
-        const startColor = material.color.getHex();
-        const endColor = currentTheme.colors[i];        const startEmissive = material.emissive.getHex();        const endEmissive = new THREE.Color(endColor).multiplyScalar(0.3).getHex();        const startTime = performance.now();        
-        const animate = () => {
-            const elapsed = performance.now() - startTime;
-            const progress = Math.min(elapsed / transitionDuration, 1);
+        currentTheme = THEMES[themeName];
+        localStorage.setItem('selectedTheme', themeName);
 
-            material.color.setHex(startColor).lerp(new THREE.Color(endColor), progress);
-            material.emissive.setHex(startEmissive).lerp(new THREE.Color(endEmissive), progress);
+        // Create a new copy of colors array
+        const newColors = [...currentTheme.colors];
+        COLORS.length = 0;
+        COLORS.push(...newColors);
 
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
-        };
+        // Update materials synchronously
+        MATERIALS.forEach((material, i) => {
+            const color = newColors[i];
+            material.color.setHex(color);
+            material.emissive.copy(new THREE.Color(color).multiplyScalar(0.3));
+        });
 
-        requestAnimationFrame(animate);
-    });
+        // Update shadow materials synchronously
+        SHADOW_MATERIALS.forEach((material, i) => {
+            const color = newColors[i];
+            material.color.setHex(color);
+            material.emissive.copy(new THREE.Color(color).multiplyScalar(0.15));
+        });
 
-    SHADOW_MATERIALS.forEach((material, i) => {
-        const startColor = material.color.getHex();
-        const endColor = currentTheme.colors[i];
-        const startEmissive = material.emissive.getHex();
-        const endEmissive = new THREE.Color(endColor).multiplyScalar(0.15).getHex();
-
-        const startTime = performance.now();
-        
-        const animate = () => {
-            const elapsed = performance.now() - startTime;
-            const progress = Math.min(elapsed / transitionDuration, 1);
-
-            material.color.setHex(startColor).lerp(new THREE.Color(endColor), progress);
-            material.emissive.setHex(startEmissive).lerp(new THREE.Color(endEmissive), progress);
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
-        };
-
-        requestAnimationFrame(animate);
-    });
+    } catch (error) {
+        console.error('Error setting theme:', error);
+        // Revert to default theme
+        currentTheme = THEMES[DEFAULT_THEME];
+        COLORS.length = 0;
+        COLORS.push(...THEMES[DEFAULT_THEME].colors);
+    }
 };
 
 export { currentTheme };

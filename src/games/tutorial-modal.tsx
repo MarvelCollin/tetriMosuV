@@ -144,10 +144,12 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                 <h4 className="text-xl text-white mb-4">Select Theme</h4>
                 <div className="relative flex flex-col gap-4">
                   <select
-                    value={selectedTheme}
+                    value={selectedTheme || DEFAULT_THEME}
                     onChange={(e) => {
-                      setSelectedTheme(e.target.value);
-                      setCurrentTheme(e.target.value as keyof typeof THEMES);
+                      const newTheme = e.target.value as keyof typeof THEMES;
+                      setSelectedTheme(newTheme);
+                      localStorage.setItem('selectedTheme', newTheme);
+                      setCurrentTheme(newTheme);
                     }}
                     className="w-full p-4 rounded-lg bg-gray-900/90 border-2 border-cyan-500/30 text-white 
                              focus:border-cyan-400/50 focus:outline-none transition-all duration-300
@@ -158,7 +160,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                     }}
                   >
                     <option value="" disabled className="bg-gray-900">Choose a theme</option>
-                    {Object.entries(THEMES).map(([themeName, theme]) => (
+                    {Object.entries(THEMES).sort().map(([themeName, theme]) => ( // Sort themes alphabetically
                       <option 
                         key={themeName} 
                         value={themeName} 
@@ -177,18 +179,55 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                 </div>
 
                 {selectedTheme && (
-                  <div className="mt-4 flex flex-wrap gap-2 justify-center p-2 bg-gray-900/50 rounded-lg">
-                    <span className="text-white/70 mr-2">Theme Colors:</span>
-                    {THEMES[selectedTheme as keyof typeof THEMES].colors.map((color, i) => (
-                      <div
-                        key={i}
-                        className="w-6 h-6 rounded-full border border-white/20 transition-transform hover:scale-110"
-                        style={{ 
-                          backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
-                          boxShadow: `0 0 10px #${color.toString(16).padStart(6, '0')}`
-                        }}
-                      />
-                    ))}
+                  <div className="mt-4 space-y-4 p-4 bg-gray-900/50 rounded-lg">
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <span className="text-white/70 w-full text-center mb-2">Theme Colors:</span>
+                      {Object.entries(THEMES[selectedTheme as keyof typeof THEMES].colors)
+                        .sort((a, b) => Number(a[0]) - Number(b[0]))
+                        .map(([_, color], i) => (
+                          <div
+                            key={i}
+                            className="w-8 h-8 rounded-full border-2 border-white/20 transition-transform hover:scale-110 relative group"
+                            style={{ 
+                              backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
+                              boxShadow: `0 0 15px #${color.toString(16).padStart(6, '0')}`
+                            }}
+                          >
+                            <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                 style={{ 
+                                   backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
+                                   filter: 'brightness(1.5)'
+                                 }}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded"
+                             style={{ 
+                               backgroundColor: `#${THEMES[selectedTheme as keyof typeof THEMES].grid.toString(16).padStart(6, '0')}`
+                             }}
+                        />
+                        <span className="text-white/70">Grid</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded"
+                             style={{ 
+                               backgroundColor: `#${THEMES[selectedTheme as keyof typeof THEMES].border.toString(16).padStart(6, '0')}`
+                             }}
+                        />
+                        <span className="text-white/70">Border</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded"
+                             style={{ 
+                               backgroundColor: `#${THEMES[selectedTheme as keyof typeof THEMES].background.toString(16).padStart(6, '0')}`
+                             }}
+                        />
+                        <span className="text-white/70">Background</span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -391,6 +430,14 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       window.removeEventListener('resize', handleResize);
     };
   }, [animateParticles]);
+
+  useEffect(() => {
+    // Set initial theme when component mounts
+    if (!selectedTheme) {
+        const currentThemeName = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
+        setSelectedTheme(currentThemeName);
+    }
+}, []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">

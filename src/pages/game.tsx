@@ -215,6 +215,16 @@ const Game = () => {
   };
 
   useEffect(() => {
+    // Check if we should skip tutorial
+    const shouldSkipTutorial = localStorage.getItem('skipTutorial') === 'true';
+    if (shouldSkipTutorial) {
+        setShowTutorial(false);
+        // Clear the flag after use
+        localStorage.removeItem('skipTutorial');
+    }
+}, []);
+
+  useEffect(() => {
     if (!showTutorial) {
       const cleanup = initializeGame();
       const handleKeyPress = (event: KeyboardEvent) => {
@@ -266,11 +276,13 @@ const Game = () => {
   const handleRestart = () => {
     setShowSettings(false);
     setShowGameOver(false);
-    if (gameInstanceRef.current) {
-      gameInstanceRef.current = null;
-    }
-    initializeGame();
-  };
+    
+    // Add a flag to localStorage to skip tutorial on reload
+    localStorage.setItem('skipTutorial', 'true');
+    
+    // Reload the page
+    window.location.reload();
+};
 
   return (
     <>

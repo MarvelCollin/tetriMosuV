@@ -111,9 +111,14 @@ class GridOverlay {
 interface TetrisBackgroundProps {
   selectedTheme: string;
   isBlurred?: boolean;
+  isInteractive?: boolean; // Add this prop
 }
 
-const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBlurred = false }) => {
+const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ 
+  selectedTheme, 
+  isBlurred = false,
+  isInteractive = false 
+}) => {
   const [themeConfig, setThemeConfig] = useState(() => 
     themes.find(t => t.name === selectedTheme) || themes[0]
   );
@@ -133,9 +138,50 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBl
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
     
-    // Add a slight blur after click
     context.filter = isBlurred ? 'blur(2px)' : 'none';
     
+    // Add mouse interaction
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isInteractive) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+
+      // Enhanced interaction with shapes
+      shapes.forEach(shapeObj => {
+        const dx = mouseX - shapeObj.x;
+        const dy = mouseY - shapeObj.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 150; // Increased interaction radius
+        
+        if (distance < maxDistance) {
+          const force = (1 - distance / maxDistance) * 8; // Stronger force
+          const angle = Math.atan2(dy, dx);
+          
+          // Repel shapes from cursor with easing
+          shapeObj.x -= Math.cos(angle) * force;
+          shapeObj.y -= Math.sin(angle) * force;
+          
+          // Add rotation effect
+          shapeObj.rotation = (shapeObj.rotation || 0) + force * 0.1;
+          
+          // Add scale effect
+          shapeObj.scale = 1 + (1 - distance / maxDistance) * 0.3;
+        } else {
+          // Reset scale when out of range
+          shapeObj.scale = 1;
+        }
+      });
+    };
+
+    if (isInteractive) {
+      canvas.addEventListener('mousemove', handleMouseMove);
+    }
+
     const size = 25;
 
     const resizeCanvas = () => {
@@ -293,12 +339,19 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBl
         });
     }
 
-    const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1) => {
+    const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1, scale = 1) => {
         context.save();
         context.translate(x + (shape[0].length * size) / 2, y + (shape.length * size) / 2);
         context.rotate(rotation);
+        context.scale(scale, scale);
         context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
         context.globalAlpha = opacity;
+        
+        // Add glow effect for interactive shapes
+        if (scale > 1) {
+          context.shadowBlur = 20;
+          context.shadowColor = color;
+        }
         
         context.fillStyle = color;
         shape.forEach((row, rowIndex) => {
@@ -341,7 +394,8 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBl
                 shapeObj.y,
                 shapeObj.color,
                 shapeObj.pattern === 'rotate' ? shapeObj.rotation : 0,
-                shapeObj.opacity * pulse
+                shapeObj.opacity * pulse,
+                shapeObj.scale || 1
             );
         });
 
@@ -355,8 +409,11 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBl
             cancelAnimationFrame(animationFrameRef.current);
         }
         window.removeEventListener('resize', resizeCanvas);
+        if (isInteractive) {
+          canvas.removeEventListener('mousemove', handleMouseMove);
+        }
     };
-  }, [themeConfig, isBlurred]); 
+  }, [themeConfig, isBlurred, isInteractive]); 
 
   return (
     <div className="fixed inset-0 z-0">
@@ -364,12 +421,13 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBl
       <div className="absolute inset-0">
             <canvas
             ref={canvasRef}
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            className="absolute top-0 left-0 w-full h-full"
             style={{ 
                 zIndex: 1, 
                 mixBlendMode: 'lighten',
                 filter: isBlurred ? 'blur(2px)' : 'none',
-                transition: 'filter 0.5s ease'
+                transition: 'filter 0.5s ease',
+                pointerEvents: isInteractive ? 'auto' : 'none'
             }}
         />
       </div>

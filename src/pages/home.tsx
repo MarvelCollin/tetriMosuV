@@ -65,14 +65,18 @@ function Home() {
 
   return (
     <div
-      className=" w-full h-screen flex flex-col items-center bg-black justify-center font-game"
+      className="w-full h-screen flex flex-col items-center bg-black justify-center font-game"
       onClick={!showWelcome ? handleClick : undefined}
     >
       {showThemeSwitcher && (
         <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
       )}
-      <TetrisBackground selectedTheme={currentTheme} isBlurred={isBlurred} />
-      <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
+      <TetrisBackground 
+        selectedTheme={currentTheme} 
+        isBlurred={isBlurred}
+        isInteractive={!showWelcome} // Only interactive before clicking
+      />
+      <div className={`relative pointer-events-none z-10 transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative">
             <div className="fixed inset-0 z-0 pointer-events-none"></div>
@@ -685,7 +689,9 @@ function Home() {
 
           </div>
         ) : (
-          <HeroComponent />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <HeroComponent />
+          </div>
         )}
       </div>
     </div>

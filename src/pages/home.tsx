@@ -33,6 +33,7 @@ function Home() {
     return themes[Math.floor(Math.random() * themes.length)];
   });
   const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
+  const [isBlurred, setIsBlurred] = useState(false);
 
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -43,6 +44,7 @@ function Home() {
 
   const handleClick = () => {
     setIsTransitioning(true);
+    setIsBlurred(true);
     setTimeout(() => {
       setShowWelcome(true);
       setShowThemeSwitcher(true);
@@ -69,7 +71,7 @@ function Home() {
       {showThemeSwitcher && (
         <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
       )}
-      <TetrisBackground selectedTheme={currentTheme} />
+      <TetrisBackground selectedTheme={currentTheme} isBlurred={isBlurred} />
       <div className={`transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative">
@@ -77,21 +79,20 @@ function Home() {
             
             <section
               ref={section1Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-                         backdrop-blur-lg bg-black/30
-                         ${section1InView ? 'slide-from-left' : ''}`}
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+                         bg-black/50"
             >
               <div className="relative h-full flex items-center justify-center p-8">
                 <div className="w-full max-w-7xl relative">
                   <div className="w-full flex flex-col items-center justify-center text-center gap-16">
-                    <div className="relative flex flex-col items-center gap-8 p-8 rounded-2xl backdrop-blur-lg ">
+                    <div className="relative flex flex-col items-center gap-8 p-8 rounded-2xl">
                       <div className="relative">
                         <h1 className="text-[120px] font-bold tracking-tight text-shadow-glow text-white">
                           <span className="inline-block animate-float-title-0">N</span>
                           <span className="inline-block animate-float-title-1">A</span>
                           <span className="inline-block animate-float-title-2">R</span>
                         </h1>
-                        <div className="absolute -top-8 -right-8 bg-gradient-to-br from-cyan-500 to-blue-500 
+                        <div className="absolute -top-8 -right-8
                                       text-white text-4xl px-4 py-2 rounded-full animate-float">
                           25-2
                         </div>
@@ -130,7 +131,7 @@ function Home() {
                         <Link
                           key={index}
                           to={button.to}
-                          className="group relative overflow-hidden rounded-xl backdrop-blur-lg bg-black/50 
+                          className="group relative overflow-hidden rounded-xl bg-black/50 
                                    hover:scale-105 transition-all duration-500 border border-white/10"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
@@ -152,9 +153,10 @@ function Home() {
               <ScrollIndicator text="Scroll for Phases" />
             </section>
 
-            <section ref={section2Ref} className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-                         backdrop-blur-lg bg-black/30
-                         ${section2InView ? 'slide-from-right' : ''}`}>
+            <section ref={section2Ref} 
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+                         bg-black/50"
+            >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
                   <span className="inline-block animate-float-title transition-all duration-300">RECRUITMENT</span>
@@ -222,7 +224,7 @@ function Home() {
                           ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'}`}>
                         <div className={`group flex flex-col items-center animate-float`}>
                           <div className={`w-20 h-20 rounded-full flex items-center justify-center
-                             backdrop-blur-sm relative bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50'`}>
+                             bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50'`}>
                             <span className="text-3xl" id="hero-text-static">{phase.phase}</span>
 
                             {phase.isCurrent && (
@@ -230,7 +232,7 @@ function Home() {
                             )}
                           </div>
 
-                          <div className={`mt-4 text-center backdrop-blur-lg rounded-lg p-3 bg-black/50 border-2 border-white/50`}>
+                          <div className={`mt-4 text-center bg-black/50 border-2 border-white/50 rounded-lg p-3`}>
                             <h3 className="text-xl mb-2" id="hero-text-static">{phase.title}</h3>
                             <div className="space-y-1">
                               {phase.steps.map((step, i) => (
@@ -252,9 +254,8 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-              backdrop-blur-lg bg-black/30
-              ${section3InView ? 'slide-from-left' : ''}`}
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              bg-black/50"
             >
               <div className="w-full max-w-6xl px-8"> 
                 <h1 className="text-5xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown">
@@ -270,7 +271,7 @@ function Home() {
                       <div className="flex-1 group perspective">
                         <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
                           <div className="p-6 rounded-xl 
-                            backdrop-blur-lg transition-all duration-300">
+                            transition-all duration-300">
                             <div className="flex items-center gap-3 mb-4">
                               <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                                 <span className="text-xl">🧠</span>
@@ -286,7 +287,7 @@ function Home() {
                               ].map((item, idx) => (
                                 <div key={idx}
                                   className="p-3 bg-black rounded-lg transform hover:translate-x-2 
-                                  transition-all duration-300 border border-white backdrop-blur-md">
+                                  transition-all duration-300 border border-white">
                                   <h3 className="text-lg text-white/90 mb-1">{item.name}</h3>
                                   <p className="text-sm text-white/60">{item.desc}</p>
                                 </div>
@@ -299,7 +300,7 @@ function Home() {
                       <div className="flex-1 group perspective">
                         <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
                           <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-6 rounded-xl 
-                            backdrop-blur-lg hover:border-purple-500/40 transition-all duration-300">
+                            hover:border-purple-500/40 transition-all duration-300">
                             <div className="flex items-center gap-3 mb-4">
                               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                                 <span className="text-xl">💻</span>
@@ -316,7 +317,7 @@ function Home() {
                               ].map((lang, idx) => (
                                 <div key={idx} className="relative group/item">
                                   <div className="p-3 bg-black rounded-lg transform hover:translate-x-2
-                                    transition-all duration-300 border border-white backdrop-blur-md">
+                                    transition-all duration-300 border border-white">
                                     <div className="flex items-center gap-2">
                                       <span className="text-xl">{lang.icon}</span>
                                       <div>
@@ -336,7 +337,7 @@ function Home() {
                     <div className="mt-6 group perspective">
                       <div className="relative transform transition-all duration-500 group-hover:rotate-x-12">
                         <div className="p-6 rounded-xl 
-                          backdrop-blur-lg hover:border-blue-500/40 transition-all duration-300">
+                          hover:border-blue-500/40 transition-all duration-300">
                           <div className="flex items-center justify-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
                               <span className="text-xl">📅</span>
@@ -346,7 +347,7 @@ function Home() {
 
                           <div className="grid grid-cols-2  gap-6">
                             <div className="space-y-3 justify-items-end align-middle">
-                              <div className=" bg-black p-4  rounded-lg border border-white backdrop-blur-md transition-all duration-300">  
+                              <div className=" bg-black p-4  rounded-lg border border-white transition-all duration-300">  
                                 <h3 className="text-4xl text-white/90 mb-1">27 March 2024</h3>
                                 <div className="space-y-1">
                                   <p className="text-2xl text-white">Batch 1: 08:00 - 11:00</p>
@@ -363,7 +364,7 @@ function Home() {
                               ].map((item, idx) => (
                                 <div key={idx}
                                   className="flex items-center gap-2 p-3 bg-black rounded-lg
-                                  border border-white backdrop-blur-md
+                                  border border-white
                                   transition-all duration-300">
                                   <span className="text-xl">{item.icon}</span>
                                   <span className="text-lg text-white/90">{item.text}</span>
@@ -382,9 +383,8 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-              backdrop-blur-lg bg-black/30
-              ${section4InView ? 'slide-from-right' : ''}`}
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              bg-black/50"
             >
               <div className="w-full max-w-6xl px-8">
                 <h1 className="text-5xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown">
@@ -405,7 +405,7 @@ function Home() {
                           ${item.status === 'current' ? 'bg-black border-2 border-cyan-500' :
                            item.status === 'past' ? 'bg-black border-2 border-purple-500' :
                            'bg-black border border-white'}
-                          backdrop-blur-sm relative`}>
+                          relative`}>
                           <span className="text-2xl">{item.icon}</span>
                           {item.status === 'current' && (
                             <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-ping"></div>
@@ -432,7 +432,7 @@ function Home() {
                         ].map((req, idx) => (
                           <div key={idx} className="flex items-start gap-4 group">
                             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 
-                                          flex items-center justify-center backdrop-blur-sm flex-shrink-0
+                                          flex items-center justify-center flex-shrink-0
                                           group-hover:from-cyan-500/30 group-hover:to-purple-500/30 transition-all duration-300">
                               <span className="text-2xl">{req.icon}</span>
                             </div>
@@ -480,9 +480,8 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-              backdrop-blur-lg bg-black/30
-              ${section6InView ? 'slide-from-right' : ''}`}
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              bg-black/50"
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown relative group">
@@ -589,9 +588,8 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className={`w-full h-screen snap-start relative flex items-center justify-center section-hidden z-10
-                         backdrop-blur-lg bg-black/30
-                         ${section5InView ? 'slide-from-left' : ''}`}
+              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+                         bg-black/50"
               onWheel={(e) => {
                 if (e.deltaY > 0) {
                   scrollToTop();
@@ -625,7 +623,7 @@ function Home() {
                       }
                     ].map((item, index) => (
                       <div key={index}
-                        className="group relative p-6 rounded-xl bg-black/50 backdrop-blur-lg
+                        className="group relative p-6 rounded-xl bg-black/50
                                     border border-white/10 hover:border-white/30 transition-all duration-300">
                         <div className="relative z-10">
                           <span className="text-3xl mb-4 block">{item.icon}</span>

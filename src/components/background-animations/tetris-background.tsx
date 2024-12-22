@@ -82,14 +82,13 @@ class ParticleSystem {
     }
 }
 
-// Add grid overlay class
 class GridOverlay {
     draw(context: CanvasRenderingContext2D, width: number, height: number, gridColor: string) {
         context.strokeStyle = gridColor;
         context.lineWidth = 0.5;
         context.globalAlpha = 0.2;
 
-        const gridSize = 64; // Match the grid size from the original CSS
+        const gridSize = 64; 
 
         for (let x = 0; x < width; x += gridSize) {
             context.beginPath();
@@ -111,9 +110,10 @@ class GridOverlay {
 
 interface TetrisBackgroundProps {
   selectedTheme: string;
+  isBlurred?: boolean;
 }
 
-const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) => {
+const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme, isBlurred = false }) => {
   const [themeConfig, setThemeConfig] = useState(() => 
     themes.find(t => t.name === selectedTheme) || themes[0]
   );
@@ -132,6 +132,10 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
+    
+    // Add a slight blur after click
+    context.filter = isBlurred ? 'blur(2px)' : 'none';
+    
     const size = 25;
 
     const resizeCanvas = () => {
@@ -325,7 +329,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
         context.shadowBlur = 0;
 
         shapes.forEach(shapeObj => {
-            context.shadowBlur = 20;
+            context.shadowBlur = 6;
             context.shadowColor = shapeObj.color;
             const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
             context.shadowBlur *= pulse;
@@ -352,25 +356,24 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({ selectedTheme }) =>
         }
         window.removeEventListener('resize', resizeCanvas);
     };
-  }, [themeConfig]);
+  }, [themeConfig, isBlurred]); 
 
   return (
-    <>        <div             className="fixed top-0 left-0 w-full h-full"            style={{                background: themeConfig.background,                backgroundSize: themeConfig.backgroundSize,                opacity: 0.95,                zIndex: -1,                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'            }}
-        />
-        <div 
-            className="fixed top-0 left-0 w-full h-full pointer-events-none"
-            style={{
-                background: `radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%)`,
-                zIndex: 0,
-                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
-        />
-        <canvas
+    <div className="fixed inset-0 z-0">
+      <div className={`absolute inset-0 ${themeConfig.background}`}></div>
+      <div className="absolute inset-0">
+            <canvas
             ref={canvasRef}
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 1, mixBlendMode: 'lighten' }}
+            style={{ 
+                zIndex: 1, 
+                mixBlendMode: 'lighten',
+                filter: isBlurred ? 'blur(2px)' : 'none',
+                transition: 'filter 0.5s ease'
+            }}
         />
-    </>
+      </div>
+    </div>
   );
 };
 

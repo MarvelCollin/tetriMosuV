@@ -81,28 +81,6 @@
   }
 }
 
-@keyframes slideFromLeft {
-  from {
-    transform: translateX(-100vw);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideFromRight {
-  from {
-    transform: translateX(100vw);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
 @keyframes dash {
   to {
     stroke-dashoffset: -20;
@@ -428,18 +406,6 @@ html {
   will-change: transform;
 }
 
-.slide-from-left {
-  animation: slideFromLeft 0.8s ease-out forwards;
-}
-
-.slide-from-right {
-  animation: slideFromRight 0.8s ease-out forwards;
-}
-
-.section-hidden {
-  opacity: 0;
-}
-
 * {
   font-family: "Joystix Monospace", sans-serif;
 }
@@ -482,7 +448,6 @@ html {
   position: absolute;
   inset: 0;
   background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.3));
-  backdrop-filter: blur(8px);
   z-index: -1;
   border-radius: inherit;
 }
@@ -494,7 +459,7 @@ html {
 }
 
 .card-blur {
-  @apply bg-black/50 backdrop-blur-lg border border-white/10 transition-all duration-300;
+  @apply bg-black/50 border border-white/10 transition-all duration-300;
 }
 
 .card-hover {

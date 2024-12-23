@@ -131,6 +131,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   const animationFrameRef = useRef<number>();
   const shapesRef = useRef<any[]>([]);
 
+  // useEffect for handling theme changes and animation loop
   useEffect(() => {
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
     setThemeConfig(newTheme);
@@ -142,43 +143,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     if (!canvas || !context) return;
 
     context.filter = isBlurred ? 'blur(2px)' : 'none';
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isInteractive) return;
-
-      const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-
-      // Enhanced interaction with shapes
-      shapesRef.current.forEach(shapeObj => {
-        const dx = mouseX - shapeObj.x;
-        const dy = mouseY - shapeObj.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const maxDistance = 150;
-
-        if (distance < maxDistance) {
-          const force = (1 - distance / maxDistance) * 8;
-          const angle = Math.atan2(dy, dx);
-
-          shapeObj.x -= Math.cos(angle) * force;
-          shapeObj.y -= Math.sin(angle) * force;
-
-          shapeObj.rotation = (shapeObj.rotation || 0) + force * 0.1;
-
-          shapeObj.scale = 1 + (1 - distance / maxDistance) * 0.3;
-        } else {
-          shapeObj.scale = 1;
-        }
-      });
-    };
-
-    if (isInteractive) {
-      canvas.addEventListener('mousemove', handleMouseMove);
-    }
 
     const size = 25;
 
@@ -319,65 +283,60 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       }
     };
 
+// ...existing code...
+
     if (!shapesRef.current.length) {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
+      const shapes = [];
+      
+      // Create all shapes as random initially
+      for (let i = 0; i < 20; i++) {
+        const randomShape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
+        const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
+        
+        // Random starting position from any edge
+        const randomQuadrant = Math.floor(Math.random() * 4);
+        let x, y;
 
-      // Create L shapes first
-      const lShape = [[1, 1, 1], [1, 0, 0]];
-      const reverseLShape = [[1, 1, 1], [0, 0, 1]];
-
-      // Add L shapes in the middle
-      shapes.push({
-        shape: lShape,
-        color: themeConfig.colors[0],
-        x: centerX,
-        y: centerY,
-        speed: 2,
-        pattern: 'rotate',
-        opacity: 1,
-        isSpecial: true,
-        rotation: 0,
-        rotationRadius: 50, // Initial rotation radius
-        rotationSpeed: 0.05 // Speed of initial rotation
-      });
-
-      shapes.push({
-        shape: reverseLShape,
-        color: themeConfig.colors[0],
-        x: centerX,
-        y: centerY,
-        speed: 2,
-        pattern: 'rotate',
-        opacity: 1,
-        isSpecial: true,
-        rotation: Math.PI, // Start at opposite side
-        rotationRadius: 50,
-        rotationSpeed: 0.05
-      });
-
-      // Add remaining shapes
-      for (let i = 0; i < 18; i++) {
-        const shape = i < 2 ?
-          (i === 0 ? [[1, 1, 1], [1, 0, 0]] : [[1, 1, 1], [0, 0, 1]]) :
-          tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
-
-        const color = themeConfig.colors[i < 2 ? 0 : Math.floor(Math.random() * themeConfig.colors.length)];
+        switch (randomQuadrant) {
+          case 0: // Top
+            x = Math.random() * canvas.width;
+            y = -Math.random() * canvas.height;
+            break;
+          case 1: // Right
+            x = canvas.width + Math.random() * canvas.height;
+            y = Math.random() * canvas.height;
+            break;
+          case 2: // Bottom
+            x = Math.random() * canvas.width;
+            y = canvas.height + Math.random() * canvas.height;
+            break;
+          case 3: // Left
+            x = -Math.random() * canvas.height;
+            y = Math.random() * canvas.height;
+            break;
+        }
 
         shapes.push({
-          shape,
+          shape: randomShape,
           color,
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height - canvas.height, 
-          speed: Math.random() * 1 + 2,
+          x,
+          y,
+          speed: Math.random() * 2 + 1,
           pattern: 'straight',
           opacity: 1,
-          isSpecial: i < 2, 
-          rotation: Math.random() * Math.PI * 2 
+          isSpecial: false,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.04,
+          scale: 1
         });
       }
+
       shapesRef.current = shapes;
     }
+
+// ...existing code...
 
     // Add transition timer
     let transitionTimer = 0;
@@ -424,7 +383,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       particleSystemRef.current?.update(context, themeConfig.particleColor);
       context.shadowBlur = 0;
 
-      // Calculate center point
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
 
@@ -436,22 +394,45 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
         if (isTransitioning) {
           if (transitionTimer < transitionDuration) {
-            // Initial rotating animation
-            if (shapeObj.isSpecial) {
-              shapeObj.rotation += shapeObj.rotationSpeed;
-              shapeObj.x = centerX + Math.cos(shapeObj.rotation) * shapeObj.rotationRadius;
-              shapeObj.y = centerY + Math.sin(shapeObj.rotation) * shapeObj.rotationRadius;
-            } else {
-              // Other shapes continue falling
-              shapeObj.y += shapeObj.speed;
-              if (shapeObj.y > canvas.height) {
-                shapeObj.y = -shapeObj.shape.length * size;
-                shapeObj.x = Math.random() * canvas.width;
-              }
+            // During first phase, identify two shapes to become L shapes
+            if (transitionTimer === 0) {
+              // Find two shapes near the center to transform
+              const centerShapes = shapesRef.current
+                .filter(shape => !shape.isSpecial)
+                .sort((a, b) => {
+                  const distA = Math.sqrt(Math.pow(centerX - a.x, 2) + Math.pow(centerY - a.y, 2));
+                  const distB = Math.sqrt(Math.pow(centerX - b.x, 2) + Math.pow(centerY - b.y, 2));
+                  return distA - distB;
+                })
+                .slice(0, 2);
+
+              // Transform the shapes
+              centerShapes[0].shape = [[1, 1, 1], [1, 0, 0]]; // L shape
+              centerShapes[1].shape = [[1, 1, 1], [0, 0, 1]]; // Reverse L
+              centerShapes[0].isSpecial = true;
+              centerShapes[1].isSpecial = true;
+              centerShapes[0].color = themeConfig.colors[0];
+              centerShapes[1].color = themeConfig.colors[0];
+              centerShapes[0].rotationRadius = 50;
+              centerShapes[1].rotationRadius = 50;
             }
+
+            // Continue with regular transition animation
+            shapesRef.current.forEach(shapeObj => {
+              if (shapeObj.isSpecial) {
+                shapeObj.rotation += shapeObj.rotationSpeed;
+                shapeObj.x = centerX + Math.cos(shapeObj.rotation) * shapeObj.rotationRadius;
+                shapeObj.y = centerY + Math.sin(shapeObj.rotation) * shapeObj.rotationRadius;
+              } else {
+                shapeObj.y += shapeObj.speed;
+                if (shapeObj.y > canvas.height) {
+                  shapeObj.y = -shapeObj.shape.length * size;
+                  shapeObj.x = Math.random() * canvas.width;
+                }
+              }
+            });
             transitionTimer++;
           } else {
-            // After 3 seconds, transition to final formation
             const dx = centerX - shapeObj.x;
             const dy = centerY - shapeObj.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -508,10 +489,11 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           }
         } else {
           shapeObj.y += shapeObj.speed;
-          shapeObj.rotation = (shapeObj.rotation || 0) + 0.01;
+          shapeObj.rotation += shapeObj.rotationSpeed || 0.01;
 
           if (shapeObj.y > canvas.height) {
-            shapeObj.y = -shapeObj.shape.length * size;
+            // Reset position with random x when shape goes off screen
+            shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200; // Add random delay
             shapeObj.x = Math.random() * canvas.width;
           }
         }
@@ -533,9 +515,61 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     animate();
 
     return () => {
-      if (animationFrameRef.current) { cancelAnimationFrame(animationFrameRef.current); } window.removeEventListener('resize', resizeCanvas); if (isInteractive) { canvas.removeEventListener('mousemove', handleMouseMove); }
+      if (animationFrameRef.current) { 
+        cancelAnimationFrame(animationFrameRef.current); 
+      } 
+      window.removeEventListener('resize', resizeCanvas); 
     };
-  }, [themeConfig, isBlurred, isInteractive, isTransitioning]);
+  }, [themeConfig, isBlurred]); // Removed isInteractive from dependencies
+
+  // New useEffect for handling interactivity
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isInteractive) return;
+
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+
+      // Enhanced interaction with shapes
+      shapesRef.current.forEach(shapeObj => {
+        const dx = mouseX - shapeObj.x;
+        const dy = mouseY - shapeObj.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 150;
+
+        if (distance < maxDistance) {
+          const force = (1 - distance / maxDistance) * 8;
+          const angle = Math.atan2(dy, dx);
+
+          shapeObj.x -= Math.cos(angle) * force;
+          shapeObj.y -= Math.sin(angle) * force;
+
+          shapeObj.rotation = (shapeObj.rotation || 0) + force * 0.1;
+
+          shapeObj.scale = 1 + (1 - distance / maxDistance) * 0.3;
+        } else {
+          shapeObj.scale = 1;
+        }
+      });
+    };
+
+    if (isInteractive) {
+      canvas.addEventListener('mousemove', handleMouseMove);
+    } else {
+      canvas.removeEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      canvas.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isInteractive]);
 
   return (
     <div className="fixed inset-0">

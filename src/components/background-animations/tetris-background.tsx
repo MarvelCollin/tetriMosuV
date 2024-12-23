@@ -420,21 +420,18 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   }, [themeConfig, isBlurred, isInteractive]); 
 
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="fixed inset-0">
       <div className={`absolute inset-0 ${themeConfig.background}`}></div>
-      <div className="absolute inset-0">
-            <canvas
-            ref={canvasRef}
-            className="absolute top-0 left-0 w-full h-full"
-            style={{ 
-                zIndex: 1, 
-                mixBlendMode: 'lighten',
-                filter: isBlurred ? 'blur(2px)' : 'none',
-                transition: 'filter 0.5s ease',
-                pointerEvents: isInteractive ? 'auto' : 'none'
-            }}
-        />
-      </div>
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full"
+        style={{ 
+          mixBlendMode: 'lighten',
+          filter: isBlurred ? 'blur(2px)' : 'none',
+          transition: 'filter 0.5s ease',
+          pointerEvents: isInteractive ? 'auto' : 'none'
+        }}
+      />
     </div>
   );
 };

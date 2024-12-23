@@ -34,6 +34,8 @@ function Home() {
   });
   const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
   const [isBlurred, setIsBlurred] = useState(false);
+  const [pageTransition, setPageTransition] = useState(''); // Add this state
+  const [isBackgroundTransitioning, setIsBackgroundTransitioning] = useState(false);
 
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -43,12 +45,21 @@ function Home() {
   const [section6Ref, section6InView] = useInView();
 
   const handleClick = () => {
-    setIsTransitioning(true);
+    // Start both transitions
+    setPageTransition('animate-zoom-in-fade');
+    setIsBackgroundTransitioning(true);
     setIsBlurred(true);
+    
     setTimeout(() => {
       setShowWelcome(true);
       setShowThemeSwitcher(true);
-      setIsTransitioning(false);
+      setPageTransition('animate-zoom-out-fade');
+      
+      // Reset background transition after content swap
+      setTimeout(() => {
+        setIsBackgroundTransitioning(false);
+        setPageTransition('');
+      }, 1000);
     }, 1000);
   };
 
@@ -74,17 +85,16 @@ function Home() {
       <TetrisBackground 
         selectedTheme={currentTheme} 
         isBlurred={isBlurred}
-        isInteractive={!showWelcome} // Only interactive before clicking
+        isInteractive={!showWelcome} 
+        isTransitioning={isBackgroundTransitioning}
       />
-      <div className={`relative pointer-events-none z-10 transition-all duration-1000 w-full ${isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}>
+      <div className={`relative z-10 w-full ${pageTransition}`}>
         {showWelcome ? (
-          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative">
-            <div className="fixed inset-0 z-0 pointer-events-none"></div>
+          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative pointer-events-auto">
             
             <section
               ref={section1Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
-                         bg-black/50"
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto" 
             >
               <div className="relative h-full flex items-center justify-center p-8">
                 <div className="w-full max-w-7xl relative">
@@ -158,8 +168,7 @@ function Home() {
             </section>
 
             <section ref={section2Ref} 
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
-                         bg-black/50"
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto"
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
@@ -258,7 +267,7 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
               bg-black/50"
             >
               <div className="w-full max-w-6xl px-8"> 
@@ -387,7 +396,7 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
               bg-black/50"
             >
               <div className="w-full max-w-6xl px-8">
@@ -484,7 +493,7 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
               bg-black/50"
             >
               <div className="w-full max-w-7xl px-8">
@@ -592,7 +601,7 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center z-10
+              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
                          bg-black/50"
               onWheel={(e) => {
                 if (e.deltaY > 0) {
@@ -689,7 +698,7 @@ function Home() {
 
           </div>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
             <WelcomeTitle />
           </div>
         )}

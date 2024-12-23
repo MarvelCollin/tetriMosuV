@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import TetrisBackground from "../components/background-animations/tetris-background";
 import "../index.css";
-import HeroComponent from "../components/main-page/HeroComponent";
+import WelcomeTitle from "../components/main-page/welcome-title";
 import { useInView } from '../hooks/useInView';
 import ThemeSwitcher from '../components/main-page/ThemeSwitcher';
 
@@ -690,7 +690,7 @@ function Home() {
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <HeroComponent />
+            <WelcomeTitle />
           </div>
         )}
       </div>

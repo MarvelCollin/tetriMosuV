@@ -123,15 +123,16 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     themes.find(t => t.name === selectedTheme) || themes[0]
   );
 
-  useEffect(() => {
-    const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
-    setThemeConfig(newTheme);
-  }, [selectedTheme]);
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particleSystemRef = useRef<ParticleSystem | null>(null);
   const gridRef = useRef<GridOverlay>(new GridOverlay());
   const animationFrameRef = useRef<number>();
+  const shapesRef = useRef<any[]>([]); // Store shapes in a ref to preserve state
+
+  useEffect(() => {
+    const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
+    setThemeConfig(newTheme);
+  }, [selectedTheme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -152,7 +153,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       mouseY = e.clientY - rect.top;
 
       // Enhanced interaction with shapes
-      shapes.forEach(shapeObj => {
+      shapesRef.current.forEach(shapeObj => {
         const dx = mouseX - shapeObj.x;
         const dy = mouseY - shapeObj.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -220,7 +221,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
     const defaultAnimations = ['straight', 'zigzag', 'bounce'];
     
-    const shapes = [];
+    const shapes = shapesRef.current.length ? shapesRef.current : [];
     const themeAnimations = themeSpecificAnimations[themeConfig.name as keyof typeof themeSpecificAnimations] || defaultAnimations;
 
     if (!themeAnimations || themeAnimations.length === 0) {
@@ -321,22 +322,25 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         }
     };
 
-    for (let i = 0; i < 20; i++) {
-        const shape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
-        const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        // Safely get a random animation pattern
-        const pattern = themeAnimations[Math.floor(Math.random() * themeAnimations.length)];
-        shapes.push({ 
-            shape, 
-            color, 
-            x, 
-            y, 
-            speed: Math.random() * 2 + 1,
-            pattern,
-            opacity: 1
-        });
+    if (!shapesRef.current.length) {
+      for (let i = 0; i < 20; i++) {
+          const shape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
+          const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          // Safely get a random animation pattern
+          const pattern = themeAnimations[Math.floor(Math.random() * themeAnimations.length)];
+          shapes.push({ 
+              shape, 
+              color, 
+              x, 
+              y, 
+              speed: Math.random() * 2 + 1,
+              pattern,
+              opacity: 1
+          });
+      }
+      shapesRef.current = shapes;
     }
 
     const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1, scale = 1) => {
@@ -381,7 +385,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         particleSystemRef.current?.update(context, themeConfig.particleColor);
         context.shadowBlur = 0;
 
-        shapes.forEach(shapeObj => {
+        shapesRef.current.forEach(shapeObj => {
             context.shadowBlur = 6;
             context.shadowColor = shapeObj.color;
             const pulse = Math.sin(Date.now() / 1000) * 0.1 + 0.9;
@@ -393,7 +397,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
                 shapeObj.x,
                 shapeObj.y,
                 shapeObj.color,
-                shapeObj.pattern === 'rotate' ? shapeObj.rotation : 0,
+                shapeObj.rotation, 
                 shapeObj.opacity * pulse,
                 shapeObj.scale || 1
             );

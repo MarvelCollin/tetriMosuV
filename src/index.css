@@ -212,16 +212,12 @@
 
 @keyframes logo-expand {
   0% {
-    transform: rotate(0deg) scale(1);
-    filter: brightness(1);
-  }
-  50% {
-    transform: rotate(180deg) scale(20);
-    filter: brightness(2);
+    transform: scale(1);
+    opacity: 1;
   }
   100% {
-    transform: rotate(360deg) scale(40);
-    filter: brightness(0);
+    transform: scale(100);
+    opacity: 1;
   }
 }
 
@@ -294,8 +290,10 @@
 }
 
 .animate-logo-expand {
-  animation: logo-expand 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: logo-expand 10s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
   z-index: 100;
+  width: auto !important;
+  height: auto !important;
 }
 
 .glitch-text {

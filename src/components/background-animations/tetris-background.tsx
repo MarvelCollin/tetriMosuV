@@ -283,7 +283,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       }
     };
 
-
     if (!shapesRef.current.length) {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
@@ -379,7 +378,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       context.restore();
     };
 
-
     particleSystemRef.current = new ParticleSystem(50);
 
     document.body.style.background = themeConfig.background;
@@ -404,25 +402,19 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         context.shadowBlur *= pulse;
 
         if (isTransitioning) {
-          // Smoother transition with easing
           const transitionSpeed = 0.3;
           const targetY = shapeObj.y - shapeObj.speed;
           
-          // Apply smooth easing to movement
           shapeObj.y += (targetY - shapeObj.y) * transitionSpeed;
           
-          // Add gentle horizontal movement
           shapeObj.x += Math.sin(Date.now() / 1000 + shapeObj.y / 100) * 0.5;
           
-          // Smoother rotation
           shapeObj.rotation = (shapeObj.rotation || 0) + 0.01;
           
-          // Add smooth scale transition
           const targetScale = 0.8;
           shapeObj.scale = shapeObj.scale || 1;
           shapeObj.scale += (targetScale - shapeObj.scale) * 0.05;
 
-          // Reset position with fade out when off screen
           if (shapeObj.y + shapeObj.shape.length * size < 0) {
             shapeObj.opacity = (shapeObj.opacity || 1) * 0.95;
             if (shapeObj.opacity < 0.1) {
@@ -430,14 +422,12 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
               shapeObj.x = Math.random() * canvas.width;
               shapeObj.opacity = 0;
               shapeObj.scale = 1;
-              // Fade back in
               setTimeout(() => {
                 shapeObj.opacity = 1;
               }, Math.random() * 1000);
             }
           }
         } else {
-          // Normal animation
           shapeObj.y += shapeObj.speed;
           shapeObj.rotation += shapeObj.rotationSpeed || 0.01;
           shapeObj.opacity = 1;

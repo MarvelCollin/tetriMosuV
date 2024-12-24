@@ -37,6 +37,7 @@ function Home() {
   const [pageTransition, setPageTransition] = useState(''); // Add this state
   const [isBackgroundTransitioning, setIsBackgroundTransitioning] = useState(false);
   const [isExiting, setIsExiting] = useState(false); // Add this state
+  const [isGameTransitioning, setIsGameTransitioning] = useState(false);
 
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -77,6 +78,22 @@ function Home() {
 
   const handleThemeChange = (newTheme: string) => {
     setCurrentTheme(newTheme);
+  };
+
+  const handleGameClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsGameTransitioning(true);
+    
+    // Add transition class to logo
+    const logo = document.querySelector('.slc-logo') as HTMLElement;
+    if (logo) {
+      logo.classList.add('animate-logo-expand');
+    }
+  
+    // Navigate after animation
+    setTimeout(() => {
+      window.location.href = '/game';
+    }, 1500);
   };
 
   return (
@@ -123,8 +140,9 @@ function Home() {
                             <img
                               src="./assets/images/logo.png"
                               alt="SLC Logo"
-                              className="w-52 h-52 animate-spin-slow opacity-80 hover:opacity-100 transition-opacity duration-300
-                                       drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]"
+                              className={`slc-logo w-52 h-52 animate-spin-slow opacity-80 hover:opacity-100 
+                              transition-all duration-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]
+                              ${isGameTransitioning ? 'animate-logo-expand' : ''}`}
                             />
                           </div>
                         </div>
@@ -145,9 +163,11 @@ function Home() {
                       <div className="flex gap-16 mt-8 opacity-0 animate-fade-in-delay-1200">
                         {[
                           {
-                            to: '/game',
+                            to: '#',
                             text: 'Play Game',
-                            icon: '🎮'
+                            icon: '🎮',
+                            onClick: handleGameClick,
+                            className: isGameTransitioning ? 'opacity-0' : ''
                           },
                           {
                             to: 'https://bluejack.binus.ac.id/nar/home/registration',
@@ -158,8 +178,10 @@ function Home() {
                           <Link
                             key={index}
                             to={button.to}
-                            className="group relative overflow-hidden rounded-xl bg-black/50 
-                                     hover:scale-105 transition-all duration-500 border border-white/10"
+                            onClick={button.onClick}
+                            className={`group relative overflow-hidden rounded-xl bg-black/50 
+                                     hover:scale-105 transition-all duration-500 border border-white/10
+                                     ${button.className || ''}`}
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
                                          group-hover:opacity-70 transition-all duration-500"></div>

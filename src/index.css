@@ -210,6 +210,21 @@
   }
 }
 
+@keyframes logo-expand {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(20);
+    filter: brightness(2);
+  }
+  100% {
+    transform: rotate(360deg) scale(40);
+    filter: brightness(0);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -276,6 +291,11 @@
 
 .animate-fade-out-quick {
   animation: fadeOutQuick 0.3s ease-out forwards;
+}
+
+.animate-logo-expand {
+  animation: logo-expand 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 100;
 }
 
 .glitch-text {

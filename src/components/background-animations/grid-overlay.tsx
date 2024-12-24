@@ -23,3 +23,5 @@ export class GridOverlay {
     context.globalAlpha = 1;
   }
 }
+
+export default GridOverlay;

@@ -221,6 +221,17 @@
   }
 }
 
+@keyframes logo-expand-smooth {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(100);
+    opacity: 1;
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -289,11 +300,9 @@
   animation: fadeOutQuick 0.3s ease-out forwards;
 }
 
-.animate-logo-expand {
-  animation: logo-expand 10s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+.animate-logo-expand-smooth {
+  animation: logo-expand-smooth 4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
   z-index: 100;
-  width: auto !important;
-  height: auto !important;
 }
 
 .glitch-text {

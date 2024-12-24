@@ -404,17 +404,44 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         context.shadowBlur *= pulse;
 
         if (isTransitioning) {
-          shapeObj.y -= shapeObj.speed * 0.5;
-          if (shapeObj.y + shapeObj.shape.length * size < 0) {
-            shapeObj.y = canvas.height;
-            shapeObj.x = Math.random() * canvas.width;
-          }
+          // Smoother transition with easing
+          const transitionSpeed = 0.3;
+          const targetY = shapeObj.y - shapeObj.speed;
           
-          shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
+          // Apply smooth easing to movement
+          shapeObj.y += (targetY - shapeObj.y) * transitionSpeed;
+          
+          // Add gentle horizontal movement
+          shapeObj.x += Math.sin(Date.now() / 1000 + shapeObj.y / 100) * 0.5;
+          
+          // Smoother rotation
+          shapeObj.rotation = (shapeObj.rotation || 0) + 0.01;
+          
+          // Add smooth scale transition
+          const targetScale = 0.8;
           shapeObj.scale = shapeObj.scale || 1;
+          shapeObj.scale += (targetScale - shapeObj.scale) * 0.05;
+
+          // Reset position with fade out when off screen
+          if (shapeObj.y + shapeObj.shape.length * size < 0) {
+            shapeObj.opacity = (shapeObj.opacity || 1) * 0.95;
+            if (shapeObj.opacity < 0.1) {
+              shapeObj.y = canvas.height;
+              shapeObj.x = Math.random() * canvas.width;
+              shapeObj.opacity = 0;
+              shapeObj.scale = 1;
+              // Fade back in
+              setTimeout(() => {
+                shapeObj.opacity = 1;
+              }, Math.random() * 1000);
+            }
+          }
         } else {
+          // Normal animation
           shapeObj.y += shapeObj.speed;
           shapeObj.rotation += shapeObj.rotationSpeed || 0.01;
+          shapeObj.opacity = 1;
+          shapeObj.scale = 1;
 
           if (shapeObj.y > canvas.height) {
             shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200;

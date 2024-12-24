@@ -36,6 +36,7 @@ function Home() {
   const [isBlurred, setIsBlurred] = useState(false);
   const [pageTransition, setPageTransition] = useState(''); // Add this state
   const [isBackgroundTransitioning, setIsBackgroundTransitioning] = useState(false);
+  const [isExiting, setIsExiting] = useState(false); // Add this state
 
   const [section1Ref, section1InView] = useInView();
   const [section2Ref, section2InView] = useInView();
@@ -45,22 +46,26 @@ function Home() {
   const [section6Ref, section6InView] = useInView();
 
   const handleClick = () => {
-    // Start both transitions
-    setPageTransition('animate-zoom-in-fade');
-    setIsBackgroundTransitioning(true);
-    setIsBlurred(true);
+    // Start exit animation for welcome title
+    setIsExiting(true);
     
+    // Wait for exit animation to complete
     setTimeout(() => {
-      setShowWelcome(true);
-      setShowThemeSwitcher(true);
-      setPageTransition('animate-zoom-out-fade');
+      setPageTransition('animate-zoom-in-fade');
+      setIsBackgroundTransitioning(true);
+      setIsBlurred(true);
       
-      // Reset background transition after content swap
       setTimeout(() => {
-        setIsBackgroundTransitioning(false);
-        setPageTransition('');
+        setShowWelcome(true);
+        setShowThemeSwitcher(true);
+        setPageTransition('animate-zoom-out-fade');
+        
+        setTimeout(() => {
+          setIsBackgroundTransitioning(false);
+          setPageTransition('');
+        }, 1000);
       }, 1000);
-    }, 1000);
+    }, 500); // Match this with animation duration
   };
 
   const scrollToTop = () => {
@@ -98,68 +103,77 @@ function Home() {
             >
               <div className="relative h-full flex items-center justify-center p-8">
                 <div className="w-full max-w-7xl relative">
-                  <div className="w-full flex flex-col items-center justify-center text-center gap-16">
-                    <div className="relative flex flex-col items-center gap-8 p-8 rounded-2xl">
+                  <div className="w-full flex flex-col items-center justify-center text-center">
+                    <div className="relative flex flex-col items-center gap-12 animate-fade-scale-in">
+                      {/* Main Title Container */}
                       <div className="relative">
-                        <h1 className="text-[120px] font-bold tracking-tight text-shadow-glow text-white">
-                          <span className="inline-block animate-float-title-0">N</span>
-                          <span className="inline-block animate-float-title-1">A</span>
-                          <span className="inline-block animate-float-title-2">R</span>
-                        </h1>
-                        <div className="absolute -top-8 -right-8
-                                      text-white text-4xl px-4 py-2 rounded-full animate-float">
-                          25-2
-                        </div>
-                      </div>
-                      
-                      <div className="relative flex flex-col items-center">
-                        <p className="text-6xl mb-4" id="hero-text-static">
-                          New Assistant
-                        </p>
-                        <p className="text-7xl" id="hero-text-static">
-                          Recruitment
-                        </p>
-                        <div className="absolute -right-24 top-1/2 -translate-y-1/2">
-                          <img
-                            src="./assets/images/logo.png"
-                            alt="SLC Logo"
-                            className="w-32 h-32 animate-spin-slow opacity-50"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-12">
-                      {[
-                        {
-                          to: '/game',
-                          text: 'Play Game',
-                          icon: '🎮'
-                        },
-                        {
-                          to: 'https://bluejack.binus.ac.id/nar/home/registration',
-                          text: 'Register Now',
-                          icon: '📝'
-                        }
-                      ].map((button, index) => (
-                        <Link
-                          key={index}
-                          to={button.to}
-                          className="group relative overflow-hidden rounded-xl bg-black/50 
-                                   hover:scale-105 transition-all duration-500 border border-white/10"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
-                                       group-hover:opacity-70 transition-all duration-500"></div>
-                          <div className="relative px-12 py-6 flex items-center gap-4 border-2 border-white/20">
-                            <span className="text-4xl">{button.icon}</span>
-                            <span className="text-4xl glitch-text">
-                              {button.text}
-                            </span>
+                        <div className="flex items-center justify-center gap-8">
+                          {/* NAR Title */}
+                          <div className="animate-slide-in-left">
+                            <h1 className="text-[180px] font-bold tracking-tight text-shadow-glow text-white flex items-center gap-4">
+                              <span className="inline-block animate-slide-in-number-1 opacity-0">2</span>
+                              <span className="inline-block animate-slide-in-number-2 opacity-0">5</span>
+                              <span className="inline-block animate-slide-in-number-3 opacity-0">-</span>
+                              <span className="inline-block animate-slide-in-number-4 opacity-0">2</span>
+                            </h1>
                           </div>
-                          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-white/25 to-cyan-500/0 
-                                       translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                        </Link>
-                      ))}
+                          
+                          {/* Logo */}
+                          <div className="animate-fade-in-delay-300">
+                            <img
+                              src="./assets/images/logo.png"
+                              alt="SLC Logo"
+                              className="w-52 h-52 animate-spin-slow opacity-80 hover:opacity-100 transition-opacity duration-300
+                                       drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]"
+                            />
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* Subtitle */}
+                      <div className="relative animate-slide-in-bottom">
+                        <h1 className="text-8xl animate-fade-in-delay-600" id="hero-text-static">
+                          New Assistant
+                        </h1>
+                        <h1 className="text-9xl mt-4 animate-fade-in-delay-900" id="hero-text-static">
+                          Recruitment
+                        </h1>
+                      </div>
+
+                      {/* Buttons Container */}
+                      <div className="flex gap-16 mt-8 opacity-0 animate-fade-in-delay-1200">
+                        {[
+                          {
+                            to: '/game',
+                            text: 'Play Game',
+                            icon: '🎮'
+                          },
+                          {
+                            to: 'https://bluejack.binus.ac.id/nar/home/registration',
+                            text: 'Register Now',
+                            icon: '📝'
+                          }
+                        ].map((button, index) => (
+                          <Link
+                            key={index}
+                            to={button.to}
+                            className="group relative overflow-hidden rounded-xl bg-black/50 
+                                     hover:scale-105 transition-all duration-500 border border-white/10"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-50 
+                                         group-hover:opacity-70 transition-all duration-500"></div>
+                            <div className="relative px-12 py-6 flex items-center gap-4 border-2 border-white/20">
+                              <span className="text-4xl">{button.icon}</span>
+                              <span className="text-4xl glitch-text">
+                                {button.text}
+                              </span>
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-white/25 to-cyan-500/0 
+                                         translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -699,7 +713,7 @@ function Home() {
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-            <WelcomeTitle />
+            <WelcomeTitle isExiting={isExiting} />
           </div>
         )}
       </div>

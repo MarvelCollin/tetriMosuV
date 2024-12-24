@@ -283,19 +283,16 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       }
     };
 
-// ...existing code...
 
     if (!shapesRef.current.length) {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       const shapes = [];
       
-      // Create all shapes as random initially
       for (let i = 0; i < 20; i++) {
         const randomShape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
         const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
         
-        // Random starting position from any edge
         const randomQuadrant = Math.floor(Math.random() * 4);
         let x, y;
 
@@ -336,9 +333,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       shapesRef.current = shapes;
     }
 
-// ...existing code...
-
-    // Add transition timer
     let transitionTimer = 0;
     const transitionDuration = 180; // 3 seconds at 60fps
 
@@ -350,21 +344,41 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
       context.globalAlpha = opacity;
 
-      if (scale > 1) {
-        context.shadowBlur = 20;
-        context.shadowColor = color;
+      context.shadowBlur = 15;
+      context.shadowColor = color;
+      for (let i = 0; i < 2; i++) {
+        context.fillStyle = color;
+        shape.forEach((row, rowIndex) => {
+          row.forEach((cell, cellIndex) => {
+            if (cell) {
+              if (i === 0) {
+                context.shadowBlur = 20;
+                context.globalAlpha = opacity * 0.5;
+              }
+              else {
+                context.shadowBlur = 10;
+                context.globalAlpha = opacity;
+              }
+              context.fillRect(cellIndex * size, rowIndex * size, size, size);
+            }
+          });
+        });
       }
 
-      context.fillStyle = color;
+      context.shadowBlur = 5;
+      context.shadowColor = 'white';
+      context.globalAlpha = opacity * 0.7;
       shape.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
           if (cell) {
-            context.fillRect(cellIndex * size, rowIndex * size, size, size);
+            context.fillRect(cellIndex * size + 2, rowIndex * size + 2, size - 4, size - 4);
           }
         });
       });
+
       context.restore();
     };
+
 
     particleSystemRef.current = new ParticleSystem(50);
 

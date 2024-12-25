@@ -51,28 +51,36 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
               isCurrent: true,
               position: "left-[15%] top-[45%]",
               steps: ["Aptitude Test", "Programming Test"],
-              pathPercent: 15
+              pathPercent: 15,
+              color: "rgb(34, 197, 94)", // green-500
+              hoverStyle: "hover:!border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.5)]"
             },
             {
               phase: "02",
               title: "Pre Training",
               position: "left-[35%] top-[25%]",
               steps: ["DS Using C", "OOP Using Java", "Database"],
-              pathPercent: 35
+              pathPercent: 35,
+              color: "rgb(59, 130, 246)", // blue-500
+              hoverStyle: "hover:!border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"
             },
             {
               phase: "03",
               title: "Interview",
               position: "left-[65%] top-[65%]",
               steps: ["Resume", "Presentation"],
-              pathPercent: 65
+              pathPercent: 65,
+              color: "rgb(234, 179, 8)", // yellow-500
+              hoverStyle: "hover:!border-yellow-500 hover:shadow-[0_0_15px_rgba(234,179,8,0.5)]"
             },
             {
               phase: "04",
               title: "Core Training",
               position: "left-[85%] top-[45%]",
               steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"],
-              pathPercent: 85
+              pathPercent: 85,
+              color: "rgb(239, 68, 68)", // red-500
+              hoverStyle: "hover:!border-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
             }
           ].map((phase, index) => (
             <div key={index}
@@ -83,17 +91,39 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
                 animationDelay: `${(phase.pathPercent / 100) * 4}s` 
               }}
             >
-              <div className={`group flex flex-col items-center animate-float`}>
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center
-                   bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50`}>
+              <div className={`group relative flex flex-col items-center animate-float phase-group-${phase.phase}`}>
+                <div 
+                  className={`particle-container w-20 h-20 rounded-full flex items-center justify-center
+                   bg-cyan-500/20 border-2 border-white transition-all duration-300 phase-card-${phase.phase}`}
+                >
                   <span className="text-3xl" id="hero-text-static">{phase.phase}</span>
 
                   {phase.isCurrent && (
                     <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
                   )}
+                  
+                  <div className="particles-wrapper">
+                    {[...Array(15)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="particle"
+                        style={{
+                          left: `${50}%`,
+                          top: `${50}%`,
+                          '--random-x': `${Math.random() * 100 - 50}px`,
+                          '--random-y': `${Math.random() * 100 - 50}px`,
+                          animationDelay: `${i * 0.1}s`,
+                          color: phase.color
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
 
-                <div className={`mt-4 text-center bg-black/50 border-2 border-white/50 rounded-lg p-3`}>
+                <div 
+                  className={`mt-4 text-center bg-black/50 border-2 border-white rounded-lg p-3
+                  transition-all duration-300 phase-card-${phase.phase}`}
+                >
                   <h3 className="text-xl mb-2" id="hero-text-static">{phase.title}</h3>
                   <div className="space-y-1">
                     {phase.steps.map((step, i) => (

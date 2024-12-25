@@ -275,6 +275,28 @@
   }
 }
 
+@keyframes particle {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty));
+    opacity: 0;
+  }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--random-x), var(--random-y));
+    opacity: 0;
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -766,4 +788,96 @@ html {
 .drop-shadow-glow {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))
          drop-shadow(0 0 20px rgba(99, 255, 255, 0.3));
+}
+
+.group:hover::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  z-index: -1;
+}
+
+.group:hover::before {
+  animation: particle 1s linear infinite;
+  --tx: calc(random() * 100px);
+  --ty: calc(random() * 100px);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: currentColor;
+  color: inherit;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  background-color: currentColor;
+  pointer-events: none;
+}
+
+.group:hover .particle {
+  animation: particle-float 1.5s ease-out forwards;
+}
+
+.particle-container {
+  position: relative;
+  overflow: visible;
+}
+
+.particles-wrapper {
+  position: absolute;
+  inset: -50px;
+  pointer-events: none;
+}
+
+.group:hover .particle {
+  animation: particle-float 1.5s ease-out forwards;
+}
+
+.particles {
+  pointer-events: none;
+  z-index: 10;
+}
+
+.phase-card-01:hover {
+  border-color: rgb(34, 197, 94) !important;
+  box-shadow: 0 0 15px rgb(34, 197, 94) !important;
+}
+
+.phase-card-02:hover {
+  border-color: rgb(59, 130, 246) !important;
+  box-shadow: 0 0 15px rgb(59, 130, 246) !important;
+}
+
+.phase-card-03:hover {
+  border-color: rgb(234, 179, 8) !important;
+  box-shadow: 0 0 15px rgb(234, 179, 8) !important;
+}
+
+.phase-card-04:hover {
+  border-color: rgb(239, 68, 68) !important;
+  box-shadow: 0 0 15px rgb(239, 68, 68) !important;
+}
+
+.phase-group-01:hover .phase-card-01 {
+  border-color: rgb(34, 197, 94) !important;
+  box-shadow: 0 0 15px rgb(34, 197, 94) !important;
+}
+
+.phase-group-02:hover .phase-card-02 {
+  border-color: rgb(59, 130, 246) !important;
+  box-shadow: 0 0 15px rgb(59, 130, 246) !important;
+}
+
+.phase-group-03:hover .phase-card-03 {
+  border-color: rgb(234, 179, 8) !important;
+  box-shadow: 0 0 15px rgb(234, 179, 8) !important;
+}
+
+.phase-group-04:hover .phase-card-04 {
+  border-color: rgb(239, 68, 68) !important;
+  box-shadow: 0 0 15px rgb(239, 68, 68) !important;
 }

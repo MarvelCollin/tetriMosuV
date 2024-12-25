@@ -407,7 +407,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         style={{
           mixBlendMode: 'lighten',
           filter: isBlurred ? 'blur(2px)' : 'none',
-          transition: 'filter 0.5s ease',
+          transition: 'filter 1s ease', 
           pointerEvents: isInteractive ? 'auto' : 'none'
         }}
       />

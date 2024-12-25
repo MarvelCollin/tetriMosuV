@@ -3,9 +3,16 @@ import ParticleSystem from './particle-system-tetris';
 import GridOverlay from './grid-overlay';
 import { themes } from './themes';
 
+interface TetrisBackgroundProps {
+  selectedTheme: string;
+  isBlurred?: boolean;
+  isFalling?: boolean; // Add this prop
+}
+
 const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   selectedTheme,
   isBlurred = false,
+  isFalling = false,
 }) => {
   const [themeConfig, setThemeConfig] = useState(() =>
     themes.find(t => t.name === selectedTheme) || themes[0]
@@ -61,29 +68,60 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
     const animationPatterns = {
       leaf: (shapeObj: any, time: number) => {
-        const swayAmplitude = shapeObj.swayAmplitude || 50; 
-        const swayFrequency = shapeObj.swayFrequency || 0.001; 
-        shapeObj.x += Math.sin(time * swayFrequency) * swayAmplitude * 0.001;
-        
-        shapeObj.y += shapeObj.speed * 1.2;
-        
-        if (shapeObj.y > canvas.height) {
-          shapeObj.y = -shapeObj.shape.length * size;
-          shapeObj.x = Math.random() * canvas.width;
-          shapeObj.swayAmplitude = Math.random() * 30 + 20; 
-          shapeObj.swayFrequency = Math.random() * 0.002 + 0.001; 
+        if (isFalling) {
+          shapeObj.speed = 15;
+          shapeObj.y += shapeObj.speed;
+          shapeObj.rotation += 0.1;
+          
+          const centerX = canvas.width / 2;
+          const dx = centerX - shapeObj.x;
+          shapeObj.x += dx * 0.1;
+
+          if (shapeObj.y > canvas.height) {
+            const originalScale = shapeObj.originalScale || shapeObj.scale;
+            const normalSpeed = 0.5 + (Math.random() * 0.5) / originalScale;
+            
+            Object.assign(shapeObj, {
+              speed: normalSpeed * 0.3,
+              y: -shapeObj.shape.length * size * originalScale,
+              x: Math.random() * canvas.width,
+              rotation: 0,
+              scale: originalScale,
+              swayAmplitude: Math.random() * 30 + 20,
+              swayFrequency: Math.random() * 0.002 + 0.001,
+              isReset: true
+            });
+          }
+        } else {
+          if (shapeObj.isReset && shapeObj.speed > 1) {
+            shapeObj.speed = 0.5 + (Math.random() * 0.5) / shapeObj.scale;
+            shapeObj.isReset = false;
+          }
+          
+          const swayAmplitude = shapeObj.swayAmplitude || 50;
+          const swayFrequency = shapeObj.swayFrequency || 0.001;
+          shapeObj.x += Math.sin(time * swayFrequency) * swayAmplitude * 0.001;
+          shapeObj.y += shapeObj.speed;
+          
+          if (shapeObj.y > canvas.height) {
+            shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
+            shapeObj.x = Math.random() * canvas.width;
+            shapeObj.swayAmplitude = Math.random() * 30 + 20;
+            shapeObj.swayFrequency = Math.random() * 0.002 + 0.001;
+          }
         }
       }
     };
 
+    // When creating shapes, store their original scale
     if (!shapesRef.current.length) {
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
       const shapes = [];
       
       for (let i = 0; i < 20; i++) {
         const randomShape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
         const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
+        
+        const sizeVariation = [0.4, 0.6, 1, 1.5, 2.0][Math.floor(Math.random() * 5)];
         
         const randomQuadrant = Math.floor(Math.random() * 4);
         let x, y;
@@ -91,7 +129,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         switch (randomQuadrant) {
           case 0: // Top
             x = Math.random() * canvas.width;
-            y = -Math.random() * canvas.height;
+            y = -(randomShape.length * size * sizeVariation);
             break;
           case 1: // Right
             x = canvas.width + Math.random() * canvas.height;
@@ -99,7 +137,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
             break;
           case 2: // Bottom
             x = Math.random() * canvas.width;
-            y = canvas.height + Math.random() * canvas.height;
+            y = canvas.height + (randomShape.length * size * sizeVariation); 
             break;
           case 3: // Left
             x = -Math.random() * canvas.height;
@@ -112,13 +150,14 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           color,
           x,
           y,
-          speed: Math.random() + 0.5,
+          speed: 0.5 + (Math.random() * 0.5) / sizeVariation,
           pattern: 'straight',
           opacity: 1,
           isSpecial: false,
-          rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.08, 
-          scale: 1
+          rotation: 0,
+          rotationSpeed: 0,
+          scale: sizeVariation,
+          originalScale: sizeVariation // Store original scale for reset
         });
       }
 
@@ -130,7 +169,8 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
     const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1, scale = 1) => {
       context.save();
-      context.translate(x + (shape[0].length * size) / 2, y + (shape.length * size) / 2);
+      const adjustedSize = size * scale;
+      context.translate(x + (shape[0].length * adjustedSize) / 2, y + (shape.length * adjustedSize) / 2);
       context.rotate(rotation);
       context.scale(scale, scale);
       context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
@@ -197,13 +237,15 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         context.shadowBlur *= pulse;
 
         shapeObj.y += shapeObj.speed;
-        shapeObj.rotation += shapeObj.rotationSpeed || 0.08;
+        // Remove the rotation increment
+        // shapeObj.rotation += shapeObj.rotationSpeed;
         shapeObj.opacity = 1;
         shapeObj.scale = 1;
 
         animationPatterns.leaf(shapeObj, currentTime);
 
-        shapeObj.rotation += shapeObj.rotationSpeed;
+        // Remove this line as well since we don't want any rotation
+        // shapeObj.rotation += shapeObj.rotationSpeed;
 
         if (shapeObj.y > canvas.height) {
           shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200;
@@ -211,8 +253,8 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         }
 
         drawShape(
-          shapeObj.shape,
-          shapeObj.x,
+            shapeObj.shape,
+            shapeObj.x,
           shapeObj.y,
           shapeObj.color,
           shapeObj.rotation,
@@ -232,7 +274,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       } 
       window.removeEventListener('resize', resizeCanvas); 
     };
-  }, [themeConfig, isBlurred]);
+  }, [themeConfig, isBlurred, isFalling]);
 
   return (
     <div className="fixed inset-0">

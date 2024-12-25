@@ -25,6 +25,7 @@ function Home() {
   const [isBackgroundTransitioning, setIsBackgroundTransitioning] = useState(false);
   const [isExiting, setIsExiting] = useState(false); 
   const [isGameTransitioning, setIsGameTransitioning] = useState(false);
+  const [isFalling, setIsFalling] = useState(false);
 
   const [section1Ref, section1InView] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView] = useInView({}, 'Recruitment Phase');
@@ -34,6 +35,7 @@ function Home() {
   const [section6Ref, section6InView] = useInView({}, 'Assistant Benefits');
 
   const handleClick = () => {
+    setIsFalling(true);
     setIsExiting(true);
     
     setTimeout(() => {
@@ -45,6 +47,7 @@ function Home() {
         setShowWelcome(true);
         setShowThemeSwitcher(true);
         setPageTransition('animate-zoom-out-fade');
+        setIsFalling(false);
         
         setTimeout(() => {
           setIsBackgroundTransitioning(false);
@@ -91,6 +94,7 @@ function Home() {
       <TetrisBackground 
         selectedTheme={currentTheme} 
         isBlurred={isBlurred}
+        isFalling={isFalling}
         isInteractive={!showWelcome} 
         isTransitioning={isBackgroundTransitioning}
       />

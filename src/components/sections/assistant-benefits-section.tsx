@@ -111,21 +111,36 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView }) => (
           ))}
         </div>
 
-        <div className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 ${
+        <div className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-1000 ${
           sectionInView ? 'opacity-100' : 'opacity-0'
         }`}>
-          {Array.from({ length: 20 }).map((_, i) => (
+          {Array.from({ length: 30 }).map((_, i) => (
             <div
               key={i}
-              className="absolute w-2 h-2 rounded-full bg-white/30 animate-float"
+              className="shine-particle"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-                transition: 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${2 + Math.random() * 4}s`,
+                transform: `scale(${0.5 + Math.random() * 1})`,
+                opacity: 0.1 + Math.random() * 0.5
               }}
-            ></div>
+            />
+          ))}
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div
+              key={`layer2-${i}`}
+              className="shine-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${1 + Math.random() * 3}s`,
+                transform: `scale(${0.3 + Math.random() * 0.7})`,
+                opacity: 0.05 + Math.random() * 0.3
+              }}
+            />
           ))}
         </div>
       </div>

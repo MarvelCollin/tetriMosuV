@@ -47,7 +47,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         color,
         x: Math.random() * window.innerWidth,
         y: -(randomShape.length * 25 * sizeVariation) - (Math.random() * window.innerHeight * 2), 
-        speed: 0.2 + (Math.random() * 0.3) / sizeVariation,
+        speed: 2 + (Math.random() * 0.3) / sizeVariation,
         pattern: 'straight',
         opacity: 1,
         rotation: 0,
@@ -72,7 +72,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           transitionEndSpeed: 0.2 + (Math.random() * 0.2) / (shape.originalScale || 1),
           transitioning: true,
           transitionStartTime: Date.now(),
-          transitionDuration: 4000,
+          transitionDuration: 2000,
         }));
         setIsTemporaryFalling(false);
       } else {
@@ -87,10 +87,8 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
     setThemeConfig(newTheme);
     
-    // Update background based on the new theme
     document.body.style.background = newTheme.background;
 
-    // Update shapes' colors based on the new theme
     shapesRef.current = shapesRef.current.map(shape => ({
       ...shape,
       color: newTheme.colors[Math.floor(Math.random() * newTheme.colors.length)]
@@ -142,7 +140,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           }
           
           shapeObj.currentSpeed = Math.min(20, shapeObj.currentSpeed * 1.03);
-          shapeObj.y += shapeObj.currentSpeed * 3;
+          shapeObj.y += shapeObj.currentSpeed ;
           
           const centerX = canvas.width / 2;
           const dx = centerX - shapeObj.x;
@@ -161,12 +159,10 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           
           shapeObj.y += shapeObj.currentSpeed;
           
-          if (shapeObj.rotation) {
-            shapeObj.rotation *= Math.pow(0.95, easedProgress * 10);
-          }
+          // shapeObj.rotation *= 0.95;
+
         } else {
           if (shapeObj.y > canvas.height + 100) {
-            // Only respawn if not in transition phase
             if (!isTemporaryFalling) {
               shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
               shapeObj.x = Math.random() * canvas.width;

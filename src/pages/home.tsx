@@ -39,11 +39,9 @@ function Home() {
     setIsFalling(true);
     setIsExiting(true);
     
-    // Wait for shapes to fall down (4 seconds)
     setTimeout(() => {
       setIsFalling(false);
       
-      // Wait for shapes to finish falling animation (2 seconds)
       setTimeout(() => {
         setPageTransition('animate-zoom-in-fade');
         setIsBackgroundTransitioning(true);
@@ -55,8 +53,8 @@ function Home() {
           setPageTransition('animate-zoom-out-fade');
           setIsBackgroundTransitioning(false);
         }, 500);
-      }, 2000);
-    }, 4000);
+      }, 0);
+    }, 5000);
   };
 
   const scrollToTop = () => {

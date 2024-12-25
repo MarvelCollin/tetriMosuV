@@ -72,28 +72,48 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     const animationPatterns = {
       leaf: (shapeObj: any, time: number) => {
         if (isFalling) {
-          // Increase falling speed
-          shapeObj.speed = 25; // Increased from 15
-          shapeObj.y += shapeObj.speed;
+          // Smoother acceleration
+          if (!shapeObj.currentSpeed) {
+            shapeObj.currentSpeed = shapeObj.speed;
+          }
           
+          // Gradually increase speed instead of instant jump
+          shapeObj.currentSpeed = Math.min(25, shapeObj.currentSpeed * 1.05);
+          shapeObj.y += shapeObj.currentSpeed;
+          
+          // Smoother center attraction with easing
           const centerX = canvas.width / 2;
           const dx = centerX - shapeObj.x;
-          shapeObj.x += dx * 0.1; // Increased from 0.05 for faster centering
+          const easing = 0.08;
+          shapeObj.x += dx * easing;
+          
+          // Smooth rotation
+          shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
           
           if (shapeObj.y > canvas.height + 100) {
             shapeObj.shouldRemove = true;
           }
         } else {
+          // Reset and smooth transition back to normal
+          if (shapeObj.currentSpeed > shapeObj.speed) {
+            shapeObj.currentSpeed = Math.max(
+              shapeObj.speed,
+              shapeObj.currentSpeed * 0.95
+            );
+          }
+
           if (shapeObj.y > canvas.height) {
             shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
             shapeObj.x = Math.random() * canvas.width;
             shapeObj.shouldRemove = false;
+            shapeObj.currentSpeed = shapeObj.speed;
+            shapeObj.rotation = 0;
             
             const originalScale = shapeObj.originalScale || shapeObj.scale;
             const normalSpeed = 0.2 + (Math.random() * 0.3) / originalScale;
+            
             Object.assign(shapeObj, {
               speed: normalSpeed,
-              rotation: 0,
               swayAmplitude: Math.random() * 20 + 10,
               swayFrequency: Math.random() * 0.001 + 0.0005,
               isReset: true
@@ -102,8 +122,9 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           
           const swayAmplitude = shapeObj.swayAmplitude || 30;
           const swayFrequency = shapeObj.swayFrequency || 0.0008;
-          shapeObj.x += Math.sin(time * swayFrequency) * swayAmplitude * 0.0005;
-          shapeObj.y += shapeObj.speed;
+          const sway = Math.sin(time * swayFrequency) * swayAmplitude * 0.0003;
+          shapeObj.x += sway;
+          shapeObj.y += shapeObj.currentSpeed || shapeObj.speed;
         }
       }
     };

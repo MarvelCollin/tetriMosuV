@@ -76,18 +76,19 @@ const RegistrationSection = ({ sectionRef }) => {
                                 ].map((req, idx) => (
                                     <div
                                         key={idx}
-                                        className={`requirement-card rounded-lg p-4 flex items-center gap-2 group/item
-                      transition-all duration-1000 transform cursor-pointer
+                                        className={`group flex items-center gap-2 p-4 rounded-lg 
+                      transition-all duration-200 cursor-pointer hover:bg-cyan-500/10
+                      transform 
                       ${isInView ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
                                         style={{ transitionDelay: `${1600 + idx * 200}ms` }}
                                     >
-                                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 
-                                  flex items-center justify-center flex-shrink-0 transition-all duration-300">
-                                            <span className="text-2xl transform transition-transform duration-300 group-hover/item:scale-125">
+                                        <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0
+                                  transition-transform duration-200">
+                                            <span className="text-2xl transform group-hover:scale-110 transition-transform duration-200">
                                                 {req.icon}
                                             </span>
                                         </div>
-                                        <div className="transition-all duration-300">
+                                        <div>
                                             <h3 className="text-xl text-white/90 mb-1">{req.text}</h3>
                                             <p className="text-sm text-white/60">{req.desc}</p>
                                         </div>
@@ -125,7 +126,7 @@ const RegistrationSection = ({ sectionRef }) => {
                                 style={{
                                     left: `${Math.random() * 100}%`,
                                     top: `${Math.random() * 100}%`,
-                                    animationDelay: `${Math.random() * 2}s`,
+                                    animationDelay: `${Math.random() * 1}s`,
                                     animationDuration: `${2 + Math.random() * 2}s`,
                                     transitionDelay: `${2000 + i * 100}ms`
                                 }}

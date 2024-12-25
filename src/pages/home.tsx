@@ -126,6 +126,7 @@ function Home() {
             
             <AssistantBenefitsSection
               sectionRef={section6Ref}
+              sectionInView={section6InView}
             />
             
             <ContactUsSection

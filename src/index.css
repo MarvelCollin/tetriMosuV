@@ -365,6 +365,28 @@
   50% { transform: translateX(10px); }
 }
 
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -453,6 +475,14 @@
 .animate-reveal-stagger {
   opacity: 0;
   animation: reveal-stagger 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fade-up-in {
+  animation: fadeUpIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.scale-in {
+  animation: scaleIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .hover-float {

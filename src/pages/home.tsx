@@ -27,12 +27,12 @@ function Home() {
   const [isGameTransitioning, setIsGameTransitioning] = useState(false);
   const [isFalling, setIsFalling] = useState(false);
 
-  const [section1Ref, section1InView] = useInView({}, 'Welcome Section');
-  const [section2Ref, section2InView] = useInView({}, 'Recruitment Phase');
-  const [section3Ref, section3InView] = useInView({}, 'Initial Test');
-  const [section4Ref, section4InView] = useInView({}, 'Registration');
-  const [section5Ref, section5InView] = useInView({}, 'Contact Us');
-  const [section6Ref, section6InView] = useInView({}, 'Assistant Benefits');
+  const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
+  const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
+  const [section3Ref, section3InView, section3Triggered] = useInView({}, 'Initial Test');
+  const [section4Ref, section4InView, section4Triggered] = useInView({}, 'Registration');
+  const [section5Ref, section5InView, section5Triggered] = useInView({}, 'Contact Us');
+  const [section6Ref, section6InView, section6Triggered] = useInView({}, 'Assistant Benefits');
 
   const handleClick = () => {
     setIsFalling(true);
@@ -112,6 +112,7 @@ function Home() {
             <RecruitmentPhaseSection
               sectionRef={section2Ref}
               sectionInView={section2InView}
+              hasTriggered={section2Triggered}
             />
             
             <InitialTestSection
@@ -127,10 +128,13 @@ function Home() {
             <AssistantBenefitsSection
               sectionRef={section6Ref}
               sectionInView={section6InView}
+              hasTriggered={section6Triggered}
             />
             
             <ContactUsSection
               sectionRef={section5Ref}
+              sectionInView={section5InView}
+              hasTriggered={section5Triggered}
               scrollToTop={scrollToTop}
             />
 

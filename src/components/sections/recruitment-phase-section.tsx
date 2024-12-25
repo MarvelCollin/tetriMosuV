@@ -1,12 +1,14 @@
 import React from 'react';
 import ScrollIndicator from '../main-page/scroll-indicator';
 
-const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
+const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) => (
   <section ref={sectionRef} className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto mb-20">
     <div className="w-full max-w-7xl px-8">
-      <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
-        <span className="inline-block animate-float-title transition-all duration-500 ease-in-out">RECRUITMENT</span>
-        <span className="inline-block animate-float-title-delayed mx-2 transition-all duration-500 ease-in-out">PHASE</span>
+      <h1 className={`text-6xl font-bold text-white mb-8 text-center text-shadow-glow relative group transition-all duration-1000 ${
+        hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
+      }`}>
+        <span className="inline-block animate-float-title">RECRUITMENT</span>
+        <span className="inline-block animate-float-title-delayed mx-2">PHASE</span>
       </h1>
 
       <div className="relative h-[600px] px-4">
@@ -21,7 +23,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
             strokeDasharray="2000"
             strokeDashoffset="2000"
             style={{
-              animation: sectionInView ? 'drawPath 4s linear forwards' : 'none'
+              animation: hasTriggered ? 'drawPath 4s linear forwards' : 'none'
             }}
           />
 
@@ -86,7 +88,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
             <div key={index}
               className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2
                 ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'} opacity-0
-                ${sectionInView ? 'animate-fade-in-card' : ''}`}
+                ${hasTriggered ? 'animate-fade-in-card' : ''}`}
               style={{
                 animationDelay: `${(phase.pathPercent / 100) * 4}s`
               }}

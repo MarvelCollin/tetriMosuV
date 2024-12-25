@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 
-export const useInView = (options?: IntersectionObserverInit, sectionName?: string): [React.RefObject<HTMLDivElement>, boolean] => {
+export const useInView = (options?: IntersectionObserverInit, sectionName?: string): [React.RefObject<HTMLDivElement>, boolean, boolean] => {
   const ref = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
+  const [hasTriggered, setHasTriggered] = useState(false);
   const prevInViewRef = useRef(false);
   const lastLoggedSectionRef = useRef<string | null>(null);
 
@@ -14,9 +15,12 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         setIsInView(isNowInView);
         prevInViewRef.current = isNowInView;
 
-        if (isNowInView && sectionName && lastLoggedSectionRef.current !== sectionName) {
-          lastLoggedSectionRef.current = sectionName;
-          console.log(`Current section: ${sectionName}`);
+        if (isNowInView && !hasTriggered) {
+          setHasTriggered(true);
+          if (sectionName && lastLoggedSectionRef.current !== sectionName) {
+            lastLoggedSectionRef.current = sectionName;
+            console.log(`Current section: ${sectionName}`);
+          }
         }
       }
     }, {
@@ -34,7 +38,7 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         observer.unobserve(ref.current);
       }
     };
-  }, [options, sectionName]);
+  }, [options, sectionName, hasTriggered]);
 
-  return [ref, isInView];
+  return [ref, isInView, hasTriggered];
 };

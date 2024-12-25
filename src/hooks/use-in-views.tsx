@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 
-export const useInView = (options?: IntersectionObserverInit): [React.RefObject<HTMLDivElement>, boolean] => {
+export const useInView = (options?: IntersectionObserverInit, sectionName?: string): [React.RefObject<HTMLDivElement>, boolean] => {
   const ref = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsInView(entry.isIntersecting);
+      if (entry.isIntersecting && sectionName) {
+        console.log(`Entered section: ${sectionName}`);
+      }
     }, options);
 
     if (ref.current) {
@@ -18,7 +21,7 @@ export const useInView = (options?: IntersectionObserverInit): [React.RefObject<
         observer.unobserve(ref.current);
       }
     };
-  }, [options]);
+  }, [options, sectionName]);
 
   return [ref, isInView];
 };

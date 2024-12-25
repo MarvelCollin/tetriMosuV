@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import TetrisBackground from "../components/background-animations/tetris-background";
 import "../index.css";
 import WelcomeTitle from "../components/main-page/welcome-title";
-import { useInView } from '../hooks/useInView';
+import { useInView } from '../hooks/user-in-views'; // Fix this import path to match your file
 import ThemeSwitcher from '../components/main-page/ThemeSwitcher';
 
 const ScrollIndicator = ({ text = "Scroll Down", onClick }) => (
@@ -39,18 +39,16 @@ function Home() {
   const [isExiting, setIsExiting] = useState(false); // Add this state
   const [isGameTransitioning, setIsGameTransitioning] = useState(false);
 
-  const [section1Ref, section1InView] = useInView();
-  const [section2Ref, section2InView] = useInView();
-  const [section3Ref, section3InView] = useInView();
-  const [section4Ref, section4InView] = useInView();
-  const [section5Ref, section5InView] = useInView();
-  const [section6Ref, section6InView] = useInView();
+  const [section1Ref, section1InView] = useInView({}, 'Welcome Section');
+  const [section2Ref, section2InView] = useInView({}, 'Recruitment Phase');
+  const [section3Ref, section3InView] = useInView({}, 'Initial Test');
+  const [section4Ref, section4InView] = useInView({}, 'Registration');
+  const [section5Ref, section5InView] = useInView({}, 'Contact Us');
+  const [section6Ref, section6InView] = useInView({}, 'Assistant Benefits');
 
   const handleClick = () => {
-    // Start exit animation for welcome title
     setIsExiting(true);
     
-    // Wait for exit animation to complete
     setTimeout(() => {
       setPageTransition('animate-zoom-in-fade');
       setIsBackgroundTransitioning(true);
@@ -66,7 +64,7 @@ function Home() {
           setPageTransition('');
         }, 1000);
       }, 1000);
-    }, 500); // Match this with animation duration
+    }, 500); 
   };
 
   const scrollToTop = () => {
@@ -115,7 +113,7 @@ function Home() {
             
             <section
               ref={section1Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto z-0" 
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto z-0 mb-20" 
             >
               <div className="relative h-full flex flex-col items-center justify-center p-8">
                 <div className="flex flex-col items-center gap-12 animate-fade-scale-in">
@@ -186,7 +184,7 @@ function Home() {
             </section>
 
             <section ref={section2Ref} 
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto"
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto mb-20"
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
@@ -197,20 +195,26 @@ function Home() {
                 <div className="relative h-[600px] px-4">
                   <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 600">
                     <path
-                      d="M100,300 C250,300 300,100 500,100 C700,100 750,500 900,500"
+                      id="roadPath"
+                      d="M100,300 C250,300 350,100 500,300 C650,500 750,100 900,300"
                       fill="none"
                       stroke="url(#roadGradient)"
                       strokeWidth="40"
                       className="drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                      strokeDasharray="2000"
+                      strokeDashoffset="2000"
+                      style={{
+                        animation: section2InView ? 'drawPath 7s linear forwards' : 'none' // Slower and linear animation
+                      }}
                     />
 
                     <path
-                      d="M100,300 C250,300 300,100 500,100 C700,100 750,500 900,500"
+                      d="M100,300 C250,300 350,100 500,300 C650,500 750,100 900,300"
                       fill="none"
                       stroke="rgba(6,182,212,0.5)"
                       strokeWidth="2"
                       strokeDasharray="10,10"
-                      className="animate-dash"
+                      className="animate-dash opacity-50"
                     />
 
                     <defs>
@@ -228,31 +232,40 @@ function Home() {
                         phase: "01",
                         title: "Initial Test",
                         isCurrent: true,
-                        position: "left-[10%] top-[45%]",
-                        steps: ["Aptitude Test", "Programming Test"]
+                        position: "left-[15%] top-[45%]",
+                        steps: ["Aptitude Test", "Programming Test"],
+                        pathPercent: 15 // This phase appears at 15% of path drawing
                       },
                       {
                         phase: "02",
                         title: "Pre Training",
-                        position: "left-[40%] top-[15%]",
-                        steps: ["DS Using C", "OOP Using Java", "Database"]
+                        position: "left-[35%] top-[25%]",
+                        steps: ["DS Using C", "OOP Using Java", "Database"],
+                        pathPercent: 35 // This phase appears at 35% of path drawing
                       },
                       {
                         phase: "03",
                         title: "Interview",
-                        position: "left-[60%] top-[15%]",
-                        steps: ["Resume", "Presentation"]
+                        position: "left-[65%] top-[65%]",
+                        steps: ["Resume", "Presentation"],
+                        pathPercent: 65
                       },
                       {
                         phase: "04",
                         title: "Core Training",
-                        position: "left-[85%] top-[80%]",
-                        steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"]
+                        position: "left-[85%] top-[45%]",
+                        steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"],
+                        pathPercent: 85
                       }
                     ].map((phase, index) => (
                       <div key={index}
                         className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2
-                          ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'}`}>
+                          ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'} opacity-0
+                          ${section2InView ? 'animate-fade-in-card' : ''}`}
+                        style={{
+                          animationDelay: `${(phase.pathPercent / 100) * 4}s` 
+                        }}
+                      >
                         <div className={`group flex flex-col items-center animate-float`}>
                           <div className={`w-20 h-20 rounded-full flex items-center justify-center
                              bg-cyan-500/20 border-2 border-white shadow-lg shadow-cyan-500/50'`}>
@@ -285,8 +298,7 @@ function Home() {
 
             <section
               ref={section3Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
-              bg-black/50"
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20"
             >
               <div className="w-full max-w-6xl px-8"> 
                 <h1 className="text-5xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown">
@@ -414,8 +426,7 @@ function Home() {
 
             <section
               ref={section4Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
-              bg-black/50"
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20"
             >
               <div className="w-full max-w-6xl px-8">
                 <h1 className="text-5xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown">
@@ -511,8 +522,7 @@ function Home() {
 
             <section
               ref={section6Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
-              bg-black/50"
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20"
             >
               <div className="w-full max-w-7xl px-8">
                 <h1 className="text-6xl font-bold text-white mb-12 text-center text-shadow-glow animate-slideDown relative group">
@@ -619,8 +629,8 @@ function Home() {
 
             <section
               ref={section5Ref}
-              className="w-full h-screen snap-start relative flex items-center justify-center pointer-events-auto
-                         bg-black/50"
+              className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto
+                         bg-black/50 mb-20"
               onWheel={(e) => {
                 if (e.deltaY > 0) {
                   scrollToTop();

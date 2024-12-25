@@ -232,6 +232,49 @@
   }
 }
 
+@keyframes drawPath {
+  0% {
+    stroke-dashoffset: 2000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeInCard {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeInCard {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -303,6 +346,10 @@
 .animate-logo-expand-smooth {
   animation: logo-expand-smooth 4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
   z-index: 100;
+}
+
+.animate-fade-in-card {
+  animation: fadeInCard 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .glitch-text {

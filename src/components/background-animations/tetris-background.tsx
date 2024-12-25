@@ -5,14 +5,10 @@ import { themes } from './themes';
 
 interface TetrisBackgroundProps {
   selectedTheme: string;
-  isBlurred?: boolean;
-  isFalling?: boolean;
 }
 
 const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   selectedTheme,
-  isBlurred = false,
-  isFalling = false,
 }) => {
   const [themeConfig, setThemeConfig] = useState(() =>
     themes.find(t => t.name === selectedTheme) || themes[0]
@@ -23,8 +19,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   const gridRef = useRef<GridOverlay>(new GridOverlay());
   const animationFrameRef = useRef<number>();
   const shapesRef = useRef<any[]>([]);
-  const [isTemporaryFalling, setIsTemporaryFalling] = useState(false);
-  const fallingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const createNewShapes = (count: number) => {
     const shapes = [];
@@ -60,28 +54,10 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   };
 
   useEffect(() => {
-    if (isFalling) {
-      setIsTemporaryFalling(true);
-      const extraShapes = createNewShapes(20);
-      shapesRef.current = [...shapesRef.current, ...extraShapes];
-    } else {
-      if (isTemporaryFalling) {
-        shapesRef.current = shapesRef.current.map(shape => ({
-          ...shape,
-          transitionStartSpeed: shape.currentSpeed || shape.speed,
-          transitionEndSpeed: 0.2 + (Math.random() * 0.2) / (shape.originalScale || 1),
-          transitioning: true,
-          transitionStartTime: Date.now(),
-          transitionDuration: 2000,
-        }));
-        setIsTemporaryFalling(false);
-      } else {
-        if (!shapesRef.current.length) {
-          shapesRef.current = createNewShapes(10);
-        }
-      }
+    if (!shapesRef.current.length) {
+      shapesRef.current = createNewShapes(10);
     }
-  }, [isFalling]);
+  }, []);
 
   useEffect(() => {
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
@@ -99,8 +75,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
-
-    context.filter = isBlurred ? 'blur(2px)' : 'none';
 
     const size = 25;
 
@@ -133,72 +107,11 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     }
 
     const animationPatterns = {
-      leaf: (shapeObj: any, time: number, isFallingNow: boolean) => {
-        if (isFallingNow) {
-          if (!shapeObj.currentSpeed) {
-            shapeObj.currentSpeed = shapeObj.speed;
-          }
-          
-          shapeObj.currentSpeed = Math.min(20, shapeObj.currentSpeed * 1.03);
-          shapeObj.y += shapeObj.currentSpeed ;
-          
-          const centerX = canvas.width / 2;
-          const dx = centerX - shapeObj.x;
-          const easing = 0.095; 
-          shapeObj.x += dx * easing;
-          
-          shapeObj.rotation = (shapeObj.rotation || 0) + 0.015; 
-          
-        } else if (shapeObj.transitioning) {
-          const progress = Math.min(1, (Date.now() - shapeObj.transitionStartTime) / shapeObj.transitionDuration);
-          const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
-          const easedProgress = easeOutQuint(progress);
-          
-          shapeObj.currentSpeed = shapeObj.transitionStartSpeed * (1 - easedProgress) + 
-                                 shapeObj.transitionEndSpeed * easedProgress;
-          
-          shapeObj.y += shapeObj.currentSpeed;
-          
-          // shapeObj.rotation *= 0.95;
-
-        } else {
-          if (shapeObj.y > canvas.height + 100) {
-            if (!isTemporaryFalling) {
-              shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
-              shapeObj.x = Math.random() * canvas.width;
-              shapeObj.currentSpeed = shapeObj.speed;
-              shapeObj.rotation = 0;
-            } else {
-              shapeObj.shouldRemove = true;
-            }
-          }
-          if (shapeObj.currentSpeed > shapeObj.speed) {
-            shapeObj.currentSpeed = shapeObj.speed + (shapeObj.currentSpeed - shapeObj.speed) * 0.98;
-          }
-
-          if (shapeObj.y > canvas.height) {
-            shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
-            shapeObj.x = Math.random() * canvas.width;
-            shapeObj.shouldRemove = false;
-            shapeObj.currentSpeed = shapeObj.speed;
-            shapeObj.rotation = 0;
-            
-            const originalScale = shapeObj.originalScale || shapeObj.scale;
-            const normalSpeed = 0.2 + (Math.random() * 0.3) / originalScale;
-            
-            Object.assign(shapeObj, {
-              speed: normalSpeed,
-              swayAmplitude: Math.random() * 20 + 10 + 100,
-              swayFrequency: Math.random() * 0.001 + 0.0005 * 10,
-              isReset: true
-            });
-          }
-          
-          const swayAmplitude = shapeObj.swayAmplitude || 30;
-          const swayFrequency = shapeObj.swayFrequency || 0.0008;
-          const sway = Math.sin(time * swayFrequency) * swayAmplitude * 0.0003;
-          shapeObj.x += sway;
-          shapeObj.y += shapeObj.currentSpeed || shapeObj.speed;
+      leaf: (shapeObj: any, time: number) => {
+        shapeObj.y += shapeObj.speed;
+        if (shapeObj.y > canvas.height) {
+          shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200;
+          shapeObj.x = Math.random() * canvas.width;
         }
       }
     };
@@ -328,7 +241,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           shapeObj.opacity = 1;
           shapeObj.scale = 1;
 
-          animationPatterns.leaf(shapeObj, currentTime, isTemporaryFalling);
+          animationPatterns.leaf(shapeObj, currentTime);
 
           if (shapeObj.y > canvas.height) {
             shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200;
@@ -357,7 +270,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       } 
       window.removeEventListener('resize', resizeCanvas); 
     };
-  }, [themeConfig, isBlurred, isTemporaryFalling]);
+  }, [themeConfig]);
 
   return (
     <div className="fixed inset-0">
@@ -367,7 +280,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
         className="absolute top-0 left-0 w-full h-full"
         style={{
           mixBlendMode: 'lighten',
-          filter: isBlurred ? 'blur(2px)' : 'none',
           transition: 'filter 1s ease', 
           pointerEvents: 'none' 
         }}

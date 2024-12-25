@@ -27,6 +27,7 @@ function Home() {
   const [isExiting, setIsExiting] = useState(false); 
   const [isGameTransitioning, setIsGameTransitioning] = useState(false);
   const [isFalling, setIsFalling] = useState(false);
+  const [isExploding, setIsExploding] = useState(false);
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
@@ -36,11 +37,11 @@ function Home() {
   const [section6Ref, section6InView, section6Triggered] = useInView({}, 'Assistant Benefits');
 
   const handleClick = () => {
-    setIsFalling(true);
+    setIsExploding(true);
     setIsExiting(true);
     
     setTimeout(() => {
-      setIsFalling(false);
+      setIsExploding(false);
       
       setTimeout(() => {
         setPageTransition('animate-zoom-in-fade');
@@ -54,7 +55,7 @@ function Home() {
           setIsBackgroundTransitioning(false);
         }, 500);
       }, 0);
-    }, 5000);
+    }, 500);
   };
 
   const scrollToTop = () => {
@@ -100,6 +101,7 @@ function Home() {
         isFalling={isFalling}
         isInteractive={!showWelcome} 
         isTransitioning={isBackgroundTransitioning}
+        isExploding={isExploding}
       />
       <div className={`relative z-10 w-full ${pageTransition}`}>
         {showWelcome ? (

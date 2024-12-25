@@ -102,18 +102,22 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
                     <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
                   )}
                   
-                  <div className="particles-wrapper">
-                    {[...Array(15)].map((_, i) => (
+                  <div className="particles-wrapper absolute inset-0">
+                    {[...Array(8)].map((_, i) => (
                       <div
                         key={i}
                         className="particle"
                         style={{
-                          left: `${50}%`,
-                          top: `${50}%`,
-                          '--random-x': `${Math.random() * 100 - 50}px`,
-                          '--random-y': `${Math.random() * 100 - 50}px`,
-                          animationDelay: `${i * 0.1}s`,
-                          color: phase.color
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          '--random-x': `${(Math.random() - 0.5) * 20}px`, 
+                          '--random-y': `-${Math.random() * 50 + 20}px`,
+                          '--initial-opacity': 0.4,
+                          animationDelay: `${i * 0.2}s`, 
+                          animationDuration: '1.5s',
+                          width: '3px',
+                          height: '3px',
+                          color: phase.color,
                         }}
                       />
                     ))}
@@ -122,8 +126,28 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
 
                 <div 
                   className={`mt-4 text-center bg-black/50 border-2 border-white rounded-lg p-3
-                  transition-all duration-300 phase-card-${phase.phase}`}
+                  transition-all duration-300 phase-card-${phase.phase} relative overflow-visible`}
                 >
+                  <div className="particles-wrapper absolute -bottom-4 w-full opacity-0 group-hover:opacity-100">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="particle"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          '--random-x': `${(Math.random() - 0.5) * 30}px`,
+                          '--random-y': `-${Math.random() * 150 + 50}px`,
+                          animationDelay: `${i * 0.1}s`,
+                          animationDuration: '2s',
+                          width: `${Math.random() * 3 + 2}px`,
+                          height: `${Math.random() * 3 + 2}px`,
+                          color: phase.color,
+                          opacity: Math.random() * 0.5 + 0.5
+                        }}
+                      />
+                    ))}
+                  </div>
                   <h3 className="text-xl mb-2" id="hero-text-static">{phase.title}</h3>
                   <div className="space-y-1">
                     {phase.steps.map((step, i) => (

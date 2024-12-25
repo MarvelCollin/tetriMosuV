@@ -80,23 +80,23 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
     const animationPatterns = {
       straight: (shapeObj: any) => {
-        shapeObj.y += shapeObj.speed;
+        shapeObj.y += shapeObj.speed * 1.5; // Added multiplier
         if (shapeObj.y > canvas.height) {
           shapeObj.y = -shapeObj.shape.length * size;
           shapeObj.x = Math.random() * canvas.width;
         }
       },
       zigzag: (shapeObj: any) => {
-        shapeObj.y += shapeObj.speed;
-        shapeObj.x += Math.sin(shapeObj.y / 50) * 2;
+        shapeObj.y += shapeObj.speed * 1.5;
+        shapeObj.x += Math.sin(shapeObj.y / 30) * 3; // Adjusted frequency and amplitude
         if (shapeObj.y > canvas.height) {
           shapeObj.y = -shapeObj.shape.length * size;
           shapeObj.x = Math.random() * canvas.width;
         }
       },
       spiral: (shapeObj: any) => {
-        shapeObj.angle = (shapeObj.angle || 0) + shapeObj.speed * 0.02;
-        shapeObj.y += shapeObj.speed;
+        shapeObj.angle = (shapeObj.angle || 0) + shapeObj.speed * 0.03; // Increased from 0.02 to 0.03
+        shapeObj.y += shapeObj.speed * 1.5;
         shapeObj.x += Math.cos(shapeObj.angle) * 2;
         if (shapeObj.y > canvas.height) {
           shapeObj.y = -shapeObj.shape.length * size;
@@ -207,12 +207,12 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           color,
           x,
           y,
-          speed: Math.random() * 2 + 1,
+          speed: Math.random() * 3 + 2, // Increased from (2 + 1) to (3 + 2)
           pattern: 'straight',
           opacity: 1,
           isSpecial: false,
           rotation: Math.random() * Math.PI * 2,
-          rotationSpeed: (Math.random() - 0.5) * 0.04,
+          rotationSpeed: (Math.random() - 0.5) * 0.08, // Increased from 0.04 to 0.08
           scale: 1
         });
       }

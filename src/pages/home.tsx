@@ -111,6 +111,8 @@ function Home() {
             
             <InitialTestSection
               sectionRef={section3Ref}
+              sectionInView={section3InView}
+              scrollToTop={scrollToTop}
             />
             
             <RegistrationSection

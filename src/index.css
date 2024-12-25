@@ -312,6 +312,39 @@
   }
 }
 
+@keyframes reveal-line {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes morph-in {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0;
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-stagger {
+  from {
+    opacity: 0;
+    transform: perspective(500px) rotateX(15deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(500px) rotateX(0);
+  }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -387,6 +420,19 @@
 
 .animate-fade-in-card {
   animation: fadeInCard 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-reveal-line {
+  animation: reveal-line 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-morph-in {
+  animation: morph-in 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-reveal-stagger {
+  opacity: 0;
+  animation: reveal-stagger 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .glitch-text {

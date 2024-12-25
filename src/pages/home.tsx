@@ -38,26 +38,24 @@ function Home() {
     setIsFalling(true);
     setIsExiting(true);
     
-    // Let it fall for exactly 3 seconds before starting transition
+    // Wait for shapes to fall down (4 seconds)
     setTimeout(() => {
-      setIsFalling(false); // Stop falling after 3 seconds
+      setIsFalling(false);
       
-      // Start the transition sequence
-      setPageTransition('animate-zoom-in-fade');
-      setIsBackgroundTransitioning(true);
-      setIsBlurred(true);
-      
+      // Wait for shapes to finish falling animation (2 seconds)
       setTimeout(() => {
+        setPageTransition('animate-zoom-in-fade');
+        setIsBackgroundTransitioning(true);
+        setIsBlurred(true);
         setShowWelcome(true);
         setShowThemeSwitcher(true);
-        setPageTransition('animate-zoom-out-fade');
         
         setTimeout(() => {
+          setPageTransition('animate-zoom-out-fade');
           setIsBackgroundTransitioning(false);
-          setPageTransition('');
         }, 500);
-      }, 1000); // Reduced transition time after falling
-    }, 3000); // Exact 3 second falling duration
+      }, 2000);
+    }, 4000);
   };
 
   const scrollToTop = () => {

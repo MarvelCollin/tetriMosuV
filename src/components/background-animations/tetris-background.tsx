@@ -23,37 +23,64 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   const gridRef = useRef<GridOverlay>(new GridOverlay());
   const animationFrameRef = useRef<number>();
   const shapesRef = useRef<any[]>([]);
-  const resetShapes = useRef(false);
-  const [allCleared, setAllCleared] = useState(false);
-  const [shouldSpawnNew, setShouldSpawnNew] = useState(false);
   const [isTemporaryFalling, setIsTemporaryFalling] = useState(false);
   const fallingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const createNewShapes = (count: number) => {
+    const shapes = [];
+    for (let i = 0; i < count; i++) {
+      const randomShape = [
+        [[1, 1, 1, 1]], // I
+        [[1, 1], [1, 1]], // O
+        [[0, 1, 0], [1, 1, 1]], // T
+        [[1, 1, 0], [0, 1, 1]], // S
+        [[0, 1, 1], [1, 1, 0]], // Z
+        [[1, 1, 1], [1, 0, 0]], // L
+        [[1, 1, 1], [0, 0, 1]], // J
+      ][Math.floor(Math.random() * 7)];
+      
+      const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
+      const sizeVariation = [0.4, 0.6, 1, 1.5, 2.0][Math.floor(Math.random() * 5)];
+      
+      shapes.push({
+        shape: randomShape,
+        color,
+        x: Math.random() * window.innerWidth,
+        y: -(randomShape.length * 25 * sizeVariation) - (Math.random() * window.innerHeight * 2), 
+        speed: 0.2 + (Math.random() * 0.3) / sizeVariation,
+        pattern: 'straight',
+        opacity: 1,
+        rotation: 0,
+        scale: sizeVariation,
+        originalScale: sizeVariation,
+        isReset: false
+      });
+    }
+    return shapes;
+  };
 
   useEffect(() => {
     if (isFalling) {
       setIsTemporaryFalling(true);
-      
-      // Clear any existing timer
-      if (fallingTimerRef.current) {
-        clearTimeout(fallingTimerRef.current);
-      }
-      
-      // Set new timer to stop falling after 3 seconds
-      fallingTimerRef.current = setTimeout(() => {
-        setIsTemporaryFalling(false);
-      }, 3000);
+      const extraShapes = createNewShapes(20);
+      shapesRef.current = [...shapesRef.current, ...extraShapes];
     } else {
-      setIsTemporaryFalling(false);
-      if (fallingTimerRef.current) {
-        clearTimeout(fallingTimerRef.current);
+      if (isTemporaryFalling) {
+        shapesRef.current = shapesRef.current.map(shape => ({
+          ...shape,
+          transitionStartSpeed: shape.currentSpeed || shape.speed,
+          transitionEndSpeed: 0.2 + (Math.random() * 0.2) / (shape.originalScale || 1),
+          transitioning: true,
+          transitionStartTime: Date.now(),
+          transitionDuration: 4000,
+        }));
+        setIsTemporaryFalling(false);
+      } else {
+        if (!shapesRef.current.length) {
+          shapesRef.current = createNewShapes(10);
+        }
       }
     }
-
-    return () => {
-      if (fallingTimerRef.current) {
-        clearTimeout(fallingTimerRef.current);
-      }
-    };
   }, [isFalling]);
 
   useEffect(() => {
@@ -105,25 +132,43 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
             shapeObj.currentSpeed = shapeObj.speed;
           }
           
-          shapeObj.currentSpeed = Math.min(25, shapeObj.currentSpeed * 1.05);
-          shapeObj.y += shapeObj.currentSpeed * 4;
+          shapeObj.currentSpeed = Math.min(20, shapeObj.currentSpeed * 1.03);
+          shapeObj.y += shapeObj.currentSpeed * 3;
           
           const centerX = canvas.width / 2;
           const dx = centerX - shapeObj.x;
-          const easing = 0.15;
-          shapeObj.x += dx * easing ;
+          const easing = 0.095; 
+          shapeObj.x += dx * easing;
           
-          shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
+          shapeObj.rotation = (shapeObj.rotation || 0) + 0.015; 
           
-          if (shapeObj.y > canvas.height + 100) {
-            shapeObj.shouldRemove = true;
+        } else if (shapeObj.transitioning) {
+          const progress = Math.min(1, (Date.now() - shapeObj.transitionStartTime) / shapeObj.transitionDuration);
+          const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+          const easedProgress = easeOutQuint(progress);
+          
+          shapeObj.currentSpeed = shapeObj.transitionStartSpeed * (1 - easedProgress) + 
+                                 shapeObj.transitionEndSpeed * easedProgress;
+          
+          shapeObj.y += shapeObj.currentSpeed;
+          
+          if (shapeObj.rotation) {
+            shapeObj.rotation *= Math.pow(0.95, easedProgress * 10);
           }
         } else {
+          if (shapeObj.y > canvas.height + 100) {
+            // Only respawn if not in transition phase
+            if (!isTemporaryFalling) {
+              shapeObj.y = -shapeObj.shape.length * size * shapeObj.scale;
+              shapeObj.x = Math.random() * canvas.width;
+              shapeObj.currentSpeed = shapeObj.speed;
+              shapeObj.rotation = 0;
+            } else {
+              shapeObj.shouldRemove = true;
+            }
+          }
           if (shapeObj.currentSpeed > shapeObj.speed) {
-            shapeObj.currentSpeed = Math.max(
-              shapeObj.speed,
-              shapeObj.currentSpeed * 0.95
-            );
+            shapeObj.currentSpeed = shapeObj.speed + (shapeObj.currentSpeed - shapeObj.speed) * 0.98;
           }
 
           if (shapeObj.y > canvas.height) {
@@ -138,8 +183,8 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
             
             Object.assign(shapeObj, {
               speed: normalSpeed,
-              swayAmplitude: Math.random() * 20 + 10,
-              swayFrequency: Math.random() * 0.001 + 0.0005,
+              swayAmplitude: Math.random() * 20 + 10 + 100,
+              swayFrequency: Math.random() * 0.001 + 0.0005 * 10,
               isReset: true
             });
           }
@@ -151,30 +196,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           shapeObj.y += shapeObj.currentSpeed || shapeObj.speed;
         }
       }
-    };
-
-    const createNewShapes = () => {
-      const shapes = [];
-      for (let i = 0; i < 20; i++) {
-        const randomShape = tetrisShapes[Math.floor(Math.random() * tetrisShapes.length)];
-        const color = themeConfig.colors[Math.floor(Math.random() * themeConfig.colors.length)];
-        const sizeVariation = [0.4, 0.6, 1, 1.5, 2.0][Math.floor(Math.random() * 5)];
-        
-        shapes.push({
-          shape: randomShape,
-          color,
-          x: Math.random() * canvas.width,
-          y: -(randomShape.length * size * sizeVariation) - (Math.random() * canvas.height * 2), 
-          speed: 0.2 + (Math.random() * 0.3) / sizeVariation,
-          pattern: 'straight',
-          opacity: 1,
-          rotation: 0,
-          scale: sizeVariation,
-          originalScale: sizeVariation,
-          isReset: false
-        });
-      }
-      return shapes;
     };
 
     if (!shapesRef.current.length) {

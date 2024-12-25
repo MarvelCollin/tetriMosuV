@@ -1,11 +1,5 @@
 import React from 'react';
-
-const themes = [
-  { name: 'cyberpunk', label: 'Cyberpunk', icon: '🌟' },
-  { name: 'midnight', label: 'Midnight', icon: '🌙' },
-  { name: 'neon', label: 'Neon', icon: '⚡' },
-  { name: 'synthwave', label: 'Synthwave', icon: '🌆' }
-];
+import { themes } from '../background-animations/themes';
 
 interface ThemeSwitcherProps {
   currentTheme: string;

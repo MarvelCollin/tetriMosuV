@@ -5,6 +5,7 @@ import "../index.css";
 import WelcomeTitle from "../components/main-page/welcome-title";
 import { useInView } from '../hooks/use-in-views'; 
 import ThemeSwitcher from '../components/main-page/theme-switcher';
+import { themes } from '../components/background-animations/themes';
 import WelcomeSection from '../components/sections/welcome-section';
 import RecruitmentPhaseSection from '../components/sections/recruitment-phase-section';
 import InitialTestSection from '../components/sections/initial-test-section';
@@ -16,8 +17,8 @@ function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentTheme, setCurrentTheme] = useState(() => {
-    const themes = ['cyberpunk', 'midnight', 'neon', 'synthwave'];
-    return themes[Math.floor(Math.random() * themes.length)];
+    const defaultTheme = themes[Math.floor(Math.random() * themes.length)].name;
+    return defaultTheme;
   });
   const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
   const [isBlurred, setIsBlurred] = useState(false);

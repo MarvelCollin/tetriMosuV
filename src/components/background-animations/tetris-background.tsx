@@ -86,6 +86,15 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   useEffect(() => {
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
     setThemeConfig(newTheme);
+    
+    // Update background based on the new theme
+    document.body.style.background = newTheme.background;
+
+    // Update shapes' colors based on the new theme
+    shapesRef.current = shapesRef.current.map(shape => ({
+      ...shape,
+      color: newTheme.colors[Math.floor(Math.random() * newTheme.colors.length)]
+    }));
   }, [selectedTheme]);
 
   useEffect(() => {

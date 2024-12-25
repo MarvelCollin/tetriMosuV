@@ -17,7 +17,6 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   const animationFrameRef = useRef<number>();
   const shapesRef = useRef<any[]>([]);
 
-  // useEffect for handling theme changes and animation loop
   useEffect(() => {
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
     setThemeConfig(newTheme);
@@ -62,19 +61,17 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
 
     const animationPatterns = {
       leaf: (shapeObj: any, time: number) => {
-        // Gentle horizontal swaying using sine wave
-        const swayAmplitude = shapeObj.swayAmplitude || 50; // pixels
-        const swayFrequency = shapeObj.swayFrequency || 0.001; // radians per ms
+        const swayAmplitude = shapeObj.swayAmplitude || 50; 
+        const swayFrequency = shapeObj.swayFrequency || 0.001; 
         shapeObj.x += Math.sin(time * swayFrequency) * swayAmplitude * 0.001;
         
-        // Continuous downward movement
         shapeObj.y += shapeObj.speed * 1.2;
         
         if (shapeObj.y > canvas.height) {
           shapeObj.y = -shapeObj.shape.length * size;
           shapeObj.x = Math.random() * canvas.width;
-          shapeObj.swayAmplitude = Math.random() * 30 + 20; // Random sway amplitude between 20 and 50
-          shapeObj.swayFrequency = Math.random() * 0.002 + 0.001; // Random sway frequency between 0.001 and 0.003
+          shapeObj.swayAmplitude = Math.random() * 30 + 20; 
+          shapeObj.swayFrequency = Math.random() * 0.002 + 0.001; 
         }
       }
     };
@@ -115,7 +112,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           color,
           x,
           y,
-          speed: Math.random() * 3 + 2,
+          speed: Math.random() + 0.5,
           pattern: 'straight',
           opacity: 1,
           isSpecial: false,

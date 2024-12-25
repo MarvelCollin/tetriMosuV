@@ -345,6 +345,26 @@
   }
 }
 
+@keyframes float-on-hover {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(255,255,255,0.1); }
+  50% { border-color: rgba(255,255,255,0.5); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(99, 255, 255, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(99, 255, 255, 0.4); }
+}
+
+@keyframes bounce-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}
+
 .animate-dash {
   animation: dash 1s linear infinite;
 }
@@ -433,6 +453,33 @@
 .animate-reveal-stagger {
   opacity: 0;
   animation: reveal-stagger 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.hover-float {
+  transition: all 0.3s ease;
+}
+
+.hover-float:hover {
+  animation: float-on-hover 2s ease-in-out infinite;
+}
+
+.timeline-dot {
+  transition: all 0.3s ease;
+}
+
+.timeline-dot:hover {
+  transform: scale(1.2);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.requirement-card {
+  transition: all 0.3s ease;
+}
+
+.requirement-card:hover {
+  transform: translateX(10px);
+  background: rgba(99, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(99, 255, 255, 0.2);
 }
 
 .glitch-text {
@@ -959,4 +1006,8 @@ html {
 .phase-group-04:hover .phase-card-04 {
   border-color: rgb(239, 68, 68) !important;
   box-shadow: 0 0 15px rgb(239, 68, 68) !important;
+}
+
+.bounce-x {
+  animation: bounce-x 1s ease-in-out infinite;
 }

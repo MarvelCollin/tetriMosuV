@@ -38,24 +38,26 @@ function Home() {
     setIsFalling(true);
     setIsExiting(true);
     
+    // Let it fall for exactly 3 seconds before starting transition
     setTimeout(() => {
+      setIsFalling(false); // Stop falling after 3 seconds
+      
+      // Start the transition sequence
       setPageTransition('animate-zoom-in-fade');
       setIsBackgroundTransitioning(true);
       setIsBlurred(true);
       
-      // Reduced wait times
       setTimeout(() => {
         setShowWelcome(true);
         setShowThemeSwitcher(true);
         setPageTransition('animate-zoom-out-fade');
-        setIsFalling(false);
         
         setTimeout(() => {
           setIsBackgroundTransitioning(false);
           setPageTransition('');
-        }, 500); // Reduced from 1000
-      }, 1500); // Reduced from 3000
-    }, 300); // Reduced from 500
+        }, 500);
+      }, 1000); // Reduced transition time after falling
+    }, 3000); // Exact 3 second falling duration
   };
 
   const scrollToTop = () => {
@@ -86,9 +88,12 @@ function Home() {
 
   return (
     <div
-      className="w-full h-screen flex flex-col items-center bg-black justify-center font-game"
+      className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative"
       onClick={!showWelcome ? handleClick : undefined}
     >
+      {/* Add overlay div for consistent background */}
+      <div className="absolute inset-0 bg-black/50 z-0" />
+      
       {showThemeSwitcher && (
         <ThemeSwitcher currentTheme={currentTheme} onThemeChange={handleThemeChange} />
       )}
@@ -118,11 +123,13 @@ function Home() {
             <InitialTestSection
               sectionRef={section3Ref}
               sectionInView={section3InView}
+              hasTriggered={section3Triggered}
               scrollToTop={scrollToTop}
             />
             
             <RegistrationSection
               sectionRef={section4Ref}
+              hasTriggered={section4Triggered}
             />
             
             <AssistantBenefitsSection

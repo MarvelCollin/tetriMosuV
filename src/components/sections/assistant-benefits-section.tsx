@@ -4,7 +4,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) => (
   <section
     ref={sectionRef}
-    className={`w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20 transform transition-all duration-[1.2s] ease-out ${
+    className={`w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto mb-20 transform transition-all duration-[1.2s] ease-out ${
       hasTriggered ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-20 scale-95'
     }`}
   >

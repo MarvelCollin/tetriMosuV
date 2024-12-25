@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import ScrollIndicator from '../main-page/scroll-indicator';
 import { useInView } from '../../hooks/use-in-views';
 
-const RegistrationSection = ({ sectionRef }) => {
-    const [contentRef, isInView] = useInView({ threshold: 0.5 });
+const RegistrationSection = ({ sectionRef, hasTriggered }) => {
     const [hoveredDate, setHoveredDate] = useState<number | null>(null);
 
     return (
@@ -12,12 +11,11 @@ const RegistrationSection = ({ sectionRef }) => {
             className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20 overflow-hidden"
         >
             <div
-                ref={contentRef}
-                className={`w-full max-w-6xl px-8 transition-opacity duration-500 ${isInView ? 'opacity-100' : 'opacity-0'}`}
+                className={`w-full max-w-6xl px-8 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
             >
                 <h1
-                    className={`text-5xl font-bold text-white mb-12 text-center text-shadow-glow transition-all duration-1000 transform hover-float
-            ${isInView ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                    className={`text-6xl font-bold text-white mb-12 text-center text-shadow-glow transition-all duration-1000 transform hover-float
+            ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '200ms' }}
                 >
                     <span className="inline-block cursor-pointer">REGISTRATION</span>
@@ -28,7 +26,7 @@ const RegistrationSection = ({ sectionRef }) => {
                         <div
                             className={`absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500/50 via-purple-500/50 to-blue-500/50
                 transition-all duration-1000 transform origin-left
-                ${isInView ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'}`}
+                ${hasTriggered ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'}`}
                             style={{ transitionDelay: '500ms' }}
                         />
 
@@ -40,7 +38,7 @@ const RegistrationSection = ({ sectionRef }) => {
                             <div
                                 key={index}
                                 className={`relative z-10 flex flex-col items-center group transition-all duration-1000 transform
-                  ${isInView ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
+                  ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
                                 style={{ transitionDelay: `${700 + index * 200}ms` }}
                                 onMouseEnter={() => setHoveredDate(index)}
                                 onMouseLeave={() => setHoveredDate(null)}
@@ -79,7 +77,7 @@ const RegistrationSection = ({ sectionRef }) => {
                                         className={`group flex items-center gap-2 p-4 rounded-lg 
                       transition-all duration-200 cursor-pointer hover:bg-cyan-500/10
                       transform 
-                      ${isInView ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
+                      ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
                                         style={{ transitionDelay: `${1600 + idx * 200}ms` }}
                                     >
                                         <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0
@@ -99,7 +97,7 @@ const RegistrationSection = ({ sectionRef }) => {
                             <a
                                 href="https://bluejack.binus.ac.id/nar/home/registration"
                                 className={`relative group mt-8 hover-float transition-all duration-1000 transform
-                  ${isInView ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
+                  ${hasTriggered ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
                                 style={{ transitionDelay: '2400ms' }}
                             >
                                 <div className="absolute -inset-1 via-purple-500 to-cyan-500 
@@ -115,14 +113,14 @@ const RegistrationSection = ({ sectionRef }) => {
                     {/* Background Effects */}
                     <div
                         className={`absolute inset-0 pointer-events-none transition-all duration-1000
-              ${isInView ? 'opacity-100' : 'opacity-0'}`}
+              ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
                         style={{ transitionDelay: '500ms' }}
                     >
                         {Array.from({ length: 15 }).map((_, i) => (
                             <div
                                 key={i}
                                 className={`absolute w-1 h-1 rounded-full bg-cyan-500/30 transition-all duration-1000
-                  ${isInView ? 'animate-pulse opacity-100' : 'opacity-0'}`}
+                  ${hasTriggered ? 'animate-pulse opacity-100' : 'opacity-0'}`}
                                 style={{
                                     left: `${Math.random() * 100}%`,
                                     top: `${Math.random() * 100}%`,

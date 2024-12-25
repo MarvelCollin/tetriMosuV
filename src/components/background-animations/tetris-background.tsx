@@ -6,7 +6,7 @@ import { themes } from './themes';
 interface TetrisBackgroundProps {
   selectedTheme: string;
   isBlurred?: boolean;
-  isFalling?: boolean; // Add this prop
+  isFalling?: boolean;
 }
 
 const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
@@ -26,6 +26,35 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
   const resetShapes = useRef(false);
   const [allCleared, setAllCleared] = useState(false);
   const [shouldSpawnNew, setShouldSpawnNew] = useState(false);
+  const [isTemporaryFalling, setIsTemporaryFalling] = useState(false);
+  const fallingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (isFalling) {
+      setIsTemporaryFalling(true);
+      
+      // Clear any existing timer
+      if (fallingTimerRef.current) {
+        clearTimeout(fallingTimerRef.current);
+      }
+      
+      // Set new timer to stop falling after 3 seconds
+      fallingTimerRef.current = setTimeout(() => {
+        setIsTemporaryFalling(false);
+      }, 3000);
+    } else {
+      setIsTemporaryFalling(false);
+      if (fallingTimerRef.current) {
+        clearTimeout(fallingTimerRef.current);
+      }
+    }
+
+    return () => {
+      if (fallingTimerRef.current) {
+        clearTimeout(fallingTimerRef.current);
+      }
+    };
+  }, [isFalling]);
 
   useEffect(() => {
     const newTheme = themes.find(t => t.name === selectedTheme) || themes[0];
@@ -70,31 +99,26 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
     }
 
     const animationPatterns = {
-      leaf: (shapeObj: any, time: number) => {
-        if (isFalling) {
-          // Smoother acceleration
+      leaf: (shapeObj: any, time: number, isFallingNow: boolean) => {
+        if (isFallingNow) {
           if (!shapeObj.currentSpeed) {
             shapeObj.currentSpeed = shapeObj.speed;
           }
           
-          // Gradually increase speed instead of instant jump
           shapeObj.currentSpeed = Math.min(25, shapeObj.currentSpeed * 1.05);
-          shapeObj.y += shapeObj.currentSpeed;
+          shapeObj.y += shapeObj.currentSpeed * 4;
           
-          // Smoother center attraction with easing
           const centerX = canvas.width / 2;
           const dx = centerX - shapeObj.x;
-          const easing = 0.08;
-          shapeObj.x += dx * easing;
+          const easing = 0.15;
+          shapeObj.x += dx * easing ;
           
-          // Smooth rotation
           shapeObj.rotation = (shapeObj.rotation || 0) + 0.02;
           
           if (shapeObj.y > canvas.height + 100) {
             shapeObj.shouldRemove = true;
           }
         } else {
-          // Reset and smooth transition back to normal
           if (shapeObj.currentSpeed > shapeObj.speed) {
             shapeObj.currentSpeed = Math.max(
               shapeObj.speed,
@@ -278,7 +302,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
           shapeObj.opacity = 1;
           shapeObj.scale = 1;
 
-          animationPatterns.leaf(shapeObj, 1);
+          animationPatterns.leaf(shapeObj, currentTime, isTemporaryFalling);
 
           if (shapeObj.y > canvas.height) {
             shapeObj.y = -shapeObj.shape.length * size - Math.random() * 200;
@@ -307,7 +331,7 @@ const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
       } 
       window.removeEventListener('resize', resizeCanvas); 
     };
-  }, [themeConfig, isBlurred, isFalling]);
+  }, [themeConfig, isBlurred, isTemporaryFalling]);
 
   return (
     <div className="fixed inset-0">

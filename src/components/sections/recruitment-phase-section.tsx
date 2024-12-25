@@ -5,8 +5,8 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
   <section ref={sectionRef} className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto mb-20">
     <div className="w-full max-w-7xl px-8">
       <h1 className="text-6xl font-bold text-white mb-8 text-center text-shadow-glow animate-slideDown relative group">
-        <span className="inline-block animate-float-title transition-all duration-300">RECRUITMENT</span>
-        <span className="inline-block animate-float-title-delayed mx-2">PHASE</span>
+        <span className="inline-block animate-float-title transition-all duration-500 ease-in-out">RECRUITMENT</span>
+        <span className="inline-block animate-float-title-delayed mx-2 transition-all duration-500 ease-in-out">PHASE</span>
       </h1>
 
       <div className="relative h-[600px] px-4">
@@ -21,7 +21,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
             strokeDasharray="2000"
             strokeDashoffset="2000"
             style={{
-              animation: sectionInView ? 'drawPath 7s linear forwards' : 'none'
+              animation: sectionInView ? 'drawPath 4s linear forwards' : 'none'
             }}
           />
 
@@ -69,7 +69,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
               title: "Interview",
               position: "left-[65%] top-[65%]",
               steps: ["Resume", "Presentation"],
-              pathPercent: 65,
+              pathPercent: 50,
               color: "rgb(234, 179, 8)", // yellow-500
               hoverStyle: "hover:!border-yellow-500 hover:shadow-[0_0_15px_rgba(234,179,8,0.5)]"
             },
@@ -78,7 +78,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
               title: "Core Training",
               position: "left-[85%] top-[45%]",
               steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"],
-              pathPercent: 85,
+              pathPercent:70,
               color: "rgb(239, 68, 68)", // red-500
               hoverStyle: "hover:!border-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
             }
@@ -88,7 +88,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView }) => (
                 ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'} opacity-0
                 ${sectionInView ? 'animate-fade-in-card' : ''}`}
               style={{
-                animationDelay: `${(phase.pathPercent / 100) * 4}s` 
+                animationDelay: `${(phase.pathPercent / 100) * 4}s`
               }}
             >
               <div className={`group relative flex flex-col items-center animate-float phase-group-${phase.phase}`}>

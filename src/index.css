@@ -244,10 +244,10 @@
 @keyframes fadeInCard {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.8);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.1);
   }
   100% {
     opacity: 1;
@@ -345,23 +345,23 @@
 }
 
 .animate-slide-in-number-1 {
-  animation: slideInNumber1 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-             float-title-0 3s ease-in-out infinite 2s;
+  animation: slideInNumber1 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards,
+             float-title-0 4s ease-in-out infinite 2s;
 }
 
 .animate-slide-in-number-2 {
-  animation: slideInNumber2 2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards,
-             float-title-1 3s ease-in-out infinite 2.15s;
+  animation: slideInNumber2 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.15s forwards,
+             float-title-1 4s ease-in-out infinite 2.15s;
 }
 
 .animate-slide-in-number-3 {
-  animation: slideInNumber3 2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards,
-             float-title-2 3s ease-in-out infinite 2.3s;
+  animation: slideInNumber3 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s forwards,
+             float-title-2 4s ease-in-out infinite 2.3s;
 }
 
 .animate-slide-in-number-4 {
-  animation: slideInNumber4 2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s forwards,
-             float-title-1 3s ease-in-out infinite 2.45s;
+  animation: slideInNumber4 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.45s forwards,
+             float-title-1 4s ease-in-out infinite 2.45s;
 }
 
 .animate-scale-out {
@@ -386,7 +386,7 @@
 }
 
 .animate-fade-in-card {
-  animation: fadeInCard 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: fadeInCard 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .glitch-text {
@@ -757,7 +757,7 @@ html {
 }
 
 .card-hover {
-  @apply hover:border-white/30 hover:bg-black/60;
+  @apply hover:border-white/40 hover:bg-black/70;
 }
 
 .glow-hover {

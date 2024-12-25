@@ -24,7 +24,6 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView }) => (
 
         <div className="relative w-full">
           <div className="flex justify-between items-start gap-6">
-            {/* Aptitude Test Card */}
             <div 
               className={`flex-1 group perspective transition-all duration-1000 transform
                 ${sectionInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}`}

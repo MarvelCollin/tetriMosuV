@@ -3,7 +3,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 import { useInView } from '../../hooks/use-in-views';
 
 const RegistrationSection = ({ sectionRef }) => {
-  const [contentRef, isInView] = useInView({ threshold: 0.5 }); // Increased threshold for smoother entry
+  const [contentRef, isInView] = useInView({ threshold: 0.5 });
 
   return (
     <section
@@ -42,11 +42,7 @@ const RegistrationSection = ({ sectionRef }) => {
                   ${isInView ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
                 style={{ transitionDelay: `${700 + index * 200}ms` }}
               >
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center 
-                  ${item.status === 'current' ? 'bg-black border-2 border-cyan-500' :
-                   item.status === 'past' ? 'bg-black border-2 border-purple-500' :
-                   'bg-black border border-white'}
-                  relative`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center bg-black border border-white relative`}>
                   <span className="text-2xl">{item.icon}</span>
                   {item.status === 'current' && (
                     <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-ping"></div>

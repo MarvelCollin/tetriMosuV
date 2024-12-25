@@ -43,6 +43,7 @@ function Home() {
       setIsBackgroundTransitioning(true);
       setIsBlurred(true);
       
+      // Reduced wait times
       setTimeout(() => {
         setShowWelcome(true);
         setShowThemeSwitcher(true);
@@ -52,9 +53,9 @@ function Home() {
         setTimeout(() => {
           setIsBackgroundTransitioning(false);
           setPageTransition('');
-        }, 1000);
-      }, 1000);
-    }, 500); 
+        }, 500); // Reduced from 1000
+      }, 1500); // Reduced from 3000
+    }, 300); // Reduced from 500
   };
 
   const scrollToTop = () => {

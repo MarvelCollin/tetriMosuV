@@ -89,7 +89,6 @@ function Home() {
       className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative"
       onClick={!showWelcome ? handleClick : undefined}
     >
-      {/* Add overlay div for consistent background */}
       <div className="absolute inset-0 bg-black/50 z-0" />
       
       {showThemeSwitcher && (

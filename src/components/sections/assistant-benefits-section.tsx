@@ -60,7 +60,7 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
           <div
             key={index}
             className={`group bg-black/90 backdrop-blur-md rounded-xl p-6 border border-white/10
-              transition-all duration-700 ease-out transform
+              transition-all duration-300 ease-out transform
               hover:border-${category.color}-500/50 hover:bg-black/95
               ${hasTriggered 
                 ? 'opacity-100 translate-y-0' 

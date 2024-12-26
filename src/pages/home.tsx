@@ -28,6 +28,7 @@ function Home() {
   const [isGameTransitioning, setIsGameTransitioning] = useState(false);
   const [isFalling, setIsFalling] = useState(false);
   const [isExploding, setIsExploding] = useState(false);
+  const [isOnWelcomeSection, setIsOnWelcomeSection] = useState(true);
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
@@ -58,10 +59,27 @@ function Home() {
     }, 500);
   };
 
-  const scrollToTop = () => {
+  const scrollToWelcome = () => {
     const container = document.querySelector('.snap-y');
     if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
+      const currentScroll = container.scrollTop;
+      const start = performance.now();
+      const duration = 1000; 
+
+      function animate(currentTime: number) {
+        const elapsed = currentTime - start;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        
+        container.scrollTop = currentScroll * (1 - easeProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      requestAnimationFrame(animate);
     }
   };
 
@@ -84,6 +102,26 @@ function Home() {
     }, 1500);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = document.querySelector('.snap-y');
+      if (container) {
+        setIsOnWelcomeSection(container.scrollTop < window.innerHeight / 2);
+      }
+    };
+
+    const container = document.querySelector('.snap-y');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [showWelcome]);
+
   return (
     <div
       className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative"
@@ -102,6 +140,7 @@ function Home() {
         isTransitioning={isBackgroundTransitioning}
         isExploding={isExploding}
       />
+    
       <div className={`relative z-10 w-full ${pageTransition}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative pointer-events-auto">
@@ -122,7 +161,7 @@ function Home() {
               sectionRef={section3Ref}
               sectionInView={section3InView}
               hasTriggered={section3Triggered}
-              scrollToTop={scrollToTop}
+              scrollToTop={scrollToWelcome}
             />
             
             <RegistrationSection
@@ -140,7 +179,7 @@ function Home() {
               sectionRef={section5Ref}
               sectionInView={section5InView}
               hasTriggered={section5Triggered}
-              scrollToTop={scrollToTop}
+              scrollToTop={scrollToWelcome}
             />
 
           </div>

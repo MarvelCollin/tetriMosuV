@@ -8,7 +8,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
     return (
         <section
             ref={sectionRef}
-            className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black/50 mb-20 overflow-hidden"
+            className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto mb-20 overflow-hidden"
         >
             <div
                 className={`w-full max-w-6xl px-8 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}

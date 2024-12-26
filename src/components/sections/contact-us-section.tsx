@@ -4,7 +4,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered }) => (
   <section
     ref={sectionRef}
-    className={`w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto bg-black mb-20 transition-all duration-1000 transform ${
+    className={`w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto  mb-20 transition-all duration-1000 transform ${
       hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
     }`}
     onWheel={(e) => {

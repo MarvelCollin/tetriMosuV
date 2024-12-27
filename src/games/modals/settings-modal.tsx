@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ISettingModal } from '../../interfaces/ISettingModal';
 
-
-
 const SettingsModal: React.FC<ISettingModal> = ({ onClose, onRestart }) => {
   const navigate = useNavigate();
 
@@ -19,7 +17,7 @@ const SettingsModal: React.FC<ISettingModal> = ({ onClose, onRestart }) => {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 bg-white/10 backdrop-blur-md flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50">
       <div className="bg-white/20 p-8 rounded-xl border-2 border-white/50 max-w-md w-full mx-4 shadow-2xl backdrop-blur-lg transform animate-slideDown">
         <h2 className="text-3xl font-bold text-white mb-8 text-center drop-shadow-glow">Settings</h2>
         

@@ -26,7 +26,7 @@ class CircleTarget {
     private static geometries = {
         inner: new THREE.CircleGeometry(0.5, 16),
         outer: new THREE.RingGeometry(0.5, 0.6, 16),
-        hitbox: new THREE.CircleGeometry(0.3, 8)
+        hitbox: new THREE.CircleGeometry(0.8, 8)
     };
 
     private static materials = {
@@ -104,7 +104,6 @@ class CircleTarget {
         [this.innerCircle, this.outerCircle, this.hitbox].forEach(mesh => {
             mesh.position.copy(position);
             
-            // Initial orientation
             const matrix = new THREE.Matrix4();
             matrix.lookAt(position, cameraPos, new THREE.Vector3(0, 1, 0));
             mesh.quaternion.setFromRotationMatrix(matrix);

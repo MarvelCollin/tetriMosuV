@@ -215,11 +215,9 @@ const Game = () => {
   };
 
   useEffect(() => {
-    // Check if we should skip tutorial
     const shouldSkipTutorial = localStorage.getItem('skipTutorial') === 'true';
     if (shouldSkipTutorial) {
         setShowTutorial(false);
-        // Clear the flag after use
         localStorage.removeItem('skipTutorial');
     }
 }, []);
@@ -238,6 +236,11 @@ const Game = () => {
         window.removeEventListener('keydown', handleKeyPress);
         if (gameInstanceRef.current?.dropIntervalId) {
           clearInterval(gameInstanceRef.current.dropIntervalId);
+        }
+        // Remove tutorial when component unmounts
+        const tutorial = document.querySelector('.fixed.bottom-4.right-4');
+        if (tutorial) {
+          tutorial.remove();
         }
       };
     }

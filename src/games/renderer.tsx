@@ -171,6 +171,11 @@ class Renderer {
             this.scene.remove(this.scoreText);
         }
 
+        const existingTutorial = document.querySelector('.fixed.bottom-4.right-4');
+        if (existingTutorial) {
+            existingTutorial.remove();
+        }
+
         const loader = new FontLoader();
         loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
             const textGeometry = new TextGeometry(`SCORE: ${score}`, {

@@ -47,6 +47,7 @@ class TetrisGame {
         life: number;
         originalY: number;
     }[] = [];
+    private animationFrameId: number | null = null;  // Add this property
 
     onGameOver: ((score: number) => void) | null = null;
 
@@ -282,7 +283,7 @@ class TetrisGame {
     }
 
     moveDown() {
-        if (this.gameOver) return; 
+        if (this.gameOver || this.isPaused) return; 
 
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY + 1)) {
@@ -313,6 +314,7 @@ class TetrisGame {
     }
 
     hardDrop() {
+        if (this.isPaused) return; 
         this.hardDropPressed = true;
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
@@ -374,6 +376,7 @@ class TetrisGame {
     }
 
     rotateTetromino() {
+        if (this.isPaused) return; 
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
         const currentShape = TETROMINOES[this.currentTetromino];
@@ -413,7 +416,7 @@ class TetrisGame {
     }
 
     replaceTetromino() {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isPaused) return; 
         
         this.gridManager.clearTetromino(this.currentTetromino, this.currentX, this.currentY);
         
@@ -457,7 +460,8 @@ class TetrisGame {
     }
 
     handleKeyPress(event: KeyboardEvent) {
-        if (this.gameOver) return; 
+        // Prevent any key handling while paused except for Escape
+        if (this.gameOver || (this.isPaused && event.key !== 'Escape')) return;
         this.inputHandler.handleKeyPress(event);
     }
 
@@ -570,7 +574,7 @@ class TetrisGame {
     }
 
     private handleClick = (event: MouseEvent) => {
-        if (!this.isInTargetMode) return;
+        if (!this.isInTargetMode || this.isPaused) return;
 
         const canvas = event.target as HTMLCanvasElement;
         const rect = canvas.getBoundingClientRect();
@@ -585,7 +589,6 @@ class TetrisGame {
         for (let i = this.circleTargets.length - 1; i >= 0; i--) {
             const target = this.circleTargets[i];
             if (raycaster.intersectObject(target.hitbox).length > 0) {
-                console.log("Center hit!");
                 this.hitTargets++;
                 
                 this.triggerCameraShake(0.4);
@@ -780,12 +783,21 @@ class TetrisGame {
     }
 
     updateScene() {
+        if (this.isPaused || this.gameOver) {
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            return;
+        }
+
         const now = performance.now();
         if (now - this.lastRenderTime < 16) {
+            this.animationFrameId = requestAnimationFrame(() => this.updateScene());
             return;
         }
         this.lastRenderTime = now;
-
+        
         const isCurrentlyRotating = Math.abs(this.camera.rotation.y) > 0.01;
         if (isCurrentlyRotating !== this.isRotating) {
             this.isRotating = isCurrentlyRotating;
@@ -872,6 +884,8 @@ class TetrisGame {
             const scale = 1 + Math.sin(time * 2 + particle.originalY) * 0.1;
             particle.mesh.scale.setScalar(scale);
         });
+
+        this.animationFrameId = requestAnimationFrame(() => this.updateScene());
     }
 
     async onRotationStart() {
@@ -955,6 +969,32 @@ class TetrisGame {
     }
 
     togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            // Stop the auto-drop when paused
+            if (this.dropIntervalId) {
+                clearInterval(this.dropIntervalId);
+                this.dropIntervalId = null;
+            }
+            // Stop any pending target mode timer
+            if (this.timeoutId) {
+                clearTimeout(this.timeoutId);
+            }
+        } else {
+            // Resume the auto-drop when unpaused
+            this.startAutoDrop();
+            // Resume target mode timer if active
+            if (this.isInTargetMode) {
+                this.timeoutId = setTimeout(() => {
+                    if (this.isInTargetMode) {
+                        this.completeTargetMode(false);
+                    }
+                }, 4000);
+            }
+        }
+
+        // Update renderer to reflect current state
+        this.renderer.renderScene();
     }
 }
 

@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-// Define multiple color themes
 export const THEMES = {
     neon: {
         colors: [
@@ -60,22 +59,17 @@ export const THEMES = {
     }
 };
 
-// Change default theme to synthwave
 const DEFAULT_THEME = 'synthwave';
 
-// Modify theme selection logic to be more robust
 let currentTheme = (() => {
     try {
         const savedTheme = localStorage.getItem('selectedTheme');
-        // Always set a default theme first
         let theme = THEMES[DEFAULT_THEME];
         
-        // Try to use saved theme if it exists
         if (savedTheme && THEMES[savedTheme]) {
             theme = THEMES[savedTheme];
         }
         
-        // Ensure theme has all required properties
         if (!theme.colors || theme.colors.length !== 7) {
             console.warn('Invalid theme structure, falling back to default');
             theme = THEMES[DEFAULT_THEME];
@@ -120,10 +114,8 @@ export const SHADOW_MATERIALS = COLORS.map(color =>
     })
 );
 
-// Update setCurrentTheme to be more robust
 export const setCurrentTheme = (themeName: keyof typeof THEMES) => {
     try {
-        // Ensure theme exists and is valid
         if (!THEMES[themeName] || !THEMES[themeName].colors || THEMES[themeName].colors.length !== 7) {
             console.warn(`Invalid theme ${themeName}, using default theme`);
             themeName = DEFAULT_THEME as keyof typeof THEMES;
@@ -132,19 +124,16 @@ export const setCurrentTheme = (themeName: keyof typeof THEMES) => {
         currentTheme = THEMES[themeName];
         localStorage.setItem('selectedTheme', themeName);
 
-        // Create a new copy of colors array
         const newColors = [...currentTheme.colors];
         COLORS.length = 0;
         COLORS.push(...newColors);
 
-        // Update materials synchronously
         MATERIALS.forEach((material, i) => {
             const color = newColors[i];
             material.color.setHex(color);
             material.emissive.copy(new THREE.Color(color).multiplyScalar(0.3));
         });
 
-        // Update shadow materials synchronously
         SHADOW_MATERIALS.forEach((material, i) => {
             const color = newColors[i];
             material.color.setHex(color);

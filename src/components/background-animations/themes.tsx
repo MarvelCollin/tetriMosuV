@@ -1,10 +1,10 @@
 export interface Theme {
   name: string;
-  label: string; // Added label for display
-  icon: string;  // Added icon for visual representation
+  label: string; 
+  icon: string;  
   colors: string[];
   background: string;
-  particleColor: string; // Added particle color
+  particleColor: string;
 }
 
 export const themes: Theme[] = [

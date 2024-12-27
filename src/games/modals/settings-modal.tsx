@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ISettingModal } from '../../interfaces/ISettingModal';
 
-interface SettingsModalProps {
-  onClose: () => void;
-  onRestart: () => void;
-}
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onRestart }) => {
+
+const SettingsModal: React.FC<ISettingModal> = ({ onClose, onRestart }) => {
   const navigate = useNavigate();
 
   useEffect(() => {

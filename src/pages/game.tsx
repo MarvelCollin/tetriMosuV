@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import TetrisGame from '../games/tetris-game';
-import TutorialModal from '../games/tutorial-modal';
+import TutorialModal from '../games/modals/tutorial-modal';
 import { currentTheme } from '../games/colors';
-import GameOverModal from '../games/game-over-modal';
-import SettingsModal from '../games/settings-modal';
+import GameOverModal from '../games/modals/game-over-modal';
+import SettingsModal from '../games/modals/settings-modal';
 
 const Game = () => {
   const mountRef = useRef<HTMLDivElement>(null);

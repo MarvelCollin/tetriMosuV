@@ -1,10 +1,7 @@
 
 import React from 'react';
+import { IScrollIndicator } from '../../interfaces/IScrollIndicator';
 
-interface ScrollIndicatorProps {
-  text?: string;
-  onClick?: () => void;
-}
 
 const ScrollIndicator: React.FC<ScrollIndicatorProps> = ({ text = "Scroll Down", onClick }) => (
   <div

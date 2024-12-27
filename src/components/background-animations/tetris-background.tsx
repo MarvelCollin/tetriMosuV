@@ -2,12 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import ParticleSystem from './particle-system-tetris';
 import GridOverlay from './grid-overlay';
 import { themes } from './themes';
+import { ITetrisBackground } from '../../interfaces/ITetrisBackground';
 
-interface TetrisBackgroundProps {
-  selectedTheme: string;
-}
-
-const TetrisBackground: React.FC<TetrisBackgroundProps> = ({
+const TetrisBackground: React.FC<ITetrisBackground> = ({
   selectedTheme,
 }) => {
   const [themeConfig, setThemeConfig] = useState(() =>

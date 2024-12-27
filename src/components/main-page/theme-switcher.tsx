@@ -1,10 +1,7 @@
 import React from 'react';
 import { themes } from '../background-animations/themes';
+import { IThemeSwitcher } from '../../interfaces/IThemeSwitcher';
 
-interface ThemeSwitcherProps {
-  currentTheme: string;
-  onThemeChange: (theme: string) => void;
-}
 
 const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ currentTheme, onThemeChange }) => {
   return (

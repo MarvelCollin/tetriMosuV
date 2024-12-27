@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { THEMES, setCurrentTheme } from './colors';
+import { THEMES, setCurrentTheme } from '../colors';
+import PreviewTetris from './preview-tetris';
 
 interface TutorialModalProps {
   onClose: () => void;
@@ -25,107 +26,7 @@ const KEY_MAPPING: { [key: string]: string } = {
   'MOUSE1': 'MOUSE1'
 };
 
-interface PreviewTetrisProps {
-  theme: string;
-}
 
-const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const currentThemeColors = THEMES[theme as keyof typeof THEMES];
-    if (!currentThemeColors) return;
-
-    const blockSize = 20;
-    const gridWidth = 8;
-    const gridHeight = 8;
-    
-    canvas.width = gridWidth * blockSize + 2;
-    canvas.height = gridHeight * blockSize + 2;
-
-    ctx.fillStyle = `#${currentThemeColors.background.toString(16).padStart(6, '0')}`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = `#${currentThemeColors.grid.toString(16).padStart(6, '0')}`;
-    ctx.lineWidth = 0.5;
-    for (let x = 0; x <= gridWidth; x++) {
-      ctx.beginPath();
-      ctx.moveTo(x * blockSize, 0);
-      ctx.lineTo(x * blockSize, canvas.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= gridHeight; y++) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * blockSize);
-      ctx.lineTo(canvas.width, y * blockSize);
-      ctx.stroke();
-    }
-
-    ctx.strokeStyle = `#${currentThemeColors.border.toString(16).padStart(6, '0')}`;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-    const shapes = [
-      [[1, 1, 1, 1]], // I
-      [[1, 1], [1, 1]], // O
-      [[1, 1, 1], [0, 1, 0]], // T
-      [[1, 1, 1], [1, 0, 0]], // L
-      [[1, 1, 1], [0, 0, 1]], // J
-      [[1, 1, 0], [0, 1, 1]], // S
-      [[0, 1, 1], [1, 1, 0]], // Z
-    ];
-
-    shapes.forEach((shape, index) => {
-      const color = currentThemeColors.colors[index];
-      const x = 1 + Math.floor(Math.random() * (gridWidth - shape[0].length));
-      const y = 1 + Math.floor(Math.random() * (gridHeight - shape.length));
-
-      shape.forEach((row, rowIndex) => {
-        row.forEach((cell, cellIndex) => {
-          if (cell) {
-            ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
-            ctx.fillRect(
-              (x + cellIndex) * blockSize,
-              (y + rowIndex) * blockSize,
-              blockSize - 1,
-              blockSize - 1
-            );
-
-            const gradient = ctx.createLinearGradient(
-              (x + cellIndex) * blockSize,
-              (y + rowIndex) * blockSize,
-              (x + cellIndex + 1) * blockSize,
-              (y + rowIndex + 1) * blockSize
-            );
-            gradient.addColorStop(0, `#${color.toString(16).padStart(6, '0')}99`);
-            gradient.addColorStop(1, `#${color.toString(16).padStart(6, '0')}33`);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(
-              (x + cellIndex) * blockSize,
-              (y + rowIndex) * blockSize,
-              blockSize - 1,
-              blockSize - 1
-            );
-          }
-        });
-      });
-    });
-  }, [theme]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="border-2 border-gray-700 rounded-lg shadow-lg"
-      style={{ imageRendering: 'pixelated' }}
-    />
-  );
-};
 
 const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -243,16 +144,11 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             
             <div className="space-y-6">
               <div className="bg-gray-800/50 p-8 rounded-lg backdrop-blur-sm">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Left Column - Theme Selection */}
-                  <div className="space-y-6">
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Left side - Theme Selection */}
+                  <div className="flex-1 space-y-6">
                     <div>
-                      <h4 className="text-xl text-white mb-4 font-medium flex items-center space-x-2">
-                        <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
-                        <span>Select Your Theme</span>
-                      </h4>
+                      <h4 className="text-xl text-white mb-4 font-medium">Select Your Theme</h4>
                       <div className="relative">
                         <select
                           value={selectedTheme || DEFAULT_THEME}
@@ -284,14 +180,14 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                       </div>
                     </div>
 
-                    {/* Theme Colors Grid */}
-                    <div className="bg-gray-900/50 p-4 rounded-lg">
-                      <h5 className="text-white/70 text-sm font-medium mb-3">Theme Colors</h5>
-                      <div className="grid grid-cols-7 gap-2">
+                    {/* Theme Colors Display */}
+                    <div className="bg-gray-900/50 p-4 rounded-lg space-y-4">
+                      <h5 className="text-white/70 text-sm font-medium">Theme Colors</h5>
+                      <div className="grid grid-cols-4 gap-3">
                         {selectedTheme && THEMES[selectedTheme as keyof typeof THEMES].colors.map((color, i) => (
                           <div
                             key={i}
-                            className="group relative aspect-square rounded-md overflow-hidden transition-transform hover:scale-110"
+                            className="group relative aspect-square rounded-lg overflow-hidden transition-transform hover:scale-105"
                           >
                             <div
                               className="w-full h-full"
@@ -310,38 +206,37 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
                         ))}
                       </div>
                     </div>
-
-                    {/* Theme Properties */}
-                    <div className="grid grid-cols-3 gap-4 bg-gray-900/50 p-4 rounded-lg">
-                      <ThemePropertyBox 
-                        label="Grid"
-                        color={THEMES[selectedTheme as keyof typeof THEMES]?.grid}
-                        icon="grid"
-                      />
-                      <ThemePropertyBox 
-                        label="Border"
-                        color={THEMES[selectedTheme as keyof typeof THEMES]?.border}
-                        icon="border"
-                      />
-                      <ThemePropertyBox 
-                        label="Background"
-                        color={THEMES[selectedTheme as keyof typeof THEMES]?.background}
-                        icon="bg"
-                      />
-                    </div>
                   </div>
 
-                  {/* Right Column - Preview */}
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="relative group w-full max-w-[300px]">
+                  {/* Right side - Preview */}
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="relative group">
                       <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
-                      <div className="relative bg-gray-900 p-6 rounded-lg">
-                        <h5 className="text-white/70 text-sm font-medium mb-4 text-center">Live Preview</h5>
+                      <div className="relative bg-gray-900 p-4 rounded-lg">
+                        <h5 className="text-white/70 text-sm font-medium mb-4 text-center">Preview</h5>
                         <div className="flex items-center justify-center">
-                          <div className="transform hover:scale-110 transition-transform duration-300">
+                          <div className="transform scale-125 hover:scale-150 transition-transform duration-300">
                             <PreviewTetris theme={selectedTheme || DEFAULT_THEME} />
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Theme Properties */}
+                    <div className="mt-6 w-full bg-gray-900/50 p-4 rounded-lg">
+                      <div className="grid grid-cols-3 gap-4">
+                        <ThemePropertyDisplay 
+                          label="Grid"
+                          color={THEMES[selectedTheme as keyof typeof THEMES]?.grid}
+                        />
+                        <ThemePropertyDisplay 
+                          label="Border"
+                          color={THEMES[selectedTheme as keyof typeof THEMES]?.border}
+                        />
+                        <ThemePropertyDisplay 
+                          label="Background"
+                          color={THEMES[selectedTheme as keyof typeof THEMES]?.background}
+                        />
                       </div>
                     </div>
                   </div>
@@ -350,7 +245,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
 
               <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm text-center">
                 <p className="text-white text-lg mb-4 text-shadow-bright">
-                  Ready to experience NAR 25-2? Let's begin!
+                  Dont Forget to join NAR 25-2 !!
                 </p>
               </div>
             </div>
@@ -728,31 +623,6 @@ const ThemePropertyDisplay: React.FC<{ label: string; color: number }> = ({ labe
       }}
     />
     <span className="text-white/70 text-sm">{label}</span>
-  </div>
-);
-
-interface ThemePropertyBoxProps {
-  label: string;
-  color: number;
-  icon: 'grid' | 'border' | 'bg';
-}
-
-const ThemePropertyBox: React.FC<ThemePropertyBoxProps> = ({ label, color, icon }) => (
-  <div className="flex flex-col items-center space-y-2 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
-    <div 
-      className="w-8 h-8 rounded-lg transition-transform hover:scale-110 relative group"
-      style={{ 
-        backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
-        boxShadow: `0 0 10px #${color.toString(16).padStart(6, '0')}40`
-      }}
-    >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-           style={{ 
-             background: `linear-gradient(45deg, transparent, #${color.toString(16).padStart(6, '0')}80)`
-           }}
-      />
-    </div>
-    <span className="text-white/70 text-xs font-medium">{label}</span>
   </div>
 );
 

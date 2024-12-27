@@ -1,11 +1,8 @@
 import React from 'react';
+import { IGameOverModal } from '../../interfaces/IGameOverModal';
 
-interface GameOverModalProps {
-    score: number;
-    onClose: () => void;
-}
 
-const GameOverModal: React.FC<GameOverModalProps> = ({ score, onClose }) => {
+const GameOverModal: React.FC<IGameOverModal> = ({ score, onClose }) => {
     const handleContinue = () => {
         window.location.href = 'https://bluejack.binus.ac.id/nar/home/registration';
     };

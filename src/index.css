@@ -1106,3 +1106,22 @@ html {
 .bounce-x {
   animation: bounce-x 1s ease-in-out infinite;
 }
+
+/* New transition styles */
+.page-transition-enter {
+  opacity: 0;
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}

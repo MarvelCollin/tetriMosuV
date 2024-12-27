@@ -12,6 +12,8 @@ import InitialTestSection from '../components/sections/initial-test-section';
 import RegistrationSection from '../components/sections/registration-section';
 import AssistantBenefitsSection from '../components/sections/assistant-benefits-section';
 import ContactUsSection from '../components/sections/contact-us-section';
+import { usePageTransition } from '../context/page-transition-context';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
@@ -37,6 +39,9 @@ function Home() {
   const [section5Ref, section5InView, section5Triggered] = useInView({}, 'Contact Us');
   const [section6Ref, section6InView, section6Triggered] = useInView({}, 'Assistant Benefits');
 
+  const { startTransition } = usePageTransition();
+  const navigate = useNavigate();
+
   const handleClick = () => {
     setIsExploding(true);
     setIsExiting(true);
@@ -55,7 +60,7 @@ function Home() {
           setPageTransition('animate-zoom-out-fade');
           setIsBackgroundTransitioning(false);
         }, 500);
-      }, 0);
+      }, 500);
     }, 500);
   };
 
@@ -90,6 +95,7 @@ function Home() {
   const handleGameClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsGameTransitioning(true);
+    startTransition();
     
     const logo = document.querySelector('.slc-logo') as HTMLElement;
     if (logo) {
@@ -97,8 +103,8 @@ function Home() {
     }
     
     setTimeout(() => {
-      window.location.href = '/game';
-    }, 300);
+      navigate('/game');
+    }, 1500);
   };
 
   useEffect(() => {

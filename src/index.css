@@ -223,14 +223,15 @@
 
 @keyframes logo-expand-smooth {
   0% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
   100% {
-    transform: scale(100);
+    transform: scale(30) rotate(360deg);
     opacity: 1;
   }
 }
+
 
 @keyframes drawPath {
   0% {

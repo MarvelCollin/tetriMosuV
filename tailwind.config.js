@@ -2,7 +2,29 @@
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'spin-stop': 'spin 2s linear infinite, stopSpin 0.5s ease-out forwards',
+        'logo-expand-smooth': 'expandLogo 0.3s ease-out forwards',
+      },
+      keyframes: {
+        stopSpin: {
+          'to': {
+            'animation-timing-function': 'ease',
+            'transform': 'rotate(0deg)',
+          },
+        },
+        expandLogo: {
+          '0%': {
+            transform: 'scale(1) rotate(var(--rotation))',
+          },
+          '100%': {
+            transform: 'scale(50) rotate(var(--rotation))',
+            opacity: '0',
+          },
+        },
+      },
+    },
     colors: {
       // #00112f #0a5797 #299bb8
       navy: "#00103C",

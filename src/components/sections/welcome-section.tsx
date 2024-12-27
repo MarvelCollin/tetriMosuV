@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import ScrollIndicator from '../main-page/scroll-indicator';
 
-const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) => (
+const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick, isRotating }) => (
   <section
     ref={sectionRef}
     className="w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto z-0 mb-20" 
@@ -14,7 +14,7 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
             src="./assets/images/logo.png"
             alt="SLC Logo"
             className={`w-52 h-52 animate-spin-slow opacity-80 hover:opacity-100 
-            transition-all duration-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]
+            transition-all duration-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.5)] slc-logo
             ${isGameTransitioning ? 'animate-logo-expand-smooth' : ''}`}
           />
           <h1 className="text-[180px] font-bold tracking-tight text-shadow-glow text-white">

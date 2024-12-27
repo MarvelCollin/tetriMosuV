@@ -93,13 +93,12 @@ function Home() {
     
     const logo = document.querySelector('.slc-logo') as HTMLElement;
     if (logo) {
-      console.log(logo)
       logo.classList.add('animate-logo-expand-smooth');
     }
-  
+    
     setTimeout(() => {
       window.location.href = '/game';
-    }, 1500);
+    }, 300);
   };
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { THEMES, setCurrentTheme } from '../colors';
-import PreviewTetris from './preview-tetris';
 
 interface TutorialModalProps {
   onClose: () => void;
@@ -26,7 +25,107 @@ const KEY_MAPPING: { [key: string]: string } = {
   'MOUSE1': 'MOUSE1'
 };
 
+interface PreviewTetrisProps {
+  theme: string;
+}
 
+const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const currentThemeColors = THEMES[theme as keyof typeof THEMES];
+    if (!currentThemeColors) return;
+
+    const blockSize = 20;
+    const gridWidth = 8;
+    const gridHeight = 8;
+    
+    canvas.width = gridWidth * blockSize + 2;
+    canvas.height = gridHeight * blockSize + 2;
+
+    ctx.fillStyle = `#${currentThemeColors.background.toString(16).padStart(6, '0')}`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = `#${currentThemeColors.grid.toString(16).padStart(6, '0')}`;
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= gridWidth; x++) {
+      ctx.beginPath();
+      ctx.moveTo(x * blockSize, 0);
+      ctx.lineTo(x * blockSize, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= gridHeight; y++) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * blockSize);
+      ctx.lineTo(canvas.width, y * blockSize);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = `#${currentThemeColors.border.toString(16).padStart(6, '0')}`;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+    const shapes = [
+      [[1, 1, 1, 1]], // I
+      [[1, 1], [1, 1]], // O
+      [[1, 1, 1], [0, 1, 0]], // T
+      [[1, 1, 1], [1, 0, 0]], // L
+      [[1, 1, 1], [0, 0, 1]], // J
+      [[1, 1, 0], [0, 1, 1]], // S
+      [[0, 1, 1], [1, 1, 0]], // Z
+    ];
+
+    shapes.forEach((shape, index) => {
+      const color = currentThemeColors.colors[index];
+      const x = 1 + Math.floor(Math.random() * (gridWidth - shape[0].length));
+      const y = 1 + Math.floor(Math.random() * (gridHeight - shape.length));
+
+      shape.forEach((row, rowIndex) => {
+        row.forEach((cell, cellIndex) => {
+          if (cell) {
+            ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+            ctx.fillRect(
+              (x + cellIndex) * blockSize,
+              (y + rowIndex) * blockSize,
+              blockSize - 1,
+              blockSize - 1
+            );
+
+            const gradient = ctx.createLinearGradient(
+              (x + cellIndex) * blockSize,
+              (y + rowIndex) * blockSize,
+              (x + cellIndex + 1) * blockSize,
+              (y + rowIndex + 1) * blockSize
+            );
+            gradient.addColorStop(0, `#${color.toString(16).padStart(6, '0')}99`);
+            gradient.addColorStop(1, `#${color.toString(16).padStart(6, '0')}33`);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(
+              (x + cellIndex) * blockSize,
+              (y + rowIndex) * blockSize,
+              blockSize - 1,
+              blockSize - 1
+            );
+          }
+        });
+      });
+    });
+  }, [theme]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="border-2 border-gray-700 rounded-lg shadow-lg"
+      style={{ imageRendering: 'pixelated' }}
+    />
+  );
+};
 
 const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -64,46 +163,33 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
-            <h3 className="text-2xl text-white font-semibold mb-4 drop-shadow-glow">Basic Controls</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <h3 className="text-xl text-white font-semibold mb-2 drop-shadow-glow">Basic Controls</h3>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {[
-                { key: 'W', action: 'Rotate piece' },
-                { key: 'A', action: 'Move left' },
-                { key: 'S', action: 'Move down' },
-                { key: 'D', action: 'Move right' },
-                { key: 'SPACE', action: 'Hard drop' },
-                { key: 'R', action: 'Swap piece' },
-                { key: 'MOUSE1', action: 'Click targets'},
+                { key: 'W', action: 'Rotate' },
+                { key: 'A', action: 'Left' },
+                { key: 'S', action: 'Down' },
+                { key: 'D', action: 'Right' },
+                { key: 'SPACE', action: 'Drop' },
+                { key: 'R', action: 'Swap' },
+                { key: 'MOUSE1', action: 'Click'},
               ].map((control) => (
                 <div 
                   key={control.key} 
-                  className={`flex items-center space-x-3 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm transition-all duration-300 ${
+                  className={`flex items-center space-x-2 bg-gray-800/50 p-2 rounded-lg backdrop-blur-sm transition-all duration-300 ${
                     activeKeys.has(control.key) ? 'bg-cyan-900/50 scale-105' : ''
                   }`}
                 >
-                  <kbd 
-                    className={`px-3 py-1.5 ${
-                      activeKeys.has(control.key)
-                        ? 'bg-cyan-500/50 border-cyan-300 shadow-glow-intense animate-pulse-fast'
-                        : 'bg-cyan-500/30 border-cyan-400'
-                    } text-white border rounded-lg font-mono shadow-glow transition-all duration-300`}
+                  <kbd className={`px-2 py-1 ${
+                    activeKeys.has(control.key)
+                      ? 'bg-cyan-500/50 border-cyan-300'
+                      : 'bg-cyan-500/30 border-cyan-400'
+                    } text-white text-sm border rounded-md font-mono shadow-glow transition-all duration-300`}
                   >
-                    {control.key === 'MOUSE1' ? (
-                      <div className="flex items-center space-x-1">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 0C4.477 0 0 4.477 0 10c0 5.522 4.477 10 10 10 5.522 0 10-4.478 10-10 0-5.523-4.478-10-10-10zm0 2c4.411 0 8 3.589 8 8s-3.589 8-8 8-8-3.589-8-8 3.589-8 8-8z"/>
-                        </svg>
-                        <span>Click</span>
-                      </div>
-                    ) : control.key}
+                    {control.key === 'MOUSE1' ? '🖱️' : control.key}
                   </kbd>
-                  <span className={`text-white text-shadow-bright flex items-center space-x-2 ${
-                    activeKeys.has(control.key) ? 'text-cyan-300' : ''
-                  }`}>
-                    <span>{control.action}</span>
-                    {control.icon && <span className="text-xl">{control.icon}</span>}
-                  </span>
+                  <span className="text-white text-sm">{control.action}</span>
                 </div>
               ))}
             </div>
@@ -111,26 +197,26 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         );
       case 2:
         return (
-          <div className="space-y-6">
-            <h3 className="text-2xl text-white font-semibold mb-4 drop-shadow-glow">Special Features</h3>
-            <div className="space-y-4">
+          <div className="space-y-4">
+            <h3 className="text-xl text-white font-semibold mb-2 drop-shadow-glow">Special Features</h3>
+            <div className="grid grid-cols-2 gap-2">
               {[
                 {
                   title: 'Dynamic Camera',
-                  description: 'Experience the game from different angles with automatic camera rotation',
+                  description: 'Auto camera rotation',
                   icon: '🎥'
                 },
                 {
                   title: 'Target Mode',
-                  description: 'Hit the circular targets to clear lines and score points',
+                  description: 'Hit targets to clear lines',
                   icon: '🎯'
                 },
               ].map((feature) => (
-                <div key={feature.title} className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
-                  <span className="text-2xl">{feature.icon}</span>
+                <div key={feature.title} className="flex items-start space-x-2 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
+                  <span className="text-xl">{feature.icon}</span>
                   <div>
-                    <h4 className="text-cyan-200 font-medium text-shadow-glow">{feature.title}</h4>
-                    <p className="text-gray-100 text-shadow-sm">{feature.description}</p>
+                    <h4 className="text-cyan-200 text-sm font-medium">{feature.title}</h4>
+                    <p className="text-gray-100 text-xs">{feature.description}</p>
                   </div>
                 </div>
               ))}
@@ -139,115 +225,32 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         );
       case 3:
         return (
-          <div className="space-y-6">
-            <h3 className="text-2xl text-white font-semibold mb-4 drop-shadow-glow">Ready to Play?</h3>
-            
-            <div className="space-y-6">
-              <div className="bg-gray-800/50 p-8 rounded-lg backdrop-blur-sm">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Left side - Theme Selection */}
-                  <div className="flex-1 space-y-6">
-                    <div>
-                      <h4 className="text-xl text-white mb-4 font-medium">Select Your Theme</h4>
-                      <div className="relative">
-                        <select
-                          value={selectedTheme || DEFAULT_THEME}
-                          onChange={(e) => {
-                            const newTheme = e.target.value as keyof typeof THEMES;
-                            setSelectedTheme(newTheme);
-                            localStorage.setItem('selectedTheme', newTheme);
-                            setCurrentTheme(newTheme);
-                          }}
-                          className="w-full p-4 rounded-lg bg-gray-900/90 border-2 border-cyan-500/30 text-white 
-                                   focus:border-cyan-400/50 focus:outline-none transition-all duration-300
-                                   appearance-none cursor-pointer hover:bg-gray-800/90"
-                        >
-                          {Object.entries(THEMES).sort().map(([themeName]) => (
-                            <option 
-                              key={themeName} 
-                              value={themeName}
-                              className="bg-gray-900 py-2"
-                            >
-                              {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Theme Colors Display */}
-                    <div className="bg-gray-900/50 p-4 rounded-lg space-y-4">
-                      <h5 className="text-white/70 text-sm font-medium">Theme Colors</h5>
-                      <div className="grid grid-cols-4 gap-3">
-                        {selectedTheme && THEMES[selectedTheme as keyof typeof THEMES].colors.map((color, i) => (
-                          <div
-                            key={i}
-                            className="group relative aspect-square rounded-lg overflow-hidden transition-transform hover:scale-105"
-                          >
-                            <div
-                              className="w-full h-full"
-                              style={{ 
-                                backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
-                                boxShadow: `0 0 15px #${color.toString(16).padStart(6, '0')}40`
-                              }}
-                            />
-                            <div 
-                              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                              style={{ 
-                                background: `linear-gradient(45deg, transparent, #${color.toString(16).padStart(6, '0')}80)`
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+          <div className="space-y-4">
+            <h3 className="text-xl text-white font-semibold mb-2 drop-shadow-glow text-center">
+              Themes
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {Object.entries(THEMES).sort().map(([themeName]) => (
+                <div
+                  key={themeName}
+                  onClick={() => {
+                    setSelectedTheme(themeName);
+                    localStorage.setItem('selectedTheme', themeName);
+                    setCurrentTheme(themeName as keyof typeof THEMES);
+                  }}
+                  className={`relative cursor-pointer rounded-lg p-2 transition-all duration-300
+                    ${selectedTheme === themeName ? 
+                      'bg-cyan-500/20 ring-1 ring-cyan-400/50 scale-[1.02]' : 
+                      'bg-gray-900/50 hover:bg-gray-800/50'}`}
+                >
+                  <div className="relative aspect-video mb-2 rounded-lg overflow-hidden">
+                    <PreviewTetris theme={themeName} />
                   </div>
-
-                  {/* Right side - Preview */}
-                  <div className="flex-1 flex flex-col items-center justify-center">
-                    <div className="relative group">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
-                      <div className="relative bg-gray-900 p-4 rounded-lg">
-                        <h5 className="text-white/70 text-sm font-medium mb-4 text-center">Preview</h5>
-                        <div className="flex items-center justify-center">
-                          <div className="transform scale-125 hover:scale-150 transition-transform duration-300">
-                            <PreviewTetris theme={selectedTheme || DEFAULT_THEME} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Theme Properties */}
-                    <div className="mt-6 w-full bg-gray-900/50 p-4 rounded-lg">
-                      <div className="grid grid-cols-3 gap-4">
-                        <ThemePropertyDisplay 
-                          label="Grid"
-                          color={THEMES[selectedTheme as keyof typeof THEMES]?.grid}
-                        />
-                        <ThemePropertyDisplay 
-                          label="Border"
-                          color={THEMES[selectedTheme as keyof typeof THEMES]?.border}
-                        />
-                        <ThemePropertyDisplay 
-                          label="Background"
-                          color={THEMES[selectedTheme as keyof typeof THEMES]?.background}
-                        />
-                      </div>
-                    </div>
+                  <div className="text-sm text-white font-medium text-center">
+                    {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-gray-800/50 p-6 rounded-lg backdrop-blur-sm text-center">
-                <p className="text-white text-lg mb-4 text-shadow-bright">
-                  Dont Forget to join NAR 25-2 !!
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         );
@@ -383,12 +386,10 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     }
   }, [particles, backgroundEffect]);
 
-  // Add function to get theme-based background color
   const getThemeBackgroundColor = (themeName: string) => {
     if (!themeName) return 'rgba(2, 6, 23, 0.95)';
     const theme = THEMES[themeName as keyof typeof THEMES];
     const bgColor = theme.background;
-    // Convert hex to rgba with opacity
     const r = (bgColor >> 16) & 255;
     const g = (bgColor >> 8) & 255;
     const b = bgColor & 255;
@@ -451,7 +452,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
 }, []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fadeIn">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-2 animate-fadeIn">
       <div className="fixed inset-0">
         <canvas
           ref={canvasRef}
@@ -612,19 +613,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     </div>
   );
 };
-
-const ThemePropertyDisplay: React.FC<{ label: string; color: number }> = ({ label, color }) => (
-  <div className="flex flex-col items-center space-y-2">
-    <div 
-      className="w-8 h-8 rounded-lg transition-transform hover:scale-110"
-      style={{ 
-        backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
-        boxShadow: `0 0 10px #${color.toString(16).padStart(6, '0')}40`
-      }}
-    />
-    <span className="text-white/70 text-sm">{label}</span>
-  </div>
-);
 
 const styles = `
   @keyframes grid-move {

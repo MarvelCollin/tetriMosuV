@@ -41,7 +41,6 @@ class TetrisGame {
     private tetrominoBag: number[] = [];  
     private isRotating: boolean = false;
     private pivotPoint: THREE.Vector3;
-    // Add new property for ambient particles
     private ambientParticles: {
         mesh: THREE.Mesh;
         velocity: THREE.Vector3;
@@ -49,10 +48,8 @@ class TetrisGame {
         originalY: number;
     }[] = [];
 
-    // Add callback property for game over
     onGameOver: ((score: number) => void) | null = null;
 
-    // Add new property for pause
     isPaused: boolean = false;
 
     constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, setTetrominoState: (state: { tetromino: number; startX: number; startY: number }) => void) {
@@ -63,7 +60,6 @@ class TetrisGame {
         this.currentX = 3;
         this.currentY = -2;
         
-        // Initialize basic properties
         this.lastRenderTime = 0;
         this.hardDropPressed = false;
         this.dropAnimation = { scale: 1, blocks: new Set() };
@@ -74,38 +70,31 @@ class TetrisGame {
             decay: 0.9
         };
         
-        // Initialize instances
         this.blockInstances = this.initializeBlockInstances();
         this.shadowBlockInstances = this.initializeShadowBlockInstances();
         
-        // Initialize game components
         this.gridManager = new GridManager(10, 20);
         this.gridManager.setGame(this);
         this.renderer = new Renderer(scene, this.gridManager);
         this.particleSystem = new ParticleSystem(scene);
         this.inputHandler = new InputHandler(this);
         
-        // Setup game state
         this.tetrominoBag = this.generateNewBag();
         this.nextTetromino = this.getNextTetromino();
         this.score = 0;
         
-        // Setup visuals
         this.setupLighting();
         this.initializeAmbientParticles();
         this.pivotPoint = new THREE.Vector3(5, -10, 0);
         
-        // Start game
         this.startAutoDrop();
         this.spawnNewTetromino();
         this.renderer.updateScore(this.score);
         
-        // Add event listener
         window.addEventListener('click', this.handleClick);
     }
 
     cleanup() {
-        // Clear intervals and timeouts
         if (this.dropIntervalId) {
             clearInterval(this.dropIntervalId);
             this.dropIntervalId = null;
@@ -115,28 +104,23 @@ class TetrisGame {
             this.timeoutId = null;
         }
 
-        // Remove event listeners
         window.removeEventListener('click', this.handleClick);
 
-        // Reset game state
         this.gameOver = false;
         this.score = 0;
         this.isInTargetMode = false;
         this.currentX = 3;
         this.currentY = -2;
 
-        // Clear all visual elements
         this.circleTargets.forEach(target => target.destroy(this.scene));
         this.circleTargets = [];
 
-        // Clear all blocks from the scene
         this.blocks?.forEach(block => {
             if (block && this.scene.contains(block)) {
                 this.scene.remove(block);
             }
         });
 
-        // Clear ambient particles
         this.ambientParticles.forEach(particle => {
             this.scene.remove(particle.mesh);
             if (particle.mesh.geometry) particle.mesh.geometry.dispose();
@@ -144,7 +128,6 @@ class TetrisGame {
         });
         this.ambientParticles = [];
 
-        // Clear all existing blocks
         this.blockInstances?.forEach(instance => {
             if (instance && this.scene.contains(instance)) {
                 this.scene.remove(instance);
@@ -153,7 +136,6 @@ class TetrisGame {
             }
         });
 
-        // Clear all shadow blocks
         this.shadowBlockInstances?.forEach(instance => {
             if (instance && this.scene.contains(instance)) {
                 this.scene.remove(instance);
@@ -162,20 +144,16 @@ class TetrisGame {
             }
         });
 
-        // Reinitialize block instances
         this.blockInstances = this.initializeBlockInstances();
         this.shadowBlockInstances = this.initializeShadowBlockInstances();
 
-        // Reset and reinitialize grid
         this.gridManager = new GridManager(10, 20);
         this.gridManager.setGame(this);
 
-        // Reset game pieces
         this.tetrominoBag = this.generateNewBag();
         this.nextTetromino = this.getNextTetromino();
         this.currentTetromino = this.getNextTetromino();
 
-        // Clear the entire scene of any remaining blocks
         const objectsToRemove = [];
         this.scene.traverse(object => {
             if (object instanceof THREE.Mesh && object.geometry instanceof THREE.BoxGeometry) {
@@ -188,7 +166,6 @@ class TetrisGame {
             if (object.material) object.material.dispose();
         });
 
-        // Refresh renderer
         this.renderer.renderScene();
     }
 
@@ -407,13 +384,11 @@ class TetrisGame {
         const originalShape = TETROMINOES[this.currentTetromino];
         TETROMINOES[this.currentTetromino] = rotated;
         
-        // Try normal rotation
         if (!this.gridManager.checkCollision(this.currentTetromino, this.currentX, this.currentY)) {
             this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
             return;
         }
         
-        // Try wall kicks - first try moving left/right
         const kicks = [
             { x: 1, y: 0 },   // Try right
             { x: -1, y: 0 },  // Try left
@@ -433,7 +408,6 @@ class TetrisGame {
             }
         }
         
-        // If all wall kicks fail, revert the rotation
         TETROMINOES[this.currentTetromino] = originalShape;
         this.gridManager.placeTetromino(this.currentTetromino, this.currentX, this.currentY);
     }

@@ -48,6 +48,11 @@ class TetrisGame {
         originalY: number;
     }[] = [];
     private animationFrameId: number | null = null;  // Add this property
+    private initialDropInterval: number = 700;  // Initial drop speed in ms
+    private currentDropInterval: number = 700;
+    private minDropInterval: number = 100;      // Fastest drop speed in ms
+    private difficultyIncreaseTimer: NodeJS.Timeout | null = null;
+    private speedIncreaseAmount: number = 50;   // How much to decrease interval each time
 
     onGameOver: ((score: number) => void) | null = null;
 
@@ -93,6 +98,7 @@ class TetrisGame {
         this.renderer.updateScore(this.score);
         
         window.addEventListener('click', this.handleClick);
+        this.setupDifficultyIncrease();
     }
 
     cleanup() {
@@ -168,6 +174,12 @@ class TetrisGame {
         });
 
         this.renderer.renderScene();
+
+        if (this.difficultyIncreaseTimer) {
+            clearInterval(this.difficultyIncreaseTimer);
+            this.difficultyIncreaseTimer = null;
+        }
+        this.currentDropInterval = this.initialDropInterval;
     }
 
     private setupLighting() {
@@ -241,7 +253,7 @@ class TetrisGame {
             if (!this.gameOver && !this.isPaused) {
                 this.moveDown();
             }
-        }, 700);
+        }, this.currentDropInterval);
     }
 
     private generateNewBag(): number[] {
@@ -995,6 +1007,37 @@ class TetrisGame {
 
         // Update renderer to reflect current state
         this.renderer.renderScene();
+    }
+
+    private setupDifficultyIncrease() {
+        this.difficultyIncreaseTimer = setInterval(() => {
+            if (!this.isPaused && !this.gameOver) {
+                this.increaseSpeed();
+            }
+        }, 10000); // Increase speed every 10 seconds
+    }
+
+    private increaseSpeed() {
+        if (this.currentDropInterval > this.minDropInterval) {
+            this.currentDropInterval = Math.max(
+                this.currentDropInterval - this.speedIncreaseAmount,
+                this.minDropInterval
+            );
+            if (this.dropIntervalId) {
+                clearInterval(this.dropIntervalId);
+            }
+            this.startAutoDrop();
+        }
+    }
+
+    handleRestart() {
+        // Add this new method
+        this.currentDropInterval = this.initialDropInterval;
+        if (this.difficultyIncreaseTimer) {
+            clearInterval(this.difficultyIncreaseTimer);
+        }
+        this.setupDifficultyIncrease();
+        this.startAutoDrop();
     }
 }
 

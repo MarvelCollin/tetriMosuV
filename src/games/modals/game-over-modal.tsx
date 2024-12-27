@@ -11,7 +11,7 @@ const GameOverModal: React.FC<IGameOverModal> = ({ score, onClose }) => {
         <div className="fixed inset-0 flex items-center justify-center z-50 animate-fadeIn">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
             
-            <div className="relative bg-gray-900/90 border-2 border-cyan-400/50 rounded-xl p-8 max-w-md w-full mx-auto 
+            <div className="relative bg-gray-900/90 border-2 border-white rounded-xl p-8 max-w-md w-full mx-auto 
                           backdrop-blur-md animate-slideUp">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 
                               opacity-50 animate-pulse" />

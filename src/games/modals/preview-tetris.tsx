@@ -1,5 +1,6 @@
-
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { IPreviewTetris } from "../../interfaces/IPreviewTetris";
+import { THEMES, setCurrentTheme } from '../colors';
 
 export const PreviewTetris: React.FC<IPreviewTetris> = ({ theme }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);

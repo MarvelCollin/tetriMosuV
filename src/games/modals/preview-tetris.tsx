@@ -1,13 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import { THEMES, setCurrentTheme } from '../colors';
 
+import { IPreviewTetris } from "../../interfaces/IPreviewTetris";
 
-interface PreviewTetrisProps {
-  theme: string;
-}
-
-const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export const PreviewTetris: React.FC<IPreviewTetris> = ({ theme }) => {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -103,5 +98,3 @@ const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
     />
   );
 };
-
-export default PreviewTetris;

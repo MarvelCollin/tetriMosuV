@@ -1,19 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { THEMES, setCurrentTheme } from '../colors';
-
-interface TutorialModalProps {
-  onClose: () => void;
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  speedX: number;
-  speedY: number;
-  size: number;
-  color: string;
-}
+import { IParticle } from '../../interfaces/IParticle';
+import { ITutorialModal } from '../../interfaces/ITutorialModal';
+import { PreviewTetris } from './preview-tetris';
 
 const KEY_MAPPING: { [key: string]: string } = {
   'W': 'W',
@@ -25,10 +15,29 @@ const KEY_MAPPING: { [key: string]: string } = {
   'MOUSE1': 'MOUSE1'
 };
 
-interface PreviewTetrisProps {
-  theme: string;
-}
 
+const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+  const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
+
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
+  const [backgroundEffect, setBackgroundEffect] = useState<string>('');
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const [bgColor, setBgColor] = useState<string>('');
+  const [selectedTheme, setSelectedTheme] = useState<string>('');
+
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      setSlideDirection('right');
+      setCurrentStep(currentStep + 1);
+    } else {
+      onClose();
+    }
+  };
 const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   
@@ -126,29 +135,6 @@ const PreviewTetris: React.FC<PreviewTetrisProps> = ({ theme }) => {
     />
   );
 };
-
-const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-
-  const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
-
-  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
-  const [backgroundEffect, setBackgroundEffect] = useState<string>('');
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  const [bgColor, setBgColor] = useState<string>('');
-  const [selectedTheme, setSelectedTheme] = useState<string>('');
-
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setSlideDirection('right');
-      setCurrentStep(currentStep + 1);
-    } else {
-      onClose();
-    }
-  };
 
   const handlePrevious = () => {
     if (currentStep === 1) {
@@ -260,7 +246,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   };
 
   const particles = useMemo(() => {
-    const particlesArray: Particle[] = [];
+    const particlesArray: IParticle[] = [];
     for (let i = 0; i < 60; i++) {
       particlesArray.push({
         x: Math.random() * window.innerWidth,
@@ -317,7 +303,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
     };
   }, [currentStep, onClose]);
 
-  const animateParticles = useCallback((ctx: CanvasRenderingContext2D) => {
+  const animateIParticles = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     
     const width = window.innerWidth;
@@ -426,7 +412,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       if (delta < interval) return;
 
       lastTime = currentTime - (delta % interval);
-      animateParticles(ctx);
+      animateIParticles(ctx);
     };
 
     frameId = requestAnimationFrame(animate);
@@ -441,10 +427,9 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [animateParticles]);
+  }, [animateIParticles]);
 
   useEffect(() => {
-    // Set initial theme when component mounts
     if (!selectedTheme) {
         const currentThemeName = localStorage.getItem('selectedTheme') || DEFAULT_THEME;
         setSelectedTheme(currentThemeName);

@@ -300,27 +300,41 @@ const Game = () => {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
-        <p className="mb-4 text-lg text-mobile-message animate-fade-in">This game is not available on mobile devices. Please switch to a laptop or PC to play.</p>
-        <button 
-          onClick={() => window.location.href = '/'} 
-          className="flex items-center px-4 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-all duration-300 animate-bounce"
-        >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white p-8">
+        <div className="animate-float-slow text-center space-y-6 max-w-md">
+          <h1 className="text-2xl font-bold animate-fade-in-up mb-4 text-shadow-neon">
+            Desktop Experience Required
+          </h1>
+          <p className="text-lg mb-8 ">
+            please switch to a{' '}
+            <span className="text-sky font-bold ">laptop</span> or{' '}
+            <span className="text-sky font-bold ">PC</span> to play the game.
+          </p>
+          <button 
+            onClick={() => window.location.href = '/'} 
+            className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 animate-fade-in-up-delay-2"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Home
-        </button>
+            <div className="absolute inset-0 rounded-full bg-black blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+            <div className="relative flex items-center justify-center  text-black">
+              <svg 
+                className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              <span className="group-hover:translate-x-1 transition-transform">
+                Return to Home
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
     );
   }

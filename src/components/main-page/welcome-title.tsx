@@ -22,8 +22,8 @@ export default function WelcomeTitle({ isExiting = false }) {
                   ${isExiting ? 'animate-scale-out opacity-0' : 'opacity-100'}`}
     >
       {isMobile && (
-        <div className="bg-red-700 text-white font-bold text-lg mb-4 p-4 rounded shadow-lg border-4 border-red-900 animate-pulse-slow">
-          <h2 className="text-2xl mb-2">⚠️ Attention</h2>
+        <div className="bg-red-700 text-white font-bold text-lg mb-4 p-4 rounded shadow-lg border-4 border-red-900">
+          <h2 className="text-2xl mb-2 animate-bounce">⚠️ Attention</h2>
           <p>
             It looks like you're on a <span style={{ backgroundColor: 'yellow', color: 'black', fontWeight: 'bold', padding: '0 4px' }}>phone</span>. For the best experience, please use a <span style={{ backgroundColor: 'green', color: 'black', fontWeight: 'bold', padding: '0 4px' }}>laptop</span> or <span style={{ backgroundColor: 'green', color: 'black', fontWeight: 'bold', padding: '0 4px' }}>PC</span>.
           </p>

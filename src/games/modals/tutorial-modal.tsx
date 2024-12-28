@@ -89,8 +89,8 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
       case 2:
         return (
           <div className="space-y-4">
-            <h3 className="text-xl text-white font-semibold mb-2 drop-shadow-glow">Special Features</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <h3 className="text-[2.5vh] text-white font-semibold mb-2 drop-shadow-glow">Special Features</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 {
                   title: 'Dynamic Camera',
@@ -98,21 +98,21 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
                   icon: '🎥'
                 }
               ].map((feature) => (
-                <div key={feature.title} className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
-                  <span className="text-2xl">{feature.icon}</span>
+                <div key={feature.title} className="flex items-start space-x-4 bg-gray-800/50 p-[2vh] rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
+                  <span className="text-[4vh]">{feature.icon}</span>
                   <div>
-                    <h4 className="text-cyan-200 text-xl font-medium">{feature.title}</h4>
-                    <p className="text-gray-100 text-xs">{feature.description}</p>
+                    <h4 className="text-cyan-200 text-[2.5vh] font-medium">{feature.title}</h4>
+                    <p className="text-gray-100 text-[1.5vh]">{feature.description}</p>
                   </div>
                 </div>
               ))}
             </div>
             <div className="space-y-4 mt-4">
-              <div className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
-                <img src="public/assets/images/circle.jpeg" alt="Circle" className="w-24 h-24" />
+              <div className="flex flex-col sm:flex-row items-start space-x-0 sm:space-x-4 space-y-4 sm:space-y-0 bg-gray-800/50 p-[2vh] rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
+                <img src="public/assets/images/circle.jpeg" alt="Circle" className="w-[12vh] h-[12vh] mx-auto sm:mx-0" />
                 <div>
-                  <h4 className="text-cyan-200 text-xl font-medium">Circle Click</h4>
-                  <p className="text-gray-100 text-xs">Make sure you click on the circle like this to earn score and clear the line</p>
+                  <h4 className="text-cyan-200 text-[2.5vh] font-medium">Circle Click</h4>
+                  <p className="text-gray-100 text-[1.5vh]">Make sure you click on the circle like this to earn score and clear the line</p>
                 </div>
               </div>
             </div>
@@ -366,7 +366,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
               linear-gradient(to right, rgba(99, 255, 255, 0.15) 1px, transparent 1px),
               linear-gradient(to bottom, rgba(99, 255, 255, 0.15) 1px, transparent 1px)
             `,
-            backgroundSize: '30px 30px',
+            backgroundSize: '3vh 3vh',
             animation: 'grid-move 15s linear infinite',
           }}
         />
@@ -378,16 +378,16 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
                 linear-gradient(45deg, transparent 48%, rgba(0, 255, 255, 0.1) 50%, transparent 52%),
                 linear-gradient(-45deg, transparent 48%, rgba(0, 255, 255, 0.1) 50%, transparent 52%)
               `,
-              backgroundSize: '60px 60px',
+              backgroundSize: '6vh 6vh',
               animation: 'pattern-move 20s linear infinite',
             }}
           />
         </div>
 
         <div className="absolute w-full h-full overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-cyan-400/20 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute bottom-1/4 right-1/4 w-56 h-56 bg-blue-400/20 rounded-full blur-3xl animate-float-slow" />
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl animate-spin-slow" />
+          <div className="absolute top-1/4 left-1/4 w-[24vh] h-[24vh] bg-cyan-400/20 rounded-full blur-3xl animate-pulse-slow" />
+          <div className="absolute bottom-1/4 right-1/4 w-[28vh] h-[28vh] bg-blue-400/20 rounded-full blur-3xl animate-float-slow" />
+          <div className="absolute top-1/2 left-1/2 w-[32vh] h-[32vh] bg-purple-400/20 rounded-full blur-3xl animate-spin-slow" />
         </div>
 
         {backgroundEffect === 'keypress' && (
@@ -406,7 +406,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
               transform: 'translate(-50%, -50%)'
             }}
           >
-            <div className="absolute w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2">
+            <div className="absolute w-[50vh] h-[50vh] -translate-x-1/2 -translate-y-1/2">
               <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ripple-out" />
               <div className="absolute inset-0 bg-cyan-500/10 rounded-full animate-ripple-out-delayed" />
             </div>
@@ -414,17 +414,17 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
         )}
       </div>
 
-      <div className="relative">
-          <p className="text-9xl  font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
-            <span className="inline-block animate-float-title transition-all duration-300">2</span>
-            <span className="inline-block animate-float-title-delayed mx-2">5</span>
-            <span className="inline-block animate-float-title-more-delayed">-</span>
-            <span className="inline-block animate-float-title">2</span>
-            <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
-          </p>
-        <div className="relative bg-gray-900/80 border-2 border-cyan-400/50 rounded-xl p-8 max-w-3xl w-full mx-auto backdrop-blur-md animate-slideUp">
+      <div className="relative max-w-full p-4 sm:p-8">
+        <p className="text-[6vh] sm:text-[9vh] font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
+          <span className="inline-block animate-float-title transition-all duration-300">2</span>
+          <span className="inline-block animate-float-title-delayed mx-2">5</span>
+          <span className="inline-block animate-float-title-more-delayed">-</span>
+          <span className="inline-block animate-float-title">2</span>
+          <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
+        </p>
+        <div className="relative bg-gray-900/80 border-2 border-cyan-400/50 rounded-xl p-4 sm:p-8 max-w-3xl w-full mx-auto backdrop-blur-md animate-slideUp">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 opacity-50 animate-pulse" />
-          <div className="relative bg-gray-900/90 p-8 rounded-lg overflow-hidden">
+          <div className="relative bg-gray-900/90 p-4 sm:p-8 rounded-lg overflow-hidden">
             <div className="absolute -top-4 -right-4 animate-bounce-slow">
               <button
                 onClick={onClose}
@@ -434,7 +434,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
               </button>
             </div>
 
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
+            <h2 className="text-[3vh] sm:text-[4vh] sm:text-[5vh] font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
               <span className="inline-block animate-float-title transition-all duration-300">HOW</span>
               <span className="inline-block animate-float-title-delayed mx-2">TO</span>
               <span className="inline-block animate-float-title-more-delayed">PLAY</span>
@@ -455,7 +455,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
             <div className="mt-8 flex items-center justify-between animate-fadeIn">
               <button
                 onClick={handlePrevious}
-                className={`px-6 py-2 rounded-lg text-white font-medium relative overflow-hidden group 
+                className={`px-4 sm:px-6 py-2 rounded-lg text-white font-medium relative overflow-hidden group 
                   bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 
                   transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 
                   active:scale-95`}
@@ -476,7 +476,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
                     } transition-all duration-300`}
                   >
                     <div
-                      className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                      className={`w-[1vh] h-[1vh] rounded-full transition-all duration-500 ${
                         i + 1 === currentStep 
                           ? 'bg-cyan-400 animate-ping-slow' 
                           : 'bg-gray-600 hover:bg-gray-400'
@@ -491,7 +491,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
 
               <button
                 onClick={handleNext}
-                className="px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95"
+                className="px-4 sm:px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95"
               >
                 <span className="relative z-10 group-hover:animate-pulse-fast">
                   {currentStep === totalSteps ? 'Start' : 'Next'}

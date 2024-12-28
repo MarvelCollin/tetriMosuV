@@ -69,7 +69,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                                 {[
                                     { text: "Active BINUS Student", icon: "🎓", desc: "Currently enrolled in BINUS University" },
                                     { text: "2 Year Commitment", icon: "📝", desc: "Willing to sign a contract" },
-                                    { text: "Grade B in Algorithm and Programming / Introduction to Programming", icon: "💯", desc: "*Except for first semester students" },
+                                    { text: "Minimum Grade B in Algorithm and Programming / Introduction to Programming", icon: "💯", desc: "*Except for first semester students" },
                                     { text: "SoCS/SoIS/DP/MTP", icon: "🏫", desc: "Students from eligible majors" }
                                 ].map((req, idx) => (
                                     <div

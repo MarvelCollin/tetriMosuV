@@ -93,7 +93,6 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
               </div>
             </div>
 
-            {/* Test Schedule Card */}
             <div 
               className={`flex-1 w-full group perspective transition-all duration-1000 delay-500 transform
                 ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}

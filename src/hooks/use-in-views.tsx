@@ -8,8 +8,15 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
   const lastLoggedSectionRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const calculateThreshold = () => {
+      // Adjust threshold based on zoom level
+      const zoomLevel = Math.min(window.innerWidth / window.outerWidth, 1);
+      return Math.max(0.5, Math.min(0.85 * zoomLevel, 0.85));
+    };
+
     const observer = new IntersectionObserver(([entry]) => {
-      const isNowInView = entry.intersectionRatio >= 0.85;
+      const threshold = calculateThreshold();
+      const isNowInView = entry.intersectionRatio >= threshold;
       
       if (isNowInView !== prevInViewRef.current) {
         setIsInView(isNowInView);
@@ -24,19 +31,31 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         }
       }
     }, {
-      threshold: [0.85], 
-      rootMargin: '-50px 0px -50px 0px', 
+      threshold: [0.5, 0.85], // Multiple thresholds for smoother transitions
+      rootMargin: '-10% 0px -10% 0px', // Percentage-based margins
       ...options
     });
+
+    const handleResize = () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+        observer.observe(ref.current);
+      }
+    };
 
     if (ref.current) {
       observer.observe(ref.current);
     }
 
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('zoom', handleResize); // Some browsers support zoom event
+
     return () => {
       if(ref.current) {
         observer.unobserve(ref.current);
       }
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('zoom', handleResize);
     };
   }, [options, sectionName, hasTriggered]);
 

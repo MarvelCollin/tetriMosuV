@@ -17,8 +17,15 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
   const animationFrameRef = useRef<number>();
   const shapesRef = useRef<any[]>([]);
 
+  const getResponsiveSize = () => {
+    const vw = window.innerWidth * 0.02; // 2vw
+    return Math.min(Math.max(vw, 15), 30); // min 15px, max 30px
+  };
+
   const createNewShapes = (count: number) => {
     const shapes = [];
+    const responsiveSize = getResponsiveSize();
+    
     for (let i = 0; i < count; i++) {
       const randomShape = [
         [[1, 1, 1, 1]], // I
@@ -37,13 +44,13 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
         shape: randomShape,
         color,
         x: Math.random() * window.innerWidth,
-        y: -(randomShape.length * 25 * sizeVariation) - (Math.random() * window.innerHeight * 2), 
+        y: -(randomShape.length * responsiveSize * sizeVariation) - (Math.random() * window.innerHeight * 2), 
         speed: 2 + (Math.random() * 0.3) / sizeVariation,
         pattern: 'straight',
         opacity: 1,
         rotation: 0,
-        scale: sizeVariation,
-        originalScale: sizeVariation,
+        scale: sizeVariation * (window.innerWidth / 1920), // Base scale on viewport width
+        originalScale: sizeVariation * (window.innerWidth / 1920),
         isReset: false
       });
     }
@@ -73,12 +80,26 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
 
-    const size = 25;
+    const size = getResponsiveSize();
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth * window.devicePixelRatio;
-      canvas.height = window.innerHeight * window.devicePixelRatio;
-      context.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = window.innerWidth;
+      const displayHeight = window.innerHeight;
+      
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.height = `${displayHeight}px`;
+      
+      context.scale(dpr, dpr);
+
+      // Update existing shapes scale when zooming
+      shapesRef.current = shapesRef.current.map(shape => ({
+        ...shape,
+        scale: shape.originalScale * (window.innerWidth / 1920),
+      }));
     };
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
@@ -164,12 +185,14 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
     }
 
     const drawShape = (shape: number[][], x: number, y: number, color: string, rotation = 0, opacity = 1, scale = 1) => {
+      const responsiveSize = getResponsiveSize();
+      const adjustedSize = responsiveSize * scale;
+      
       context.save();
-      const adjustedSize = size * scale;
       context.translate(x + (shape[0].length * adjustedSize) / 2, y + (shape.length * adjustedSize) / 2);
       context.rotate(rotation);
       context.scale(scale, scale);
-      context.translate(-(shape[0].length * size) / 2, -(shape.length * size) / 2);
+      context.translate(-(shape[0].length * responsiveSize) / 2, -(shape.length * responsiveSize) / 2);
       context.globalAlpha = opacity;
 
       context.shadowBlur = 15;
@@ -187,7 +210,7 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
                 context.shadowBlur = 10;
                 context.globalAlpha = opacity;
               }
-              context.fillRect(cellIndex * size, rowIndex * size, size, size);
+              context.fillRect(cellIndex * responsiveSize, rowIndex * responsiveSize, responsiveSize, responsiveSize);
             }
           });
         });
@@ -199,7 +222,7 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
       shape.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
           if (cell) {
-            context.fillRect(cellIndex * size + 2, rowIndex * size + 2, size - 4, size - 4);
+            context.fillRect(cellIndex * responsiveSize + 2, rowIndex * responsiveSize + 2, responsiveSize - 4, responsiveSize - 4);
           }
         });
       });
@@ -277,7 +300,7 @@ const TetrisBackground: React.FC<ITetrisBackground> = ({
         className="absolute top-0 left-0 w-full h-full"
         style={{
           mixBlendMode: 'lighten',
-          transition: 'filter 1s ease', 
+          transition: 'all 0.3s ease',
           pointerEvents: 'none' 
         }}
       />

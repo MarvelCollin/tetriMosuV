@@ -96,7 +96,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               <div className={`group relative flex flex-col items-center animate-float phase-group-${phase.phase}`}>
                 <div 
                   className={`particle-container w-[8vmin] h-[8vmin] md:w-[10vmin] md:h-[10vmin] rounded-full 
-                             flex items-center justify-center bg-cyan-500/20 border-2 border-white 
+                             flex items-center justify-center bg-cyan-500/20 border-2 border-white -translate-y-[10vh] 
                              transition-all duration-300 phase-card-${phase.phase}`}
                 >
                   <span className="text-[2vmin] md:text-[2.5vmin]" id="hero-text-static">{phase.phase}</span>

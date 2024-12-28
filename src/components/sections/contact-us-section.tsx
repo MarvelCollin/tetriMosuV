@@ -4,7 +4,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered }) => (
   <section
     ref={sectionRef}
-    className={`w-full h-screen min-h-[800px] snap-start relative flex items-center justify-center pointer-events-auto  mb-20 transition-all duration-1000 transform ${
+    className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 transition-all duration-1000 transform ${
       hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
     }`}
     onWheel={(e) => {
@@ -13,16 +13,16 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
       }
     }}
   >
-    <div className="w-full max-w-7xl px-8 flex flex-col items-center justify-center">
-      <h1 className={`text-6xl font-bold text-white mb-16 text-center text-shadow-glow relative group transition-all duration-1000 ${
+    <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 flex flex-col items-center justify-center">
+      <h1 className={`text-[5vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[1vh] text-center text-shadow-glow relative group transition-all duration-1000 ${
         hasTriggered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
       }`}>
         <span className="inline-block animate-float-title">CONTACT</span>
         <span className="inline-block animate-float-title-delayed mx-2">US</span>
       </h1>
 
-      <div className="flex flex-col items-center gap-16 w-full">
-        <div className="grid grid-cols-3 w-full gap-8">
+      <div className="flex flex-col items-center gap-8 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-4 md:gap-6 lg:gap-8">
           {[
             {
               title: "Location",
@@ -42,7 +42,7 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
           ].map((item, index) => (
             <div
               key={index}
-              className={`group relative p-6 rounded-xl bg-black/50
+              className={`group relative p-4 md:p-6 rounded-xl bg-black/50
                           border border-white/10 hover:border-white/30 
                           transition-all duration-500 transform
                           ${hasTriggered 
@@ -54,19 +54,19 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
               }}
             >
               <div className="relative z-10">
-                <span className={`text-3xl mb-4 block transition-all duration-500 ${
+                <span className={`text-[4vmin] md:text-[3vmin] mb-4 block transition-all duration-500 ${
                   hasTriggered ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                 }`} style={{ transitionDelay: `${(index * 200) + 300}ms` }}>
                   {item.icon}
                 </span>
-                <h3 className={`text-2xl mb-4 transition-all duration-500 ${
+                <h3 className={`text-[3vmin] md:text-[2.5vmin] mb-4 transition-all duration-500 ${
                   hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                 }`} style={{ transitionDelay: `${(index * 200) + 400}ms` }} id="hero-text-static">
                   {item.title}
                 </h3>
                 {item.content.map((line, i) => (
                   <p key={i} 
-                    className={`text-white/70 text-xl leading-relaxed group-hover:text-white 
+                    className={`text-white/70 text-[2.5vmin] md:text-[2vmin] leading-relaxed group-hover:text-white 
                               transition-all duration-500
                               ${hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}
                     style={{ transitionDelay: `${(index * 200) + 500 + (i * 100)}ms` }}>
@@ -81,8 +81,8 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
         <div className={`w-full max-w-2xl transition-all duration-1000 transform ${
           hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
         }`} style={{ transitionDelay: '800ms' }}>
-          <h3 className="text-2xl mb-8 text-center" id="hero-text-static">Connect With Us</h3>
-          <div className="flex justify-center gap-12">
+          <h3 className="text-[3vmin] md:text-[2.5vmin] mb-8 text-center" id="hero-text-static">Connect With Us</h3>
+          <div className="flex justify-center gap-8 md:gap-12">
             {[
               {
                 name: 'Instagram',
@@ -116,9 +116,9 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
                 <img
                   src={social.icon}
                   alt={social.name}
-                  className="w-8 h-8 group-hover:scale-125 transition-transform duration-300 object-contain"
+                  className="w-[6vmin] md:w-[5vmin] h-[6vmin] md:h-[5vmin] group-hover:scale-125 transition-transform duration-300 object-contain"
                 />
-                <span className="text-white/70 text-xl group-hover:text-white transition-colors">
+                <span className="text-white/70 text-[2.5vmin] md:text-[2vmin] group-hover:text-white transition-colors">
                   {social.name}
                 </span>
               </a>

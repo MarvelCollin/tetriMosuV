@@ -12,7 +12,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
       </h1>
 
       <div className="relative h-[min(60vh,600px)] px-4">
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
+        <svg className="absolute inset-0 w-full h-full rotate-90 sm:rotate-0" viewBox="0 0 1000 600" preserveAspectRatio="none">
           <path
             id="roadPath"
             d="M100,300 C250,300 350,100 500,300 C650,500 750,100 900,300"
@@ -51,7 +51,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               phase: "01",
               title: "Initial Test",
               isCurrent: true,
-              position: "left-[calc(15%_+_2vw)] top-[45%]",
+              position: "left-[50%] top-[10%] sm:left-[calc(15%_+_2vw)] sm:top-[45%]",
               steps: ["Aptitude Test", "Programming Test"],
               pathPercent: 15,
               color: "rgb(34, 197, 94)", // green-500
@@ -60,7 +60,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
             {
               phase: "02",
               title: "Pre Training",
-              position: "left-[calc(35%_+_2vw)] top-[25%]",
+              position: "left-[90%] top-[30%] sm:left-[calc(35%_+_2vw)] sm:top-[25%]",
               steps: ["DS Using C", "OOP Using Java", "Database"],
               pathPercent: 35,
               color: "rgb(59, 130, 246)", // blue-500
@@ -69,7 +69,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
             {
               phase: "03",
               title: "Interview",
-              position: "left-[calc(65%_-_2vw)] top-[65%]",
+              position: "left-[25%] top-[60%] sm:left-[calc(65%_-_2vw)] sm:top-[65%]",
               steps: ["Resume", "Presentation"],
               pathPercent: 50,
               color: "rgb(234, 179, 8)", // yellow-500
@@ -78,7 +78,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
             {
               phase: "04",
               title: "Core Training",
-              position: "left-[calc(85%_-_2vw)] top-[45%]",
+              position: "left-[75%] top-[70%] sm:left-[calc(85%_-_2vw)] sm:top-[45%]",
               steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"],
               pathPercent:70,
               color: "rgb(239, 68, 68)", // red-500
@@ -86,71 +86,48 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
             }
           ].map((phase, index) => (
             <div key={index}
-              className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2
+              className={`absolute ${phase.position} transform -translate-x-1/2 -translate-y-1/2 rotate-0 sm:rotate-90
                 ${phase.isCurrent ? 'z-20 scale-110' : 'z-10'} opacity-0
                 ${hasTriggered ? 'animate-fade-in-card' : ''}`}
               style={{
                 animationDelay: `${(phase.pathPercent / 100) * 4}s`
               }}
             >
-              <div className={`group relative flex flex-col items-center animate-float phase-group-${phase.phase}`}>
+              <div className={`group relative flex w-[10vw] h-[10vw] flex-col items-center animate-float phase-group-${phase.phase}`}>
                 <div 
                   className={`particle-container w-[8vmin] h-[8vmin] md:w-[10vmin] md:h-[10vmin] rounded-full 
-                             flex items-center justify-center bg-cyan-500/20 border-2 border-${phase.color} ${phase.glow} -translate-y-[10vh] 
+                             flex items-center justify-center border-[${phase.color}] ${phase.glow} 
+                             -translate-y-[10vw] md:-translate-y-[10vh]
                              transition-all duration-300 phase-card-${phase.phase}`}
+                  style={{ 
+                    boxShadow: `0 0 15px ${phase.color}`,
+                    '--fire-color': phase.color 
+                  }}
                 >
                   <span className="text-[2vmin] md:text-[2.5vmin]" id="hero-text-static">{phase.phase}</span>
 
                   {phase.isCurrent && (
                     <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
                   )}
-                  
-                  <div className="particles-wrapper absolute inset-0 opacity-100">
-                    {[...Array(8)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="particle"
-                        style={{
-                          left: `${Math.random() * 100}%`,
-                          top: `${Math.random() * 100}%`,
-                          '--random-x': `${(Math.random() - 0.5) * 20}px`, 
-                          '--random-y': `-${Math.random() * 50 + 20}px`,
-                          '--initial-opacity': 0.4,
-                          animationDelay: `${i * 0.2}s`, 
-                          animationDuration: '1.5s',
-                          animation: 'recruitment-particle 1.5s ease-out infinite',
-                          width: '3px',
-                          height: '3px',
-                          color: phase.color,
-                          backgroundColor: phase.color,
-                        }}
-                      />
-                    ))}
-                  </div>
                 </div>
 
                 <div 
-                  className={`mt-4 text-center bg-black/50 border-2 border-${phase.color} ${phase.glow} rounded-lg p-2 md:p-3
+                  className={`mt-4 text-center bg-black/50 border-2 rounded-lg p-2 md:p-3
                            transition-all duration-300 phase-card-${phase.phase} relative overflow-visible
                            w-[20vmin] md:w-[25vmin]`}
+                  style={{ borderColor: phase.color, boxShadow: `0 0 15px ${phase.color}` }}
                 >
-                  <div className="particles-wrapper absolute -bottom-4 w-full opacity-100">
-                    {[...Array(20)].map((_, i) => (
+                  <div className="particles-wrapper">
+                    {[...Array(8)].map((_, i) => (
                       <div
                         key={i}
-                        className="particle"
+                        className="particle-fire"
                         style={{
                           left: `${Math.random() * 100}%`,
                           top: `${Math.random() * 100}%`,
-                          '--random-x': `${(Math.random() - 0.5) * 30}px`,
-                          '--random-y': `-${Math.random() * 150 + 50}px`,
-                          animationDelay: `${i * 0.1}s`,
-                          animationDuration: '2s',
-                          width: `${Math.random() * 3 + 2}px`,
-                          height: `${Math.random() * 3 + 2}px`,
-                          color: phase.color,
-                          backgroundColor: phase.color,
-                          opacity: Math.random() * 0.5 + 0.5
+                          '--random-x': `${(Math.random() - 0.5) * 20}px`,
+                          '--random-y': `-${Math.random() * 50 + 20}px`,
+                          '--fire-color': phase.color,
                         }}
                       />
                     ))}
@@ -176,3 +153,4 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
 );
 
 export default RecruitmentPhaseSection;
+

@@ -190,33 +190,6 @@ function Home() {
 
   return (
     <div className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative">
-      {/* Add cooldown indicator */}
-      {showWelcome && (
-        <div className="fixed right-4 top-4 z-50 w-8 h-8">
-          <svg className="w-full h-full transform -rotate-90">
-            <circle
-              className="text-gray-700"
-              strokeWidth="4"
-              stroke="currentColor"
-              fill="transparent"
-              r="14"
-              cx="16"
-              cy="16"
-            />
-            <circle
-              className="text-blue-500 transition-all duration-100"
-              strokeWidth="4"
-              stroke="currentColor"
-              fill="transparent"
-              r="14"
-              cx="16"
-              cy="16"
-              strokeDasharray={88}
-              strokeDashoffset={88 - ((88 * cooldownProgress) / 100)}
-            />
-          </svg>
-        </div>
-      )}
       <div
       className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative"
       onClick={!showWelcome ? handleClick : undefined}

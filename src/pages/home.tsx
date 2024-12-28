@@ -30,6 +30,7 @@ function Home() {
   const [isFalling, setIsFalling] = useState(false);
   const [isExploding, setIsExploding] = useState(false);
   const [isOnWelcomeSection, setIsOnWelcomeSection] = useState(true);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
@@ -65,24 +66,10 @@ function Home() {
   const scrollToWelcome = () => {
     const container = document.querySelector('.snap-y');
     if (container) {
-      const currentScroll = container.scrollTop;
-      const start = performance.now();
-      const duration = 1000; 
-
-      function animate(currentTime: number) {
-        const elapsed = currentTime - start;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        
-        container.scrollTop = currentScroll * (1 - easeProgress);
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      }
-
-      requestAnimationFrame(animate);
+      container.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -123,6 +110,35 @@ function Home() {
       }
     };
   }, [showWelcome]);
+
+  useEffect(() => {
+    if (isTransitioning) {
+      const container = document.querySelector('.snap-y');
+      if (container) {
+        container.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [isTransitioning]);
+
+  const handleWheel = (e: WheelEvent) => {
+    if (section5InView && e.deltaY > 0 && !isScrolling) {
+      setIsScrolling(true);
+      scrollToWelcome();
+      setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('wheel', handleWheel);
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, [section5InView, isScrolling]);
 
   return (
     <div

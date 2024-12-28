@@ -87,16 +87,17 @@ function Home() {
 
   const handleGameClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsGameTransitioning(true);
-    
-    const logo = document.querySelector('.slc-logo') as HTMLElement;
-    if (logo) {
-      logo.classList.add('animate-logo-expand-smooth');
-    }
-    
+    scrollToWelcome();
     setTimeout(() => {
-      navigate('/game');
-    }, 1500);
+      setIsGameTransitioning(true);
+      const logo = document.querySelector('.slc-logo') as HTMLElement;
+      if (logo) {
+        logo.classList.add('animate-logo-expand-smooth');
+      }
+      setTimeout(() => {
+        navigate('/game');
+      }, 1500);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -261,6 +262,14 @@ function Home() {
           </div>
         )}
       </div>
+      {!isOnWelcomeSection && (
+        <button
+          onClick={handleGameClick}
+          className="absolute top-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 z-50"
+        >
+          Play Game
+        </button>
+      )}
     </div>
     </div>
   );

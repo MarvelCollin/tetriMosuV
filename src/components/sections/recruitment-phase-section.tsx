@@ -104,7 +104,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                     '--fire-color': phase.color 
                   }}
                 >
-                  <span className="text-[2vmin] md:text-[2.5vmin]" id="hero-text-static">{phase.phase}</span>
+                  <span className="text-[3vmin] md:text-[2.5vmin]" id="hero-text-static">{phase.phase}</span>
 
                   {phase.isCurrent && (
                     <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
@@ -114,7 +114,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                 <div 
                   className={`mt-4 text-center bg-black/50 border-2 rounded-lg p-2 md:p-3
                            transition-all duration-300 phase-card-${phase.phase} relative overflow-visible
-                           w-[20vmin] md:w-[25vmin]`}
+                           w-[30vmin] md:w-[25vmin]`}
                   style={{ borderColor: phase.color, boxShadow: `0 0 15px ${phase.color}` }}
                 >
                   <div className="particles-wrapper">
@@ -132,11 +132,11 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                       />
                     ))}
                   </div>
-                  <h3 className="text-[1.5vmin] md:text-[2vmin] mb-2" id="hero-text-static">{phase.title}</h3>
+                  <h3 className="text-[3vmin] md:text-[2vmin] mb-2" id="hero-text-static">{phase.title}</h3>
                   <div className="space-y-1">
                     {phase.steps.map((step, i) => (
                       <div key={i}
-                        className={`text-[1.2vmin] md:text-[1.5vmin] text-white`}>
+                        className={`text-[1.6vmin] md:text-[1.5vmin] text-white`}>
                         {step}
                       </div>
                     ))}

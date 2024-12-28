@@ -1595,3 +1595,20 @@ html {
 .animate-pulse-glow {
   animation: pulse-glow 1.5s ease-in-out infinite;
 }
+
+/* Hide scrollbars for all browsers */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari and Opera */
+}
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}

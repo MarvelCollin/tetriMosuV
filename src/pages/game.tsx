@@ -340,7 +340,7 @@ const Game = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden hide-scrollbar">
       <div className={`fixed inset-0 bg-black z-50 pointer-events-none transition-opacity duration-300 opacity-0`} />
       <button
         onClick={handleOpenSettings}

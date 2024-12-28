@@ -1715,3 +1715,85 @@ html, body {
     transform: rotate(90deg);
   }
 }
+
+@media (max-width: 640px) {
+  /* Reduce padding and margins */
+  .container {
+    padding: 1rem;
+    margin: 0 auto;
+  }
+
+  /* Decrease font sizes */
+  body {
+    font-size: 14px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-size: 1.25rem;
+  }
+
+  /* Adjust animation durations */
+  .animate-fade-in,
+  .animate-slide-in-right,
+  .animate-slide-in-left {
+    animation-duration: 0.8s;
+  }
+
+  /* Simplify complex animations */
+  .animate-glitch-text {
+    animation: none;
+  }
+
+  /* Stack elements vertically */
+  .flex-row {
+    flex-direction: column;
+  }
+
+  /* Make images responsive */
+  img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Adjust navigation menu */
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Compact card layouts */
+  .requirement-card {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Hide unnecessary elements */
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Ensure container is compact */
+  .container {
+    padding: 1vh 2vw;
+    margin: 0 auto;
+  }
+
+  /* Adjust fonts globally if necessary */
+  body {
+    font-size: 14px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-size: 1.25rem;
+  }
+
+  /* Modify animations for better performance on mobile */
+  .animate-float-title,
+  .animate-float-title-delayed {
+    animation-duration: 2s;
+  }
+
+  /* ...other global responsive styles... */
+}

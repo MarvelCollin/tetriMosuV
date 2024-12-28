@@ -14,8 +14,8 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
         transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}
         style={{ transitionDelay: '200ms' }}
       >
-        <span className="inline-block hover:scale-105 transition-transform duration-300">ASSISTANT</span>
-        <span className="inline-block hover:scale-105 transition-transform duration-300 mx-2">BENEFITS</span>
+        <span className="inline-block animate-float-title">ASSISTANT</span>
+        <span className="inline-block mx-2 animate-float-title-delayed">BENEFITS</span>
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6 lg:gap-8">
@@ -61,7 +61,6 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
             key={index}
             className={`group bg-black/90 backdrop-blur-md rounded-xl p-3 md:p-4 lg:p-6 border border-white/10
               transition-all duration-300 ease-out transform
-              hover:border-${category.color}-500/50 hover:bg-black/95
               ${hasTriggered 
                 ? 'opacity-100 translate-y-0' 
                 : 'opacity-0 translate-y-20'}`}
@@ -77,7 +76,6 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
                   key={idx}
                   className={`flex items-center gap-2 p-2 rounded-lg
                     transform transition-all duration-500 ease-out
-                    hover:translate-x-2 hover:bg-white/5
                     ${hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}
                   style={{ transitionDelay: `${600 + index * 200 + idx * 100}ms` }}
                 >

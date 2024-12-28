@@ -24,7 +24,6 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
 
         <div className="relative w-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-[1vh] lg:gap-[1vw]">
-            {/* Aptitude Test Card */}
             <div 
               className={`flex-1 w-full group perspective transition-all duration-1000 transform
                 ${hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}`}

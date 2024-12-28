@@ -18,7 +18,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
             ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '200ms' }}
                 >
-                    <span className="inline-block cursor-pointer">REGISTRATION</span>
+                    <span className="inline-block cursor-pointer animate-float-title">REGISTRATION</span>
                 </h1>
 
                 <div className="relative">

@@ -862,6 +862,7 @@ html {
   font-family: "Joystix Monospace", sans-serif;
 }
 
+
 @layer utilities {
   .delay-100 {
     transition-delay: 100ms;
@@ -1596,14 +1597,13 @@ html {
   animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
-/* Hide scrollbars for all browsers */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari and Opera */
+  display: none;           
 }
 
 html, body {

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ScrollIndicator from '../main-page/scroll-indicator';
 
-const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered }) => {
+const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
   useEffect(() => {
     const handleScroll = (e) => {
       if (sectionInView && e.deltaY > 0) {
@@ -24,7 +24,6 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
       }`}
       onWheel={(e) => {
         if (e.deltaY > 0) {
-          scrollToTop();
         }
       }}
     >
@@ -142,7 +141,6 @@ const ContactUsSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered
           </div>
         </div>
       </div>
-      <ScrollIndicator text="Back to Top" onClick={scrollToTop} />
     </section>
   );
 };

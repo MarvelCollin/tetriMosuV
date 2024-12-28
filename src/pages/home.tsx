@@ -32,6 +32,13 @@ function Home() {
   const [isOnWelcomeSection, setIsOnWelcomeSection] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const [showModal, setShowModal] = useState(true);
+  const [isScrollLocked, setIsScrollLocked] = useState(false);
+  const [lastScrollTime, setLastScrollTime] = useState(0);
+  const scrollTimeout = useRef<number | null>(null);
+  const scrollThreshold = useRef(0);
+  const [cooldownProgress, setCooldownProgress] = useState(100); // Add this state
+  const cooldownDuration = 1000; // 1 second cooldown
+  const cooldownInterval = useRef<number>();
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
@@ -125,25 +132,92 @@ function Home() {
   }, [isTransitioning]);
 
   const handleWheel = (e: WheelEvent) => {
-    if (section5InView && e.deltaY > 0 && !isScrolling) {
-      setIsScrolling(true);
-      scrollToWelcome();
-      setTimeout(() => {
-        setIsScrolling(false);
-      }, 1000);
+    e.preventDefault();
+    
+    const now = Date.now();
+    if (isScrollLocked || now - lastScrollTime < cooldownDuration) {
+      return;
+    }
+
+    const container = document.querySelector('.snap-y');
+    if (container) {
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const currentScroll = container.scrollTop;
+      const nextScroll = currentScroll + (window.innerHeight * direction);
+      
+      setIsScrollLocked(true);
+      setLastScrollTime(now);
+      setCooldownProgress(0);
+      
+      container.scrollTo({
+        top: nextScroll,
+        behavior: 'smooth'
+      });
+
+      if (cooldownInterval.current) {
+        clearInterval(cooldownInterval.current);
+      }
+      
+      cooldownInterval.current = window.setInterval(() => {
+        setCooldownProgress(prev => {
+          const newProgress = prev + (100 / (cooldownDuration / 50)); 
+          if (newProgress >= 100) {
+            clearInterval(cooldownInterval.current);
+            setIsScrollLocked(false);
+            return 100;
+          }
+          return newProgress;
+        });
+      }, 50);
     }
   };
 
   useEffect(() => {
-    window.addEventListener('wheel', handleWheel);
+    const container = document.querySelector('.snap-y');
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    
     return () => {
-      window.removeEventListener('wheel', handleWheel);
+      if (container) {
+        container.removeEventListener('wheel', handleWheel);
+      }
+      if (cooldownInterval.current) {
+        clearInterval(cooldownInterval.current);
+      }
     };
-  }, [section5InView, isScrolling]);
-
+  }, [lastScrollTime, isScrollLocked]);
 
   return (
-    <div
+    <div className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative">
+      {/* Add cooldown indicator */}
+      {showWelcome && (
+        <div className="fixed right-4 top-4 z-50 w-8 h-8">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle
+              className="text-gray-700"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="transparent"
+              r="14"
+              cx="16"
+              cy="16"
+            />
+            <circle
+              className="text-blue-500 transition-all duration-100"
+              strokeWidth="4"
+              stroke="currentColor"
+              fill="transparent"
+              r="14"
+              cx="16"
+              cy="16"
+              strokeDasharray={88}
+              strokeDashoffset={88 - ((88 * cooldownProgress) / 100)}
+            />
+          </svg>
+        </div>
+      )}
+      <div
       className="w-full h-screen flex flex-col items-center bg-black justify-center font-game relative"
       onClick={!showWelcome ? handleClick : undefined}
     >
@@ -205,7 +279,6 @@ function Home() {
               sectionRef={section5Ref}
               sectionInView={section5InView}
               hasTriggered={section5Triggered}
-              scrollToTop={scrollToWelcome}
             />
 
           </div>
@@ -215,6 +288,7 @@ function Home() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

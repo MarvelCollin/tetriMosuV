@@ -1612,3 +1612,13 @@ html, body {
   padding: 0;
   height: 100%;
 }
+
+@keyframes cooldown-pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}
+
+.cooldown-active {
+  animation: cooldown-pulse 1s infinite;
+}

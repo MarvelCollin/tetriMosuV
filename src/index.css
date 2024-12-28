@@ -1000,7 +1000,7 @@ html {
   --initial-opacity: 1;
   transform-origin: center;
   will-change: transform, opacity;
-  animation: particle-float var(--duration, 1.5s) ease-out infinite;
+  animation: recruitment-particle var(--duration, 1.5s) ease-out infinite;
   transform: translateZ(0);
   backface-visibility: hidden;
   filter: none; /* Removed blur for better performance */
@@ -1643,6 +1643,21 @@ html, body {
 }
 
 @keyframes particle-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--random-x) * 1px), calc(var(--random-y) * 1px)) scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(calc(var(--random-x) * 2px), calc(var(--random-y) * 2px)) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes recruitment-particle {
   0% {
     transform: translate(0, 0) scale(1);
     opacity: 1;

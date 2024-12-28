@@ -118,9 +118,11 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                           '--initial-opacity': 0.4,
                           animationDelay: `${i * 0.2}s`, 
                           animationDuration: '1.5s',
+                          animation: 'recruitment-particle 1.5s ease-out infinite',
                           width: '3px',
                           height: '3px',
                           color: phase.color,
+                          backgroundColor: phase.color,
                         }}
                       />
                     ))}
@@ -147,6 +149,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                           width: `${Math.random() * 3 + 2}px`,
                           height: `${Math.random() * 3 + 2}px`,
                           color: phase.color,
+                          backgroundColor: phase.color,
                           opacity: Math.random() * 0.5 + 0.5
                         }}
                       />

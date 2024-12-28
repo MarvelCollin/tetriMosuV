@@ -30,7 +30,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
             >
               <div className="relative transform transition-transform duration-500 group-hover:rotate-y-12">
                 <div className="p-2 md:p-3 lg:p-4 rounded-xl transition-all duration-300 bg-gradient-to-br from-cyan-500/10 to-transparent">
-                  <div className="flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                  <div className="flex items-center justify-center gap-1 md:gap-2 mb-1 md:mb-2">
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">🧠</span>
                     </div>
@@ -62,7 +62,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
               <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
                 <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-2 md:p-3 lg:p-4 rounded-xl 
                   hover:border-purple-500/40 transition-all duration-300">
-                  <div className="flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                  <div className="flex items-center justify-center gap-1 md:gap-2 mb-1 md:mb-2">
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-purple-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">💻</span>
                     </div>

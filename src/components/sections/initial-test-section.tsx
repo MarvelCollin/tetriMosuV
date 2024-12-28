@@ -4,7 +4,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered }) => (
   <section
     ref={sectionRef}
-    className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10`}
+    className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-8`}
   >
     <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6"> 
       <h1 
@@ -23,7 +23,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
         ></div>
 
         <div className="relative w-full">
-          <div className="flex flex-col lg:flex-row justify-between items-start gap-[1vh] lg:gap-[1vw]">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-[0.5vh] lg:gap-[0.5vw]">
             {/* Aptitude Test Card */}
             <div 
               className={`flex-1 w-full group perspective transition-all duration-1000 transform
@@ -31,14 +31,14 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
             >
               <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
                 <div className="p-[1.5vh] lg:p-[1.5vw] rounded-xl transition-all duration-300">
-                  <div className="flex items-center gap-[1vw] mb-[1.5vh]">
+                  <div className="flex items-center gap-[0.5vw] mb-[1vh]">
                     <div className="w-[8vmin] h-[8vmin] md:w-[6vmin] md:h-[6vmin] rounded-xl bg-cyan-500/20 flex items-center justify-center">
                       <span className="text-[4vmin] md:text-[3vmin]">🧠</span>
                     </div>
                     <h2 className="text-[3vmin] md:text-[2.5vmin]" id="hero-text-static">Aptitude Test</h2>
                   </div>
 
-                  <div className="space-y-[1vh]">
+                  <div className="space-y-[0.5vh]">
                     {[
                       { name: "Mathematical Reasoning", desc: "Solve mathematical problems" },
                       { name: "Pattern Recognition", desc: "Identify sequences and patterns" },
@@ -64,14 +64,14 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
               <div className="relative transform transition-all duration-500 group-hover:rotate-y-12">
                 <div className="bg-gradient-to-br from-purple-500/10 to-transparent p-[1.5vh] lg:p-[1.5vw] rounded-xl 
                   hover:border-purple-500/40 transition-all duration-300">
-                  <div className="flex items-center gap-[1vw] mb-[1.5vh]">
+                  <div className="flex items-center gap-[0.5vw] mb-[1vh]">
                     <div className="w-[8vmin] h-[8vmin] md:w-[6vmin] md:h-[6vmin] rounded-xl bg-purple-500/20 flex items-center justify-center">
                       <span className="text-[4vmin] md:text-[3vmin]">💻</span>
                     </div>
                     <h2 className="text-[3vmin] md:text-[2.5vmin]" id="hero-text-static">Programming Test</h2>
                   </div>
-                  <h3 className="text-[2.5vmin] md:text-[2vmin] text-white/90 mb-[1vh]">You can use : </h3>
-                  <div className="space-y-[1vh]">
+                  <h3 className="text-[2.5vmin] md:text-[2vmin] text-white/90 mb-[0.5vh]">You can use : </h3>
+                  <div className="space-y-[0.5vh]">
                     {[
                       { lang: "C/C++" },
                       { lang: "Java" },
@@ -98,24 +98,24 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
 
           {/* Test Schedule Card */}
           <div 
-            className={`mt-[2vh] group perspective transition-all duration-1000 delay-500 transform
+            className={`mt-[1vh] group perspective transition-all duration-1000 delay-500 transform
               ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
           >
             <div className="relative transform transition-all duration-500 group-hover:rotate-x-12">
               <div className="p-[1.5vh] lg:p-[1.5vw] rounded-xl transition-all duration-300">
-                <div className="flex items-center justify-center gap-[1vw] mb-[1.5vh]">
+                <div className="flex items-center justify-center gap-[0.5vw] mb-[1vh]">
                   <div className="w-[8vmin] h-[8vmin] md:w-[6vmin] md:h-[6vmin] rounded-xl bg-blue-500/20 flex items-center justify-center">
                     <span className="text-[4vmin] md:text-[3vmin]">📅</span>
                   </div>
                   <h2 className="text-[3vmin] md:text-[2.5vmin]" id="hero-text-static">Test Schedule</h2>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-[1vh] lg:gap-[1vw]">
-                  <div className="space-y-[1vh] justify-items-end align-middle">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-[0.5vh] lg:gap-[0.5vw]">
+                  <div className="space-y-[0.5vh] justify-items-end align-middle">
                     <div className="bg-black p-[1.5vh] lg:p-[1.5vw] rounded-lg border border-white transition-all duration-300">  
-                      <h3 className="text-[4vmin] md:text-[3vmin] text-white/90 mb-[1vh] transform hover:translate-x-2
+                      <h3 className="text-[4vmin] md:text-[3vmin] text-white/90 mb-[0.5vh] transform hover:translate-x-2
                           transition-all duration-300">27 March 2024</h3>
-                      <div className="space-y-[1vh]">
+                      <div className="space-y-[0.5vh]">
                         <p className="text-[3vmin] md:text-[2.5vmin] text-white transform hover:translate-x-2
                           transition-all duration-300">Batch 1: 08:00 - 11:00</p>
                         <p className="text-[3vmin] md:text-[2.5vmin] text-white transform hover:translate-x-2
@@ -124,7 +124,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     </div>
                   </div>
 
-                  <div className="space-y-[1vh]">
+                  <div className="space-y-[0.5vh]">
                     {[
                       { text: "Dress Politely", icon: "👔" },
                       { text: "Bring Binusian Card", icon: "🪪" },

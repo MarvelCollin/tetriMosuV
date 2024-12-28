@@ -20,7 +20,7 @@ export const PageTransitionProvider = ({ children }: { children: React.ReactNode
 export const usePageTransition = () => {
   const context = useContext(PageTransitionContext);
   if (!context) {
-    throw new Error('usePageTransition must be used within a PageTransitionProvider');
+    throw new Error('page transiitonnya error');
   }
   return context;
 };

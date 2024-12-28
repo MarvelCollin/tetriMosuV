@@ -5,10 +5,8 @@ import TutorialModal from '../games/modals/tutorial-modal';
 import { currentTheme } from '../games/colors';
 import GameOverModal from '../games/modals/game-over-modal';
 import SettingsModal from '../games/modals/settings-modal';
-import { usePageTransition } from '../context/page-transition-context';
 
 const Game = () => {
-  const { endTransition } = usePageTransition();
   const mountRef = useRef<HTMLDivElement>(null);
   const [showTutorial, setShowTutorial] = useState(true);
   const [tetrominoState, setTetrominoState] = useState({ tetromino: 0, startX: 3, startY: 0 });
@@ -225,6 +223,7 @@ const Game = () => {
 }, []);
 
   useEffect(() => {
+    // Remove the delay to start initialization immediately
     if (!showTutorial) {
       const cleanup = initializeGame();
       const handleKeyPress = (event: KeyboardEvent) => {
@@ -264,15 +263,6 @@ const Game = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
-  useEffect(() => {
-    // End the transition after the game scene is initialized
-    const timer = setTimeout(() => {
-      endTransition();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleOpenSettings = () => {
     setShowSettings(true);
     if (gameInstanceRef.current) {
@@ -300,9 +290,8 @@ const Game = () => {
 
   return (
     <div className="relative">
-      {/* Add a transition overlay */}
-      <div className={`fixed inset-0 bg-black z-50 pointer-events-none transition-opacity duration-300
-        ${showTutorial ? 'opacity-0' : 'opacity-100'}`} />
+      {/* Remove the transition overlay opacity-100 state */}
+      <div className={`fixed inset-0 bg-black z-50 pointer-events-none transition-opacity duration-300 opacity-0`} />
       <button
         onClick={handleOpenSettings}
         className="fixed top-4 left-4 z-50 p-3 rounded-full bg-white border border-cyan-500/30 hover:bg-white transition-all duration-300 group backdrop-blur-sm"

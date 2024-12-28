@@ -6,7 +6,6 @@ import { PageTransitionProvider } from './context/page-transition-context';
 
 function App() {
   return (
-    <PageTransitionProvider>
       <Router>
         <Routes>
           <Route path="/home" element={<Home />} />
@@ -14,7 +13,6 @@ function App() {
           <Route path="/" element={<Home />} />
         </Routes>
       </Router>
-    </PageTransitionProvider>
   );
 }
 

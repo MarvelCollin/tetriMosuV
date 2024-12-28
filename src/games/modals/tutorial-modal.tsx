@@ -5,6 +5,8 @@ import { IParticle } from '../../interfaces/IParticle';
 import { ITutorialModal } from '../../interfaces/ITutorialModal';
 import { PreviewTetris } from './preview-tetris';
 
+const DEFAULT_THEME = 'synthwave';
+
 const KEY_MAPPING: { [key: string]: string } = {
   'W': 'W',
   'A': 'A',

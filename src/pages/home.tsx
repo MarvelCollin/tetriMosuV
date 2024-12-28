@@ -31,6 +31,7 @@ function Home() {
   const [isExploding, setIsExploding] = useState(false);
   const [isOnWelcomeSection, setIsOnWelcomeSection] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [showModal, setShowModal] = useState(true);
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
   const [section2Ref, section2InView, section2Triggered] = useInView({}, 'Recruitment Phase');
@@ -139,6 +140,7 @@ function Home() {
       window.removeEventListener('wheel', handleWheel);
     };
   }, [section5InView, isScrolling]);
+
 
   return (
     <div

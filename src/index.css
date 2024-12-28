@@ -1622,3 +1622,37 @@ html, body {
 .cooldown-active {
   animation: cooldown-pulse 1s infinite;
 }
+
+/* Particle animation styles */
+.particle-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: particle-float 5s infinite ease-in-out;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--random-x) * 1px), calc(var(--random-y) * 1px)) scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(calc(var(--random-x) * 2px), calc(var(--random-y) * 2px)) scale(1);
+    opacity: 0;
+  }
+}

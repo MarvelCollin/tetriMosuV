@@ -36,7 +36,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
         </h1>
 
         <div className="flex flex-col items-center gap-8 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-8 md:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-4 md:gap-6 lg:gap-8">
             {[
               {
                 title: "Location",
@@ -56,7 +56,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
             ].map((item, index) => (
               <div
                 key={index}
-                className={`group relative p-3 md:p-4 lg:p-6 rounded-xl bg-black/50
+                className={`group relative p-2 md:p-4 lg:p-6 rounded-xl bg-black/50
                             border border-white/10 hover:border-white/30 
                             transition-all duration-500 transform
                             ${hasTriggered 
@@ -67,17 +67,19 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
                   transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
               >
-                <div className="relative z-10">
-                  <span className={`text-[6vmin] md:text-[4vmin] mb-4 block transition-all duration-500 ${
+                <div className="relative z-10 flex items-center gap-2">
+                  <span className={`text-[5vmin] md:text-[4vmin] transition-all duration-500 ${
                     hasTriggered ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                   }`} style={{ transitionDelay: `${(index * 200) + 300}ms` }}>
                     {item.icon}
                   </span>
-                  <h3 className={`text-[4vmin] md:text-[3vmin] mb-4 transition-all duration-500 ${
+                  <h3 className={`text-[4vmin] md:text-[3vmin] transition-all duration-500 ${
                     hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                   }`} style={{ transitionDelay: `${(index * 200) + 400}ms` }} id="hero-text-static">
                     {item.title}
                   </h3>
+                </div>
+                <div className="mt-2">
                   {item.content.map((line, i) => (
                     <p key={i} 
                       className={`text-white/70 text-[3vmin] md:text-[2vmin] leading-relaxed group-hover:text-white 

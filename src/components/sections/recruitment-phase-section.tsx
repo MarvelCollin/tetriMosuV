@@ -55,7 +55,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               steps: ["Aptitude Test", "Programming Test"],
               pathPercent: 15,
               color: "rgb(34, 197, 94)", // green-500
-              hoverStyle: "hover:!border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.5)]"
+              glow: "shadow-[0_0_15px_rgba(34,197,94,0.5)]"
             },
             {
               phase: "02",
@@ -64,7 +64,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               steps: ["DS Using C", "OOP Using Java", "Database"],
               pathPercent: 35,
               color: "rgb(59, 130, 246)", // blue-500
-              hoverStyle: "hover:!border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+              glow: "shadow-[0_0_15px_rgba(59,130,246,0.5)]"
             },
             {
               phase: "03",
@@ -73,7 +73,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               steps: ["Resume", "Presentation"],
               pathPercent: 50,
               color: "rgb(234, 179, 8)", // yellow-500
-              hoverStyle: "hover:!border-yellow-500 hover:shadow-[0_0_15px_rgba(234,179,8,0.5)]"
+              glow: "shadow-[0_0_15px_rgba(234,179,8,0.5)]"
             },
             {
               phase: "04",
@@ -82,7 +82,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               steps: ["Learning Session", "Case Solving", "Presentation", "Evaluation"],
               pathPercent:70,
               color: "rgb(239, 68, 68)", // red-500
-              hoverStyle: "hover:!border-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+              glow: "shadow-[0_0_15px_rgba(239,68,68,0.5)]"
             }
           ].map((phase, index) => (
             <div key={index}
@@ -96,7 +96,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               <div className={`group relative flex flex-col items-center animate-float phase-group-${phase.phase}`}>
                 <div 
                   className={`particle-container w-[8vmin] h-[8vmin] md:w-[10vmin] md:h-[10vmin] rounded-full 
-                             flex items-center justify-center bg-cyan-500/20 border-2 border-white -translate-y-[10vh] 
+                             flex items-center justify-center bg-cyan-500/20 border-2 border-${phase.color} ${phase.glow} -translate-y-[10vh] 
                              transition-all duration-300 phase-card-${phase.phase}`}
                 >
                   <span className="text-[2vmin] md:text-[2.5vmin]" id="hero-text-static">{phase.phase}</span>
@@ -105,7 +105,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                     <div className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping" />
                   )}
                   
-                  <div className="particles-wrapper absolute inset-0">
+                  <div className="particles-wrapper absolute inset-0 opacity-100">
                     {[...Array(8)].map((_, i) => (
                       <div
                         key={i}
@@ -130,11 +130,11 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                 </div>
 
                 <div 
-                  className={`mt-4 text-center bg-black/50 border-2 border-white rounded-lg p-2 md:p-3
+                  className={`mt-4 text-center bg-black/50 border-2 border-${phase.color} ${phase.glow} rounded-lg p-2 md:p-3
                            transition-all duration-300 phase-card-${phase.phase} relative overflow-visible
                            w-[20vmin] md:w-[25vmin]`}
                 >
-                  <div className="particles-wrapper absolute -bottom-4 w-full opacity-0 group-hover:opacity-100">
+                  <div className="particles-wrapper absolute -bottom-4 w-full opacity-100">
                     {[...Array(20)].map((_, i) => (
                       <div
                         key={i}

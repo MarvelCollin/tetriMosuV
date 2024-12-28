@@ -235,7 +235,6 @@ const Game = () => {
 }, []);
 
   useEffect(() => {
-    // Remove the delay to start initialization immediately
     if (!showTutorial) {
       const cleanup = initializeGame();
       const handleKeyPress = (event: KeyboardEvent) => {
@@ -250,7 +249,6 @@ const Game = () => {
         if (gameInstanceRef.current?.dropIntervalId) {
           clearInterval(gameInstanceRef.current.dropIntervalId);
         }
-        // Remove tutorial when component unmounts
         const tutorial = document.querySelector('.fixed.bottom-4.right-4');
         if (tutorial) {
           tutorial.remove();
@@ -264,7 +262,7 @@ const Game = () => {
       if (event.key === 'Escape') {
         setShowSettings(prev => {
           if (gameInstanceRef.current) {
-            gameInstanceRef.current.togglePause();
+            // gameInstanceRef.current.togglePause();
           }
           return !prev;
         });

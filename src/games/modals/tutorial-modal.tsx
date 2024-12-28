@@ -94,23 +94,27 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
               {[
                 {
                   title: 'Dynamic Camera',
-                  description: 'Auto camera rotation',
+                  description: 'Auto camera rotation with random interval',
                   icon: '🎥'
-                },
-                {
-                  title: 'Target Mode',
-                  description: 'Hit targets to clear lines',
-                  icon: '🎯'
-                },
+                }
               ].map((feature) => (
-                <div key={feature.title} className="flex items-start space-x-2 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
-                  <span className="text-xl">{feature.icon}</span>
+                <div key={feature.title} className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
+                  <span className="text-2xl">{feature.icon}</span>
                   <div>
-                    <h4 className="text-cyan-200 text-sm font-medium">{feature.title}</h4>
+                    <h4 className="text-cyan-200 text-xl font-medium">{feature.title}</h4>
                     <p className="text-gray-100 text-xs">{feature.description}</p>
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="space-y-4 mt-4">
+              <div className="flex items-start space-x-4 bg-gray-800/50 p-4 rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
+                <img src="public/assets/images/circle.jpeg" alt="Circle" className="w-24 h-24" />
+                <div>
+                  <h4 className="text-cyan-200 text-xl font-medium">Circle Click</h4>
+                  <p className="text-gray-100 text-xs">Make sure you click on the circle like this to earn score and clear the line</p>
+                </div>
+              </div>
             </div>
           </div>
         );

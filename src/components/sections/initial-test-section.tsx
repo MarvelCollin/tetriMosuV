@@ -4,7 +4,7 @@ import ScrollIndicator from '../main-page/scroll-indicator';
 const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTriggered }) => (
   <section
     ref={sectionRef}
-    className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-8`}
+    className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-40 md:mb-8`}
   >
     <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6"> 
       <h1 

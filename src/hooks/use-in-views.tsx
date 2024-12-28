@@ -8,14 +8,8 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
   const lastLoggedSectionRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const calculateThreshold = () => {
-      const zoomLevel = Math.min(window.innerWidth / window.outerWidth, 1);
-      return Math.max(0.5, Math.min(0.85 * zoomLevel, 0.85));
-    };
-
     const observer = new IntersectionObserver(([entry]) => {
-      const threshold = calculateThreshold();
-      const isNowInView = entry.intersectionRatio >= threshold;
+      const isNowInView = entry.isIntersecting;
       
       if (isNowInView !== prevInViewRef.current) {
         setIsInView(isNowInView);
@@ -30,7 +24,7 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         }
       }
     }, {
-      threshold: [0.5, 0.85],
+      threshold: [0.1, 0.5, 0.85],
       rootMargin: '0px 0px -10% 0px',
       ...options
     });

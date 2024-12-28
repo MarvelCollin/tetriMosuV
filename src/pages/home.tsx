@@ -161,7 +161,7 @@ function Home() {
     
       <div className={`relative z-10 w-full ${pageTransition}`}>
         {showWelcome ? (
-          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative pointer-events-auto">
+          <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative pointer-events-auto space-y-8 md:space-y-0">
             
             <WelcomeSection
               sectionRef={section1Ref}
@@ -182,16 +182,22 @@ function Home() {
               scrollToTop={scrollToWelcome}
             />
             
+            <div className="h-40 md:hidden"></div> 
+            
             <RegistrationSection
               sectionRef={section4Ref}
               hasTriggered={section4Triggered}
             />
             
+            <div className="h-40 md:hidden"></div> 
             <AssistantBenefitsSection
               sectionRef={section6Ref}
               sectionInView={section6InView}
               hasTriggered={section6Triggered}
             />
+            
+            <div className="h-40 md:hidden"></div> 
+            <div className="h-40 md:hidden"></div> 
             
             <ContactUsSection
               sectionRef={section5Ref}

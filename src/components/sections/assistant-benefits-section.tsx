@@ -10,7 +10,7 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
     }`}
   >
     <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6">
-      <h1 className={`text-[5vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-700 
+      <h1 className={`text-[4vw] md:text-[3vw] lg:text-[2.5vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-700 
         transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}
         style={{ transitionDelay: '200ms' }}
       >
@@ -67,7 +67,7 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
                 : 'opacity-0 translate-y-20'}`}
             style={{ transitionDelay: `${400 + index * 200}ms` }}
           >
-            <h2 className="text-[4vw] md:text-[3vw] lg:text-[2.5vw] mb-[1vh]" id="hero-text-static">
+            <h2 className="text-[3.5vw] md:text-[2.5vw] lg:text-[2vw] mb-[1vh]" id="hero-text-static">
               {category.title}
             </h2>
 
@@ -81,8 +81,8 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
                     ${hasTriggered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}
                   style={{ transitionDelay: `${600 + index * 200 + idx * 100}ms` }}
                 >
-                  <span className="text-[3vmin] md:text-[2.5vmin]">{skill.icon}</span>
-                  <span className="text-[2.5vmin] md:text-[2vmin] text-white/90">{skill.name}</span>
+                  <span className="text-[2.5vmin] md:text-[2vmin]">{skill.icon}</span>
+                  <span className="text-[2vmin] md:text-[1.5vmin] text-white/90">{skill.name}</span>
                 </div>
               ))}
             </div>

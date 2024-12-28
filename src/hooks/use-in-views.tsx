@@ -9,7 +9,6 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
 
   useEffect(() => {
     const calculateThreshold = () => {
-      // Adjust threshold based on zoom level
       const zoomLevel = Math.min(window.innerWidth / window.outerWidth, 1);
       return Math.max(0.5, Math.min(0.85 * zoomLevel, 0.85));
     };
@@ -31,8 +30,8 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         }
       }
     }, {
-      threshold: [0.5, 0.85], // Multiple thresholds for smoother transitions
-      rootMargin: '-10% 0px -10% 0px', // Percentage-based margins
+      threshold: [0.5, 0.85],
+      rootMargin: '0px 0px -10% 0px',
       ...options
     });
 
@@ -48,14 +47,12 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
     }
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('zoom', handleResize); // Some browsers support zoom event
 
     return () => {
       if(ref.current) {
         observer.unobserve(ref.current);
       }
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('zoom', handleResize);
     };
   }, [options, sectionName, hasTriggered]);
 

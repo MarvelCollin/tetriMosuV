@@ -14,7 +14,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                 className={`w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
             >
                 <h1
-                    className={`text-[5vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-1000 transform hover-float
+                    className={`text-[4vw] md:text-[3vw] lg:text-[2.5vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-1000 transform hover-float
             ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '200ms' }}
                 >
@@ -43,14 +43,14 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                                 onMouseEnter={() => setHoveredDate(index)}
                                 onMouseLeave={() => setHoveredDate(null)}
                             >
-                                <div className={`w-[8vmin] h-[8vmin] md:w-[6vmin] md:h-[6vmin] rounded-full flex items-center justify-center 
+                                <div className={`w-[6vmin] h-[6vmin] md:w-[5vmin] md:h-[5vmin] rounded-full flex items-center justify-center 
                   border border-white relative timeline-dot cursor-pointer`}>
-                                    <span className="text-[4vmin] md:text-[3vmin] transform transition-transform duration-300
+                                    <span className="text-[3vmin] md:text-[2.5vmin] transform transition-transform duration-300
                     ${hoveredDate === index ? 'scale-125' : ''}">{item.icon}</span>
                                 </div>
                                 <div className={`mt-[1vh] text-center transform transition-all duration-300 text-white/90`}>
-                                    <p className="text-[3vmin] md:text-[2.5vmin] font-bold">{item.date}</p>
-                                    <p className="text-[2.5vmin] md:text-[2vmin]">{item.event}</p>
+                                    <p className="text-[2.5vmin] md:text-[2vmin] font-bold">{item.date}</p>
+                                    <p className="text-[2vmin] md:text-[1.5vmin]">{item.event}</p>
                                 </div>
                             </div>
                         ))}
@@ -59,7 +59,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                     <div className="mt-8 relative">
                         <div className="flex flex-col items-center space-y-6">
                             <h2
-                                className="text-[4vw] md:text-[3vw] lg:text-[2.5vw] mb-4 hover-float cursor-pointer"
+                                className="text-[3.5vw] md:text-[2.5vw] lg:text-[2vw] mb-4 hover-float cursor-pointer"
                                 id="hero-text-static"
                             >
                                 Requirements
@@ -80,15 +80,15 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                       ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
                                         style={{ transitionDelay: `${1600 + idx * 200}ms` }}
                                     >
-                                        <div className="w-[6vmin] h-[6vmin] md:w-[5vmin] md:h-[5vmin] rounded-lg flex items-center justify-center flex-shrink-0
+                                        <div className="w-[5vmin] h-[5vmin] md:w-[4vmin] md:h-[4vmin] rounded-lg flex items-center justify-center flex-shrink-0
                                   transition-transform duration-200">
-                                            <span className="text-[3vmin] md:text-[2.5vmin] transform group-hover:scale-110 transition-transform duration-200">
+                                            <span className="text-[2.5vmin] md:text-[2vmin] transform group-hover:scale-110 transition-transform duration-200">
                                                 {req.icon}
                                             </span>
                                         </div>
                                         <div>
-                                            <h3 className="text-[2.5vmin] md:text-[2vmin] text-white/90 mb-1">{req.text}</h3>
-                                            <p className="text-[2vmin] md:text-[1.5vmin] text-white/60">{req.desc}</p>
+                                            <h3 className="text-[2vmin] md:text-[1.5vmin] text-white/90 mb-1">{req.text}</h3>
+                                            <p className="text-[1.5vmin] md:text-[1.2vmin] text-white/60">{req.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -103,8 +103,8 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                                 <div className="absolute -inset-1 via-purple-500 to-cyan-500 
                               rounded-lg blur opacity-30 group-hover:opacity-70 transition duration-300"></div>
                                 <button className="relative px-12 py-4 rounded-lg  flex items-center divide-x divide-gray-600">
-                                    <span className="text-[4vmin] md:text-[3vmin] pr-6" id="hero-text-static">Register Now</span>
-                                    <span className="text-[3vmin] md:text-[2.5vmin] pl-6 text-white bounce-x inline-block">→</span>
+                                    <span className="text-[3.5vmin] md:text-[2.5vmin] pr-6" id="hero-text-static">Register Now</span>
+                                    <span className="text-[2.5vmin] md:text-[2vmin] pl-6 text-white bounce-x inline-block">→</span>
                                 </button>
                             </a>
                         </div>

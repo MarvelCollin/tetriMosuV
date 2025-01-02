@@ -141,6 +141,14 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
               ))}
             </div>
           </div>
+
+          <div className={`w-full text-center mt-8 transition-all duration-1000 transform ${
+            hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+          }`} style={{ transitionDelay: '1300ms' }}>
+            <p className="text-[3vmin] md:text-[2.5vmin] text-white/80 italic">
+              "Confront the challenges of learning and outgrow the boundaries together." ~ 24-2
+            </p>
+          </div>
         </div>
       </div>
     </section>

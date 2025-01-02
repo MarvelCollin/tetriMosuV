@@ -8,7 +8,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
   >
     <div className="content w-full max-w-[95vw] lg:max-w-[80vw]"> 
       <h1 
-        className={`lg:text-[4vw] sm:text-[6vw]  font-bold text-white mb-2 text-center text-shadow-glow transition-all duration-1000 transform
+        className={`lg:text-[5vw] sm:text-[7vw] font-bold text-white mb-2 text-center text-shadow-glow transition-all duration-1000 transform
           ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}
       >
         <span className="inline-block animate-float-title">INITIAL</span>
@@ -34,7 +34,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">🧠</span>
                     </div>
-                    <h2 className="text-xs md:text-sm" id="hero-text-static">Aptitude Test</h2>
+                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Aptitude Test</h2>
                   </div>
 
                   <div className="space-y-1 md:space-y-2">
@@ -46,8 +46,8 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                       <div key={idx}
                         className="p-1 md:p-2 bg-black rounded-lg transform hover:translate-x-2 
                         transition-all duration-300 border border-white">
-                        <h3 className="text-[0.5rem] md:text-xs text-white/90 mb-1">{item.name}</h3>
-                        <p className="text-[0.4rem] md:text-[0.75rem] text-white/60">{item.desc}</p>
+                        <h3 className="text-xs md:text-sm lg:text-base text-white/90 mb-1">{item.name}</h3>
+                        <p className="text-[0.7rem] md:text-xs lg:text-sm text-white/60">{item.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -66,9 +66,9 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-purple-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">💻</span>
                     </div>
-                    <h2 className="text-xs md:text-sm" id="hero-text-static">Programming Test</h2>
+                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Programming Test</h2>
                   </div>
-                  <h3 className="text-[0.5rem] md:text-xs text-white/90 mb-1 md:mb-2">You can use : </h3>
+                  <h3 className="text-xs md:text-sm lg:text-base text-white/90 mb-1 md:mb-2">You can use : </h3>
                   <div className="space-y-1 md:space-y-2">
                     {[
                       { lang: "C/C++" },
@@ -81,8 +81,8 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                           <div className="flex items-center gap-1 md:gap-2">
                             <span className="text-[0.4rem] md:text-[0.75rem]">{lang.icon}</span>
                             <div>
-                              <h3 className="text-[0.5rem] md:text-xs text-white/90">{lang.lang}</h3>
-                              <p className="text-[0.4rem] md:text-[0.75rem] text-white/60">{lang.desc}</p>
+                              <h3 className="text-xs md:text-sm lg:text-base text-white/90">{lang.lang}</h3>
+                              <p className="text-[0.7rem] md:text-xs lg:text-sm text-white/60">{lang.desc}</p>
                             </div>
                           </div>
                         </div>
@@ -103,18 +103,18 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="rounded-xl bg-blue-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">📅</span>
                     </div>
-                    <h2 className="text-xs md:text-sm" id="hero-text-static">Test Schedule</h2>
+                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Test Schedule</h2>
                   </div>
 
                   <div className="gap-1 space-y-2 md:gap-2">
                     <div className="w-full space-y-1 md:space-y-2 justify-items-end align-middle">
                       <div className="w-full bg-black p-1 md:p-3 lg:p-4 rounded-lg border border-white transition-all duration-300">  
-                        <h3 className="text-[0.5rem] md:text-xs text-white/90 mb-1 md:mb-2 transform hover:translate-x-2
+                        <h3 className="text-xs md:text-sm lg:text-base text-white/90 mb-1 md:mb-2 transform hover:translate-x-2
                             transition-all duration-300 w-full">27 March 2024</h3>
                         <div className="space-y-1 md:space-y-2">
-                          <p className="text-[0.4rem] md:text-[0.75rem] text-white transform hover:translate-x-2
+                          <p className="text-[0.7rem] md:text-xs lg:text-sm text-white transform hover:translate-x-2
                             transition-all duration-300">Batch 1: 08:00 - 11:00</p>
-                          <p className="text-[0.4rem] md:text-[0.75rem] text-white transform hover:translate-x-2
+                          <p className="text-[0.7rem] md:text-xs lg:text-sm text-white transform hover:translate-x-2
                             transition-all duration-300">Batch 2: 13:00 - 16:00</p>
                         </div>
                       </div>
@@ -130,7 +130,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                           className="flex items-center gap-1 md:gap-2 p-1 md:p-2 bg-black rounded-lg
                           border border-white transform hover:translate-x-2 duration-300 transition-all">
                           <span className="text-[0.4rem] md:text-[0.75rem]">{item.icon}</span>
-                          <span className="text-[0.4rem] md:text-[0.75rem] text-white/90">{item.text}</span>
+                          <span className="text-[0.7rem] md:text-xs lg:text-sm text-white/90">{item.text}</span>
                         </div>
                       ))}
                     </div>

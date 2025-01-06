@@ -8,7 +8,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
   >
     <div className="content w-full max-w-[95vw] lg:max-w-[80vw]"> 
       <h1 
-        className={`lg:text-[5vw] sm:text-[7vw] font-bold text-white mb-2 text-center text-shadow-glow transition-all duration-1000 transform
+        className={`lg:text-[4vw] sm:text-[7vw] text-[7vw] font-bold text-white mb-2 text-center text-shadow-glow transition-all duration-1000 transform
           ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}
       >
         <span className="inline-block animate-float-title">INITIAL</span>
@@ -34,7 +34,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">🧠</span>
                     </div>
-                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Aptitude Test</h2>
+                    <h2 className="md:text-xl lg:text-2xl" id="hero-text-static">Aptitude Test</h2>
                   </div>
 
                   <div className="space-y-1 md:space-y-2">
@@ -66,7 +66,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-xl bg-purple-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">💻</span>
                     </div>
-                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Programming Test</h2>
+                    <h2 className="md:text-xl lg:text-2xl" id="hero-text-static">Programming Test</h2>
                   </div>
                   <h3 className="text-xs md:text-sm lg:text-base text-white/90 mb-1 md:mb-2">You can use : </h3>
                   <div className="space-y-1 md:space-y-2">
@@ -103,19 +103,19 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="rounded-xl bg-blue-500/20 flex items-center justify-center">
                       <span className="text-sm md:text-base">📅</span>
                     </div>
-                    <h2 className="text-sm md:text-base lg:text-lg" id="hero-text-static">Test Schedule</h2>
+                    <h2 className="md:text-xl lg:text-2xl" id="hero-text-static">Test Schedule</h2>
                   </div>
 
                   <div className="gap-1 space-y-2 md:gap-2">
                     <div className="w-full space-y-1 md:space-y-2 justify-items-end align-middle">
                       <div className="w-full bg-black p-1 md:p-3 lg:p-4 rounded-lg border border-white transition-all duration-300">  
-                        <h3 className="text-xs md:text-sm lg:text-base text-white/90 mb-1 md:mb-2 transform hover:translate-x-2
-                            transition-all duration-300 w-full">27 March 2024</h3>
+                        <h3 className="sm:text-xl md:text-xl text-2xl text-white/90 mb-1 md:mb-2 transform hover:translate-x-2
+                            transition-all duration-300 w-full">16 February 2025</h3>
                         <div className="space-y-1 md:space-y-2">
                           <p className="text-[0.7rem] md:text-xs lg:text-sm text-white transform hover:translate-x-2
-                            transition-all duration-300">Batch 1: 08:00 - 11:00</p>
+                            transition-all duration-300">Batch 1: 08:00 - 13:05</p>
                           <p className="text-[0.7rem] md:text-xs lg:text-sm text-white transform hover:translate-x-2
-                            transition-all duration-300">Batch 2: 13:00 - 16:00</p>
+                            transition-all duration-300">Batch 2: 11:00 - 16:05</p>
                         </div>
                       </div>
                     </div>

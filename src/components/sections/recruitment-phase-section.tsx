@@ -136,7 +136,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
                   <div className="space-y-1">
                     {phase.steps.map((step, i) => (
                       <div key={i}
-                        className={`text-[1.6vmin] md:text-[1.5vmin] text-white`}>
+                        className={`text-[2.5vmin] md:text-[2vmin] text-white`}>
                         {step}
                       </div>
                     ))}

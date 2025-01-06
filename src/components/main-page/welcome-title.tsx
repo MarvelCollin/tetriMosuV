@@ -32,7 +32,7 @@ export default function WelcomeTitle({ isExiting = false }) {
       <div className="text-center pointer-events-none w-full">
         <div className="text-center transition-transform duration-1000 transform hover:scale-105 font-game 
                       flex flex-col items-center justify-center h-full gap-[2vh]">
-          <h1 className={`text-[8vw] md:text-[6vw] lg:text-[8vw] min-[1920px]:text-9xl
+          <h1 className={`text-[10vw] md:text-[6vw] lg:text-[8vw] min-[1920px]:text-9xl
                        ${isExiting ? 'animate-slide-out-top' : ''}`} 
               id="hero-text-static">
             NAR

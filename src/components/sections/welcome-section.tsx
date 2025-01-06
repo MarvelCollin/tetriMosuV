@@ -17,7 +17,7 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
             transition-all duration-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.5)] slc-logo
             ${isGameTransitioning ? 'animate-logo-expand-smooth' : ''}`}
           />
-          <h1 className="text-[12vw] md:text-[8vw] lg:text-[6vw] font-bold tracking-tight text-shadow-glow text-white">
+          <h1 className="text-[18vw] md:text-[8vw] lg:text-[9vw] font-bold tracking-tight text-shadow-glow text-white">
             <span className="inline-block animate-slide-in-number-1 opacity-0">2</span>
             <span className="inline-block animate-slide-in-number-2 opacity-0">5</span>
             <span className="inline-block animate-slide-in-number-3 opacity-0">-</span>
@@ -26,10 +26,10 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
         </div>
 
         <div className="relative animate-slide-in-bottom text-center">
-          <h1 className="text-[6vw] md:text-[4vw] lg:text-[3vw] animate-fade-in-delay-600" id="hero-text-static">
+          <h1 className="text-[6vw] md:text-[4vw] lg:text-[4vw] animate-fade-in-delay-600" id="hero-text-static">
             New Assistant
           </h1>
-          <h1 className="text-[8vw] md:text-[6vw] lg:text-[4vw] mt-4 animate-fade-in-delay-900" id="hero-text-static">
+          <h1 className="text-[8vw] md:text-[6vw] lg:text-[6vw] mt-4 animate-fade-in-delay-900" id="hero-text-static">
             Recruitment
           </h1>
         </div>

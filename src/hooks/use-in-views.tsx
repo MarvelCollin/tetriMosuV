@@ -24,8 +24,8 @@ export const useInView = (options?: IntersectionObserverInit, sectionName?: stri
         }
       }
     }, {
-      threshold: 0.5, 
-      rootMargin: '-20% 0px -20% 0px',
+      threshold: 0.1, // Lower threshold for smoother transitions
+      rootMargin: '0px 0px -10% 0px', // Adjusted rootMargin for better performance
       ...options
     });
 

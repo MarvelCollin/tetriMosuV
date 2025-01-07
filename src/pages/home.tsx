@@ -212,7 +212,15 @@ function Home() {
       <div className={`relative z-10 w-full ${pageTransition}`}>
         {showWelcome ? (
           <div className="w-full h-screen overflow-y-scroll snap-y snap-mandatory relative pointer-events-auto space-y-8 md:space-y-0">
-            
+            {/* <div className="absolute w-40 bottom-10 flex flex-col items-center">
+              <img 
+                src="public/assets/images/qrcode.png" 
+                alt="Scan to Register" 
+                className="w-40 h-40 rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
+              />
+              <p className="text-white mt-2 text-center">Scan to Register</p>
+            </div> */}
+
             <WelcomeSection
               sectionRef={section1Ref}
               isGameTransitioning={isGameTransitioning}
@@ -265,9 +273,10 @@ function Home() {
       {!isOnWelcomeSection && (
         <button
           onClick={handleGameClick}
-          className="absolute top-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 z-50"
+            className="border-ice-200 border-2 absolute  top-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 z-50"
         >
-          Play Game
+            <span className="inline-block animate-float-title mr-2" >Play</span>
+            <span className="inline-block animate-float-title-delayed">Game</span>
         </button>
       )}
     </div>

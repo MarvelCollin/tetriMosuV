@@ -14,7 +14,7 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                 className={`w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
             >
                 <h1
-                    className={`text-[4vw] md:text-[3vw] lg:text-[2.5vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-1000 transform hover-float
+                    className={`text-[4vw] md:text-[4vw] lg:text-[3.5vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-1000 transform hover-float
             ${hasTriggered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                     style={{ transitionDelay: '200ms' }}
                 >
@@ -43,14 +43,14 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                                 onMouseEnter={() => setHoveredDate(index)}
                                 onMouseLeave={() => setHoveredDate(null)}
                             >
-                                <div className={`w-[6vmin] h-[6vmin] md:w-[5vmin] md:h-[5vmin] rounded-full flex items-center justify-center 
-                  border border-white relative timeline-dot cursor-pointer`}>
-                                    <span className="text-[3vmin] md:text-[2.5vmin] transform transition-transform duration-300
+                                <div className={`w-[6vmin] h-[6vmin] md:w-[7vmin] md:h-[7vmin] rounded-full flex items-center justify-center 
+                  border border-white relative timeline-dot cursor-pointer hover:border-ice-200`}>
+                                    <span className="text-[3vmin] md:text-[3.5vmin] transform transition-transform duration-300
                     ${hoveredDate === index ? 'scale-125' : ''}">{item.icon}</span>
                                 </div>
                                 <div className={`mt-[1vh] text-center transform transition-all duration-300 text-white/90`}>
-                                    <p className="text-[2.5vmin] md:text-[2vmin] font-bold">{item.date}</p>
-                                    <p className="text-[2vmin] md:text-[1.5vmin]">{item.event}</p>
+                                    <p className="text-[2.5vmin] md:text-[3vmin] font-bold">{item.date}</p>
+                                    <p className="text-[2vmin] md:text-[2vmin]">{item.event}</p>
                                 </div>
                             </div>
                         ))}

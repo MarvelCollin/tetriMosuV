@@ -36,8 +36,8 @@ function Home() {
   const [lastScrollTime, setLastScrollTime] = useState(0);
   const scrollTimeout = useRef<number | null>(null);
   const scrollThreshold = useRef(0);
-  const [cooldownProgress, setCooldownProgress] = useState(100); // Add this state
-  const cooldownDuration = 1000; // 1 second cooldown
+  const [cooldownProgress, setCooldownProgress] = useState(100); 
+  const cooldownDuration = 1000; 
   const cooldownInterval = useRef<number>();
 
   const [section1Ref, section1InView, section1Triggered] = useInView({}, 'Welcome Section');
@@ -273,7 +273,7 @@ function Home() {
       {!isOnWelcomeSection && (
         <button
           onClick={handleGameClick}
-            className="border-ice-200 border-2 absolute  top-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 z-50"
+            className="hidden sm:block border-ice-200 border-2 absolute  top-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 z-50"
         >
             <span className="inline-block animate-float-title mr-2" >Play</span>
             <span className="inline-block animate-float-title-delayed">Game</span>

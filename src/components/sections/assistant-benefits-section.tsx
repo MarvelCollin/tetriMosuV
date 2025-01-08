@@ -11,12 +11,12 @@ const AssistantBenefitsSection = ({ sectionRef, sectionInView, hasTriggered }) =
   return (
     <section
       ref={sectionRef}
-      className={`w-full h-screen min-h-[60vh] max-h-[100vh] snap-start relative flex items-center justify-center pointer-events-auto mb-40 md:mb-20 
+      className={`w-full h-screen min-h-[60vh] max-h-[100vh] snap-start relative flex items-center justify-center pointer-events-auto mb-40 md:mb-20 sm:mb-8 
         transform transition-all duration-1000 ease-out ${
         hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
       }`}
     >
-      <div className="w-full max-w-[95vw] lg:max-w-[80vw] px-2 md:px-6">
+      <div className="w-full max-w-[95vw] lg:max-w-[80vw] px-2 md:px-6 sm:px-1">
         <h1 className={`text-[6vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-700 
           transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}
           style={{ transitionDelay: '200ms' }}

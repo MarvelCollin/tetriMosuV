@@ -6,10 +6,10 @@ import { ScrambleText } from '../main-page/scramble-text';
 const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) => (
   <section
     ref={sectionRef}
-    className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10" 
+    className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 sm:mb-4" 
   >
-    <div className="relative h-full flex flex-col items-center justify-center p-4 md:p-8">
-      <div className="flex flex-col items-center gap-8 md:gap-12 animate-fade-scale-in">
+    <div className="relative h-full flex flex-col items-center justify-center p-4 md:p-8 sm:p-2">
+      <div className="flex flex-col items-center gap-8 md:gap-12 sm:gap-4 animate-fade-scale-in">
         <div className="flex flex-row items-center gap-4 md:gap-8">
           <img
             src="./assets/images/logo.png"

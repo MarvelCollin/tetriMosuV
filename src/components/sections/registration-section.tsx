@@ -8,10 +8,10 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
     return (
         <section
             ref={sectionRef}
-            className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 overflow-hidden"
+            className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 overflow-hidden sm:mb-4"
         >
             <div
-                className={`w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
+                className={`w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 sm:px-2 transition-opacity duration-500 ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}
             >
                 <h1
                     className={`text-[4vw] md:text-[4vw] lg:text-[3.5vw] font-bold text-white mb-[1vh] text-center text-shadow-glow transition-all duration-1000 transform hover-float

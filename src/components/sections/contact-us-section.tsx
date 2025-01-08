@@ -19,21 +19,21 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
   return (
     <section
       ref={sectionRef}
-      className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-20 transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+      className={`w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto md:mb-20 transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
         }`}
       onWheel={(e) => {
         if (e.deltaY > 0) {
         }
       }}
     >
-      <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 flex flex-col items-center justify-center">
+      <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-6 sm:px-2 flex flex-col items-center justify-center">
         <h1 className={`text-[6vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[1vh] text-center text-shadow-glow relative group transition-all duration-1000 ${hasTriggered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
           }`}>
           <span className="inline-block animate-float-title">CONTACT</span>
           <span className="inline-block animate-float-title-delayed mx-2">US</span>
         </h1>
 
-        <div className="flex flex-col items-center gap-8 w-full">
+        <div className="flex flex-col items-center gap-1z md:gap-8 w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-4 md:gap-6 lg:gap-8">
             {[
               {
@@ -92,7 +92,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
 
           <div className={`w-full max-w-2xl transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
             }`} style={{ transitionDelay: '800ms' }}>
-            <h3 className="text-[4vmin] md:text-[3vmin] mb-8 text-center" id="hero-text-static">Connect With Us</h3>
+            <h3 className="text-[4vmin] md:text-[3vmin] md:mb-8 text-center" id="hero-text-static">Connect With Us</h3>
             <div className="flex justify-center gap-8 md:gap-12">
               {[
                 {
@@ -116,7 +116,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group flex flex-col items-center gap-3 p-4 rounded-lg
+                  className={`group flex flex-col items-center md:gap-3 p-4 rounded-lg
                            hover:bg-cyan-500/10 transition-all duration-500 transform
                            ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                   style={{
@@ -137,9 +137,9 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
             </div>
           </div>
 
-          <div className={`w-full text-center mt-8 transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+          <div className={`w-full text-center md:mt-8 transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
             }`} style={{ transitionDelay: '1300ms' }}>
-            <p className="text-[4vmin] md:text-[3vmin] text-white font-bold mb-2 text-shadow-glow">
+            <p className="text-[4vmin] md:text-[3vmin] text-white font-bold md:mb-2 text-shadow-glow">
               <span className="inline-block animate-float-title">"Confront</span>
               <span className="inline-block animate-float-title-delayed mx-1">the</span>
               <span className="inline-block animate-float-title">challenges</span>

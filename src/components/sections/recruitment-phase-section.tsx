@@ -2,8 +2,8 @@ import React from 'react';
 import ScrollIndicator from '../main-page/scroll-indicator';
 
 const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) => (
-  <section ref={sectionRef} className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-20">
-    <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-8">
+  <section ref={sectionRef} className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-20 sm:mb-8">
+    <div className="w-full max-w-[90vw] lg:max-w-[80vw] px-4 md:px-8 sm:px-2">
       <h1 className={`text-[6vw] md:text-[4vw] lg:text-[3vw] font-bold text-white mb-[2vh] text-center text-shadow-glow relative group transition-all duration-1000 ${
         hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
       }`}>

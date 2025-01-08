@@ -1,55 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import ScrollIndicator from '../main-page/scroll-indicator';
-
-const ScrambleText = ({ text, baseDelay = 0 }) => {
-  const [letters, setLetters] = useState(text.split('').map(() => ''));
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  
-  useEffect(() => {
-    const letterAnimations = text.split('').map((targetLetter, index) => {
-      const randomDelay = Math.random() * 2000; 
-      const iterations = 5 + Math.floor(Math.random() * 5);
-      let currentIteration = 0;
-      
-      return setTimeout(() => {
-        const interval = setInterval(() => {
-          setLetters(prev => {
-            const newLetters = [...prev];
-            if (currentIteration < iterations) {
-              newLetters[index] = characters[Math.floor(Math.random() * characters.length)];
-            } else {
-              newLetters[index] = targetLetter;
-              clearInterval(interval);
-            }
-            return newLetters;
-          });
-          currentIteration++;
-        }, 50);
-
-        return interval;
-      }, baseDelay + randomDelay);
-    });
-
-    return () => letterAnimations.forEach(timeout => clearTimeout(timeout));
-  }, [text, baseDelay]);
-
-  return (
-    <span className="inline-block">
-      {letters.map((letter, index) => (
-        <span 
-          key={index}
-          className={`inline-block ${letter === ' ' ? 'mx-2' : ''}`}
-          style={{
-            animation: `glitch-effect 3s infinite ${Math.random() * 1000}ms`
-          }}
-        >
-          {letter || ' '}
-        </span>
-      ))}
-    </span>
-  );
-};
+import { ScrambleText } from '../main-page/scramble-text';
 
 const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) => (
   <section
@@ -85,7 +37,7 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
             className="text-[8vw] md:text-[6vw] lg:text-[6vw] mt-4 animate-fade-in-delay-900 text-glitch" 
             id="hero-text-static"
           >
-            <ScrambleText text="RECRUITMENT" baseDelay={500} />
+            <ScrambleText text="RECRUITMENT" baseDelay={200} />
           </h1>
         </div>
 

@@ -44,12 +44,12 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
               {
                 title: "Contact",
                 icon: "📞",
-                content: ["[021] 5345830", "Extension 1762"]
+                content: ["[021] 5345830", "Ext 1762"]
               },
               {
                 title: "RECSELS",
                 icon: "👥",
-                content: ["Gabriel", "Vito", "Rico"]
+                content: ["Vito", "Viernicia", "Darwin"]
               }
             ].map((item, index) => (
               <div

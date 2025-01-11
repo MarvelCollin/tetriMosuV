@@ -144,7 +144,6 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
     </div>
     <ScrollIndicator 
       text="Registration" 
-      onClick={scrollToTop} 
       className={`transition-all duration-1000 delay-700 transform
         ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
     />

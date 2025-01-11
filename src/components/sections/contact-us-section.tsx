@@ -49,7 +49,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
               {
                 title: "RECSELS",
                 icon: "👥",
-                content: ["Vito", "Viernicia", "Darwin"]
+                content: ["Darwin", "Viernicia", "Vito"]
               }
             ].map((item, index) => (
               <div

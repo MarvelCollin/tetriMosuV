@@ -6,18 +6,20 @@ import { ScrambleText } from '../main-page/scramble-text';
 const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) => (
   <section
     ref={sectionRef}
-    className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 sm:mb-4" 
+    className="w-full h-screen min-h-[600px] max-h-[1080px] snap-start relative flex items-center justify-center pointer-events-auto mb-10 sm:mb-4"
   >
     <div className="relative h-full flex flex-col items-center justify-center p-4 md:p-8 sm:p-2">
       <div className="flex flex-col items-center gap-8 md:gap-12 sm:gap-4 animate-fade-scale-in">
         <div className="flex flex-row items-center gap-4 md:gap-8">
-          <img
-            src="./assets/images/logo.png"
-            alt="SLC Logo"
-            className={`w-[40vw] md:w-[12vw] lg:w-[8vw] h-auto animate-spin-slow opacity-80 hover:opacity-100 
-            transition-all duration-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.5)] slc-logo
+          <div className={`flex ${isGameTransitioning ? 'transform duration-1000 translate-y-72 translate-x-64 z-10' : ''}`}>
+            <img
+              src="./assets/images/logo.png"
+              alt="SLC Logo"
+              className={`w-[15vw] h-auto animate-spin-slow opacity-80 hover:opacity-100 
+            transition-all drop-shadow-[0_0_25px_rgba(255,255,255,0.5)]
             ${isGameTransitioning ? 'animate-logo-expand-smooth' : ''}`}
-          />
+            />
+          </div>
           <h1 className="text-[14vw] md:text-[8vw] lg:text-[9vw] font-bold tracking-tight text-shadow-glow text-white">
             <span className="inline-block animate-slide-in-number-1 opacity-0">2</span>
             <span className="inline-block animate-slide-in-number-2 opacity-0">5</span>
@@ -27,21 +29,21 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
         </div>
 
         <div className="relative animate-slide-in-bottom text-center">
-          <h1 
-            className="text-[12vw] md:text-[4vw] lg:text-[4vw] animate-fade-in-delay-600 text-glitch" 
+          <h1
+            className="text-[12vw] md:text-[4vw] lg:text-[4vw] animate-fade-in-delay-600 text-glitch"
             id="hero-text-static"
           >
             <ScrambleText text="NEW ASSISTANT" baseDelay={0} />
           </h1>
-          <h1 
-            className="text-[16vw] md:text-[6vw] lg:text-[6vw] mt-4 animate-fade-in-delay-900 text-glitch" 
+          <h1
+            className="text-[16vw] md:text-[6vw] lg:text-[6vw] mt-4 animate-fade-in-delay-900 text-glitch"
             id="hero-text-static"
           >
             <ScrambleText text="RECRUITMENT" baseDelay={200} />
           </h1>
         </div>
 
-        <div 
+        <div
           className="flex flex-row flex-nowrap items-center justify-center gap-2 md:gap-16 mt-8 opacity-0 animate-fade-in-delay-1200"
         >
           {[
@@ -80,7 +82,7 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
         </div>
       </div>
     </div>
-      <ScrollIndicator text="Recruitment Phase" />
+    <ScrollIndicator text="Scroll To Recruitment Phase" />
   </section>
 );
 

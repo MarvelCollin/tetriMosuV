@@ -1,0 +1,53 @@
+.center-logo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-test {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-expand-smooth {
+  animation: logo-expand-smooth 4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  z-index: 100;
+}
+
+@keyframes logo-expand-smooth {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(30) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+.move-to-center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: moveToCenter 1s ease-in-out forwards;
+}
+
+@keyframes moveToCenter {
+  0% {
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
+  }
+  100% {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

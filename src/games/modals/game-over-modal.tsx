@@ -1,10 +1,13 @@
 import React from 'react';
 import { IGameOverModal } from '../../interfaces/IGameOverModal';
 
-
 const GameOverModal: React.FC<IGameOverModal> = ({ score, onClose }) => {
     const handleContinue = () => {
-        window.location.href = 'https://bluejack.binus.ac.id/nar/home/registration';
+        const newTab = window.open('https://bluejack.binus.ac.id/nar/home/registration', '_blank', 'noopener,noreferrer');
+        if (newTab) {
+            newTab.focus();
+        } else {
+        }
     };
 
     return (

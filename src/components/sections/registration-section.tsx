@@ -31,9 +31,9 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                         />
 
                         {[
-                            { date: "Today", event: "Registration Opens", icon: "🚀", status: "past" },
-                            { date: "14 January 2025", event: "Registration Closes", icon: "🔒", status: "future" },
-                            { date: "16 January 2025", event: "Initial Test", icon: "✨", status: "future" }
+                            { date: "27 January 2025", event: "Registration Opens", icon: "🚀", status: "past" },
+                            { date: "15 February 2025", event: "Registration Closes", icon: "🔒", status: "future" },
+                            { date: "23 February 2025", event: "Initial Test", icon: "✨", status: "future" }
                         ].map((item, index) => (
                             <div
                                 key={index}
@@ -94,23 +94,38 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                                 ))}
                             </div>
 
-                            <a
-                                href="https://bluejack.binus.ac.id/nar/home/registration"
+                            <button
+                                onClick={() => {
+                                    const newTab = window.open("https://bluejack.binus.ac.id/nar/home/registration", "_blank");
+                                    if (newTab) {
+                                        newTab.focus();
+                                    } else {
+                                        alert("Popup blocked! Please allow popups for this site.");
+                                    }
+                                }}
                                 className={`relative group mt-8 hover-float transition-all duration-1000 transform
-                  ${hasTriggered ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
+    ${hasTriggered ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
                                 style={{ transitionDelay: '2400ms' }}
                             >
-                                <div className="absolute -inset-1 via-purple-500 to-cyan-500 
-                              rounded-lg blur opacity-30 group-hover:opacity-70 transition duration-300"></div>
-                                <button className="relative px-12 py-4 rounded-lg  flex items-center divide-x divide-gray-600">
-                                    <span className="text-[3.5vmin] md:text-[2.5vmin] pr-6" id="hero-text-static">Register Now</span>
-                                    <span className="text-[2.5vmin] md:text-[2vmin] pl-6 text-white bounce-x inline-block">→</span>
-                                </button>
-                            </a>
+                                <div
+                                    className="absolute -inset-1 via-purple-500 to-cyan-500 
+    rounded-lg blur opacity-30 group-hover:opacity-70 transition duration-300"
+                                ></div>
+                                <div className="relative px-12 py-4 rounded-lg flex items-center divide-x divide-gray-600">
+                                    <span className="text-[3.5vmin] md:text-[2.5vmin] pr-6" id="hero-text-static">
+                                        Register Now
+                                    </span>
+                                    <span className="text-[2.5vmin] md:text-[2vmin] pl-6 text-white bounce-x inline-block">
+                                        →
+                                    </span>
+                                </div>
+                            </button>
+
+
+
                         </div>
                     </div>
 
-                    {/* Background Effects */}
                     <div
                         className={`absolute inset-0 pointer-events-none transition-all duration-1000
               ${hasTriggered ? 'opacity-100' : 'opacity-0'}`}

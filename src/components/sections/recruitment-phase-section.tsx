@@ -61,7 +61,7 @@ const RecruitmentPhaseSection = ({ sectionRef, sectionInView, hasTriggered }) =>
               phase: "02",
               title: "Pre Training",
               position: "left-[90%] top-[30%] sm:left-[calc(35%_+_2vw)] sm:top-[25%]",
-              steps: ["DS Using C", "OOP Using Java", "Database"],
+              steps: ["DS Using C", "Python","OOP Using Java"],
               pathPercent: 35,
               color: "rgb(59, 130, 246)", // blue-500
               glow: "shadow-[0_0_15px_rgba(59,130,246,0.5)]"

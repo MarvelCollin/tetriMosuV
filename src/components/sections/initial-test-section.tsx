@@ -110,7 +110,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                     <div className="w-full space-y-1 md:space-y-2 justify-items-end align-middle">
                       <div className="w-full bg-black p-1 md:p-3 lg:p-4 rounded-lg border border-white transition-all duration-300">  
                         <h3 className="text-lg md:text-sm lg:text-2xl text-white/90 mb-1 md:mb-2 transform hover:translate-x-2
-                            transition-all duration-300 w-full">16 February 2025</h3>
+                            transition-all duration-300 w-full">23 February 2025</h3>
                         <div className="space-y-1 md:space-y-2">
                           <p className="text-[0.7rem] md:text-xs lg:text-sm text-white transform hover:translate-x-2
                             transition-all duration-300">Batch 1: 08:00 - 13:05</p>

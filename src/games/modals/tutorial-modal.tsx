@@ -24,6 +24,8 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [backgroundEffect, setBackgroundEffect] = useState<string>('');
@@ -35,7 +37,18 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setSlideDirection('right');
-      setCurrentStep(currentStep + 1);
+      setIsWaiting(true);
+      setCountdown(3);
+      const countdownInterval = setInterval(() => {
+        setCountdown(prev => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            setCurrentStep(currentStep + 1);
+            setIsWaiting(false);
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } else {
       onClose();
     }
@@ -109,7 +122,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
             </div>
             <div className="space-y-4 mt-4">
               <div className="flex flex-col sm:flex-row items-start space-x-0 sm:space-x-4 space-y-4 sm:space-y-0 bg-gray-800/50 p-[2vh] rounded-lg backdrop-blur-sm hover:bg-gray-800/70 transition-colors">
-                <img src="public/assets/images/circle.jpeg" alt="Circle" className="w-[12vh] h-[12vh] mx-auto sm:mx-0" />
+                <img src="./assets/images/circle.png" alt="Circle" className="w-[12vh] h-[12vh] mx-auto sm:mx-0" />
                 <div>
                   <h4 className="text-cyan-200 text-[2.5vh] font-medium">Circle Click</h4>
                   <p className="text-gray-100 text-[1.5vh]">Make sure you click on the circle like this to earn score and clear the line</p>
@@ -291,7 +304,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
     return `rgba(${r}, ${g}, ${b}, 0.95)`;
   };
 
-  // Update the canvas background when theme changes
+  
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -415,13 +428,13 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
       </div>
 
       <div className="relative max-w-full p-4 sm:p-8">
-        <p className="text-[6vh] sm:text-[9vh] font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
+        <div className="text-[6vh] sm:text-[9vh] font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
           <span className="inline-block animate-float-title transition-all duration-300">2</span>
           <span className="inline-block animate-float-title-delayed mx-2">5</span>
           <span className="inline-block animate-float-title-more-delayed">-</span>
           <span className="inline-block animate-float-title">2</span>
           <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
-        </p>
+        </div>
         <div className="relative bg-gray-900/80 border-2 border-cyan-400/50 rounded-xl p-4 sm:p-8 max-w-3xl w-full mx-auto backdrop-blur-md animate-slideUp">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 opacity-50 animate-pulse" />
           <div className="relative bg-gray-900/90 p-4 sm:p-8 rounded-lg overflow-hidden">
@@ -491,10 +504,11 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
 
               <button
                 onClick={handleNext}
-                className="px-4 sm:px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95"
+                disabled={isWaiting}
+                className={`px-4 sm:px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95 ${isWaiting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <span className="relative z-10 group-hover:animate-pulse-fast">
-                  {currentStep === totalSteps ? 'Start' : 'Next'}
+                  {isWaiting ? `Please wait... ${countdown}` : (currentStep === totalSteps ? 'Start' : 'Next')}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)]"></div>
@@ -738,12 +752,12 @@ const styles = `
   }
 
   .animate-float-title-delayed {
-    animation: float-title-delayed 3s ease-in-out infinite 0.2s;
+    animation: float-title-delayed 3s ease-in-out infinite;
     display: inline-block;
   }
 
   .animate-float-title-more-delayed {
-    animation: float-title-more-delayed 3s ease-in-out infinite 0.4s;
+    animation: float-title-more-delayed 3s ease-in-out infinite;
     display: inline-block;
   }
 
@@ -764,12 +778,12 @@ const styles = `
   }
 
   .animate-float-title-delayed {
-    animation: float-title-delayed 3s ease-in-out infinite 0.2s;
+    animation: float-title-delayed 3s ease-in-out infinite;
     display: inline-block;
   }
 
   .animate-float-title-more-delayed {
-    animation: float-title-more-delayed 3s ease-in-out infinite 0.4s;
+    animation: float-title-more-delayed 3s ease-in-out infinite;
     display: inline-block;
   }
 

@@ -176,29 +176,6 @@ class Renderer {
             existingTutorial.remove();
         }
 
-        const loader = new FontLoader();
-        loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
-            const textGeometry = new TextGeometry(`SCORE: ${score}`, {
-                font: font,
-                size: 0.6,
-                height: 0.1,
-                curveSegments: 1,
-                bevelEnabled: false
-            });
-            
-            const material = new THREE.MeshPhongMaterial({
-                color: 0x00ffff,
-                emissive: 0x00ffff,
-                emissiveIntensity: 0.4,
-                transparent: true,
-                opacity: 0.9,
-                flatShading: true
-            });
-            
-            this.scoreText = new THREE.Mesh(textGeometry, material);
-            this.scoreText.position.set(-8, 0, 0); 
-            this.scene.add(this.scoreText);
-
             const tutorialDiv = document.createElement('div');
             tutorialDiv.className = 'fixed bottom-4 right-4 z-50';
             tutorialDiv.innerHTML = `
@@ -238,13 +215,8 @@ class Renderer {
                 </div>
             `;
 
-            const existingTutorial = document.querySelector('.fixed.bottom-4.right-4');
-            if (existingTutorial) {
-                existingTutorial.remove();
-            }
-
+      
             document.body.appendChild(tutorialDiv);
-        });
     }
 }
 

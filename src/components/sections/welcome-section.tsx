@@ -55,15 +55,19 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
               className: isGameTransitioning ? 'opacity-0' : ''
             },
             {
-              to: 'https://bluejack.binus.ac.id/nar/home/registration',
+              to: 'https://bluejack.binus.ac.id/nar',
               text: 'Register Now',
-              icon: '📝'
+              icon: '📝',
+              target: '_blank',
+              rel: 'noopener noreferrer'
             }
           ].map((button, index) => (
             <Link
               key={index}
               to={button.to}
               onClick={button.onClick}
+              target={button.target}
+              rel={button.rel}
               className={`group relative overflow-hidden rounded-xl bg-black/50 
                            hover:scale-105 transition-all duration-500 border border-white/10 sm:w-auto
                            px-1 py-1 sm:px-3 sm:py-2

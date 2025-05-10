@@ -1,3 +1,11 @@
+# tetriMosuV
+
+3D-Tetris x osu! game built with React & Three.js
+
+🎮 **Play Now:** [https://marvelcollin.github.io/tetriMosuV/](https://marvelcollin.github.io/tetriMosuV/)
+
+## Screenshots
+
 ![image](https://github.com/user-attachments/assets/68355758-e442-480d-acc1-f72d04bdc3ee)
 ![image](https://github.com/user-attachments/assets/61c5e853-f1d3-4231-a518-c9d3bf479efd)
 ![image](https://github.com/user-attachments/assets/c83564db-7885-42bb-a521-5dce2da00689)

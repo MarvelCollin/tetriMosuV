@@ -2140,6 +2140,22 @@ body {
   }
 }
 
+@keyframes glitch-shadow {
+  0%,
+  100% {
+    text-shadow: 0.05em 0 0 rgba(0, 150, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 100, 255, 0.75);
+  }
+  28% {
+    text-shadow: 0.05em 0 0 rgba(0, 180, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 120, 255, 0.85);
+  }
+  42%,
+  85% {
+    text-shadow: none;
+  }
+}
+
 @keyframes shiny-effect {
   0% {
     background-position: -200%;

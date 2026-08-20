@@ -72,8 +72,7 @@ const InitialTestSection = ({ sectionRef, scrollToTop, sectionInView, hasTrigger
                   <div className="space-y-1 md:space-y-2">
                     {[
                       { lang: "C/C++" },
-                      { lang: "Java" },
-                      { lang: "Python" }
+                      { lang: "Java" }
                     ].map((lang, idx) => (
                       <div key={idx} className="relative group/item">
                         <div className="p-1 md:p-2 bg-black rounded-lg transform hover:translate-x-2

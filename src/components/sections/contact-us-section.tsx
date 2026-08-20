@@ -49,7 +49,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
               {
                 title: "RECSELS",
                 icon: "👥",
-                content: ["Darwin", "Viernicia", "Vito"]
+                content: ["Steven", "Weneville", "Clarence"]
               }
             ].map((item, index) => (
               <div
@@ -152,7 +152,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
               <span className="inline-block animate-float-title-delayed mx-1">together."</span>
               <span className="text-[3vmin] md:text-[2vmin] text-white/80">
                 <span className="inline-block animate-float-title">~</span>
-                <span className="inline-block animate-float-title-delayed mx-1">24-2</span>
+                <span className="inline-block animate-float-title-delayed mx-1">27-1</span>
               </span>
             </p>
           </div>

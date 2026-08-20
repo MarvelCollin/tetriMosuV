@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const ScrambleText = ({ text, baseDelay = 0 }) => {
-    const [letters, setLetters] = useState(() =>
-        text.split('').map(char =>
+    const [letters, setLetters] = useState(() => 
+        text.split('').map(char => 
             char === ' ' ? ' ' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)]
         )
     );
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const animationDelays = useMemo(() =>
-        text.split('').map(() => Math.random() * 1000), [text]
-    );
 
     useEffect(() => {
         const letterAnimations = text.split('').map((targetLetter, index) => {
@@ -45,9 +42,6 @@ export const ScrambleText = ({ text, baseDelay = 0 }) => {
                 <span
                     key={index}
                     className={`inline-block ${letter === ' ' ? 'mx-2' : ''}`}
-                    style={{
-                        animation: `glitch-effect 3s infinite ${animationDelays[index]}ms`
-                    }}
                 >
                     {letter || ' '}
                 </span>

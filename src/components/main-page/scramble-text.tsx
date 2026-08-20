@@ -42,9 +42,6 @@ export const ScrambleText = ({ text, baseDelay = 0 }) => {
                 <span
                     key={index}
                     className={`inline-block ${letter === ' ' ? 'mx-2' : ''}`}
-                    style={{
-                        animation: `glitch-effect 3s infinite ${Math.random() * 1000}ms`
-                    }}
                 >
                     {letter || ' '}
                 </span>

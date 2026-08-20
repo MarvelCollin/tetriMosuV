@@ -160,7 +160,7 @@ const ContactUsSection = ({ sectionRef, sectionInView, hasTriggered }) => {
           <div className={`w-full text-center mt-4 transition-all duration-1000 transform ${hasTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
             }`} style={{ transitionDelay: '1600ms' }}>
             <p className="text-[2.5vmin] md:text-[1.5vmin] text-white/50">
-              Made by MV24-2 ❤️
+              Made by MV24-2 with ❤️
             </p>
           </div>
         </div>

@@ -31,9 +31,9 @@ const RegistrationSection = ({ sectionRef, hasTriggered }) => {
                         />
 
                         {[
-                            { date: "27 January 2025", event: "Registration Opens", icon: "🚀", status: "past" },
-                            { date: "15 February 2025", event: "Registration Closes", icon: "🔒", status: "future" },
-                            { date: "23 February 2025", event: "Initial Test", icon: "✨", status: "future" }
+                            { date: "27 August 2026", event: "Registration Opens", icon: "🚀", status: "past" },
+                            { date: "25 September 2026", event: "Registration Closes", icon: "🔒", status: "future" },
+                            { date: "29, 30 Sept & 1 Oct 2026", event: "Initial Test", icon: "✨", status: "future" }
                         ].map((item, index) => (
                             <div
                                 key={index}

@@ -24,8 +24,6 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right');
-  const [isWaiting, setIsWaiting] = useState(false);
-  const [countdown, setCountdown] = useState(3);
 
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
   const [backgroundEffect, setBackgroundEffect] = useState<string>('');
@@ -37,18 +35,7 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setSlideDirection('right');
-      setIsWaiting(true);
-      setCountdown(3);
-      const countdownInterval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev === 1) {
-            clearInterval(countdownInterval);
-            setCurrentStep(currentStep + 1);
-            setIsWaiting(false);
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      setCurrentStep(currentStep + 1);
     } else {
       onClose();
     }
@@ -430,9 +417,9 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
       <div className="relative max-w-full p-4 sm:p-8">
         <div className="text-[6vh] sm:text-[9vh] font-bold text-white mb-6 text-center text-shadow-glow animate-slideDown relative group">
           <span className="inline-block animate-float-title transition-all duration-300">2</span>
-          <span className="inline-block animate-float-title-delayed mx-2">5</span>
+          <span className="inline-block animate-float-title-delayed mx-2">7</span>
           <span className="inline-block animate-float-title-more-delayed">-</span>
-          <span className="inline-block animate-float-title">2</span>
+          <span className="inline-block animate-float-title">1</span>
           <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 group-hover:via-cyan-500/20 transition-all duration-500"></div>
         </div>
         <div className="relative bg-gray-900/80 border-2 border-cyan-400/50 rounded-xl p-4 sm:p-8 max-w-3xl w-full mx-auto backdrop-blur-md animate-slideUp">
@@ -504,11 +491,10 @@ const TutorialModal: React.FC<ITutorialModal> = ({ onClose }) => {
 
               <button
                 onClick={handleNext}
-                disabled={isWaiting}
-                className={`px-4 sm:px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95 ${isWaiting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className="px-4 sm:px-6 py-2 text-white rounded-lg font-medium relative overflow-hidden group bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 active:scale-95"
               >
                 <span className="relative z-10 group-hover:animate-pulse-fast">
-                  {isWaiting ? `Please wait... ${countdown}` : (currentStep === totalSteps ? 'Start' : 'Next')}
+                  {currentStep === totalSteps ? 'Start' : 'Next'}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_100%)]"></div>

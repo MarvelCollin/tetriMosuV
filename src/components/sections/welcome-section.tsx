@@ -22,9 +22,9 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
           </div>
           <h1 className="text-[14vw] md:text-[8vw] lg:text-[9vw] font-bold tracking-tight text-shadow-glow text-white">
             <span className="inline-block animate-slide-in-number-1 opacity-0">2</span>
-            <span className="inline-block animate-slide-in-number-2 opacity-0">5</span>
+            <span className="inline-block animate-slide-in-number-2 opacity-0">7</span>
             <span className="inline-block animate-slide-in-number-3 opacity-0">-</span>
-            <span className="inline-block animate-slide-in-number-4 opacity-0">2</span>
+            <span className="inline-block animate-slide-in-number-4 opacity-0">1</span>
           </h1>
         </div>
 

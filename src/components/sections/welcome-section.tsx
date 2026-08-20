@@ -31,13 +31,11 @@ const WelcomeSection = ({ sectionRef, isGameTransitioning, handleGameClick }) =>
         <div className="relative animate-slide-in-bottom text-center">
           <h1
             className="text-[12vw] md:text-[4vw] lg:text-[4vw] animate-fade-in-delay-600 text-glitch"
-            id="hero-text-static"
           >
             <ScrambleText text="NEW ASSISTANT" baseDelay={0} />
           </h1>
           <h1
             className="text-[16vw] md:text-[6vw] lg:text-[6vw] mt-4 animate-fade-in-delay-900 text-glitch"
-            id="hero-text-static"
           >
             <ScrambleText text="RECRUITMENT" baseDelay={200} />
           </h1>

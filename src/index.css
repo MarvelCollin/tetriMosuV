@@ -2140,33 +2140,6 @@ body {
   }
 }
 
-@keyframes glitch-letter {
-  0% {
-    transform: translate(0);
-  }
-  14% {
-    transform: translate(2px, -2px);
-  }
-  28% {
-    transform: translate(-2px, 2px);
-  }
-  42% {
-    transform: translate(2px, -2px);
-  }
-  57% {
-    transform: translate(-2px, -2px);
-  }
-  71% {
-    transform: translate(2px, 2px);
-  }
-  85% {
-    transform: translate(-2px, 2px);
-  }
-  100% {
-    transform: translate(0);
-  }
-}
-
 @keyframes shiny-effect {
   0% {
     background-position: -200%;

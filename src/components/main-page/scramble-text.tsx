@@ -48,7 +48,7 @@ export const ScrambleText = ({ text, baseDelay = 0 }) => {
                     key={index}
                     className={`inline-block ${letter === ' ' ? 'mx-2' : ''}`}
                     style={{
-                        animation: `glitch-letter 3s infinite ${delays[index]}ms`
+                        animation: `glitch-effect 3s infinite ${delays[index]}ms`
                     }}
                 >
                     {letter || ' '}

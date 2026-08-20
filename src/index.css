@@ -2108,6 +2108,41 @@ body {
 @keyframes glitch-effect {
   0% {
     transform: translate(0);
+    text-shadow: 0.05em 0 0 rgba(0, 150, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 100, 255, 0.75);
+  }
+  14% {
+    transform: translate(2px, -2px);
+    text-shadow: 0.05em 0 0 rgba(0, 150, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 100, 255, 0.75);
+  }
+  28% {
+    transform: translate(-2px, 2px);
+    text-shadow: 0.05em 0 0 rgba(0, 180, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 120, 255, 0.85);
+  }
+  42% {
+    transform: translate(2px, -2px);
+  }
+  57% {
+    transform: translate(-2px, -2px);
+  }
+  71% {
+    transform: translate(2px, 2px);
+  }
+  85% {
+    transform: translate(-2px, 2px);
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 0.05em 0 0 rgba(0, 150, 255, 1),
+      -0.05em -0.025em 0 rgba(0, 100, 255, 0.75);
+  }
+}
+
+@keyframes glitch-letter {
+  0% {
+    transform: translate(0);
   }
   14% {
     transform: translate(2px, -2px);
@@ -2130,17 +2165,6 @@ body {
   100% {
     transform: translate(0);
   }
-}
-
-@keyframes glitch-transform {
-  0% { transform: translate(0); }
-  14% { transform: translate(2px, -2px); }
-  28% { transform: translate(-2px, 2px); }
-  42% { transform: translate(2px, -2px); }
-  57% { transform: translate(-2px, -2px); }
-  71% { transform: translate(2px, 2px); }
-  85% { transform: translate(-2px, 2px); }
-  100% { transform: translate(0); }
 }
 
 @keyframes shiny-effect {

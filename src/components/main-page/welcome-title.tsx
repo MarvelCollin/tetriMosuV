@@ -41,9 +41,9 @@ export default function WelcomeTitle({ isExiting = false }) {
                        font-bold tracking-tight text-shadow-glow text-white 
                        ${isExiting ? 'animate-slide-out-bottom' : ''}`}>
             <span className="inline-block animate-float-title-0">2</span>
-            <span className="inline-block animate-float-title-1">5</span>
+            <span className="inline-block animate-float-title-1">7</span>
             <span className="inline-block animate-float-title-2">-</span>
-            <span className="inline-block animate-float-title-0">2</span>
+            <span className="inline-block animate-float-title-0">1</span>
           </h1>
           <p className={`text-[2vw] md:text-[1.5vw] lg:text-[1.2vw] min-[1920px]:text-xl 
                       text-white/70 mt-[1vh] hover:text-white transition-colors animate-pulse 
